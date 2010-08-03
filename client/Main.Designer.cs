@@ -28,24 +28,67 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.connectButton = new System.Windows.Forms.Button();
+            this.hostNameText = new System.Windows.Forms.TextBox();
+            this.chatInputText = new System.Windows.Forms.TextBox();
+            this.chatConvoText = new System.Windows.Forms.TextBox();
+            this.hostPortText = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // label1
+            // connectButton
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Hello World!";
+            this.connectButton.Location = new System.Drawing.Point(205, 12);
+            this.connectButton.Name = "connectButton";
+            this.connectButton.Size = new System.Drawing.Size(75, 23);
+            this.connectButton.TabIndex = 2;
+            this.connectButton.Text = "Connect";
+            this.connectButton.UseVisualStyleBackColor = true;
+            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
+            // 
+            // hostNameText
+            // 
+            this.hostNameText.Location = new System.Drawing.Point(12, 12);
+            this.hostNameText.Name = "hostNameText";
+            this.hostNameText.Size = new System.Drawing.Size(141, 20);
+            this.hostNameText.TabIndex = 3;
+            this.hostNameText.Text = "localhost";
+            // 
+            // chatInputText
+            // 
+            this.chatInputText.Enabled = false;
+            this.chatInputText.Location = new System.Drawing.Point(12, 41);
+            this.chatInputText.Name = "chatInputText";
+            this.chatInputText.Size = new System.Drawing.Size(268, 20);
+            this.chatInputText.TabIndex = 5;
+            this.chatInputText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatInputText_KeyPress);
+            // 
+            // chatConvoText
+            // 
+            this.chatConvoText.Enabled = false;
+            this.chatConvoText.Location = new System.Drawing.Point(12, 67);
+            this.chatConvoText.Multiline = true;
+            this.chatConvoText.Name = "chatConvoText";
+            this.chatConvoText.Size = new System.Drawing.Size(268, 195);
+            this.chatConvoText.TabIndex = 6;
+            // 
+            // hostPortText
+            // 
+            this.hostPortText.Location = new System.Drawing.Point(159, 12);
+            this.hostPortText.Name = "hostPortText";
+            this.hostPortText.Size = new System.Drawing.Size(40, 20);
+            this.hostPortText.TabIndex = 7;
+            this.hostPortText.Text = "9999";
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 266);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(292, 274);
+            this.Controls.Add(this.hostPortText);
+            this.Controls.Add(this.chatConvoText);
+            this.Controls.Add(this.chatInputText);
+            this.Controls.Add(this.hostNameText);
+            this.Controls.Add(this.connectButton);
             this.Name = "Main";
             this.Text = "Repatriator";
             this.ResumeLayout(false);
@@ -55,6 +98,11 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button connectButton;
+        private System.Windows.Forms.TextBox hostNameText;
+        private System.Windows.Forms.TextBox chatInputText;
+        private System.Windows.Forms.TextBox chatConvoText;
+        private System.Windows.Forms.TextBox hostPortText;
+
     }
 }
