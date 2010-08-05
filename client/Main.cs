@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
 
 namespace repatriator_client
 {
@@ -35,10 +36,11 @@ namespace repatriator_client
                     int size = BitConverter.ToInt32(size_buffer, 0);
                     byte[] message_buffer = new byte[size];
                     socket.Receive(message_buffer);
-                    string message = Encoding.UTF8.GetString(message_buffer);
+                    Image image = Image.FromStream(new MemoryStream(message_buffer));
                     this.BeginInvoke(new Action(delegate()
                     {
-                        chatConvoText.AppendText(message + "\n");
+                        pictureBox.Image = image;
+
                     }));
                 }
                 catch (Exception ex)
@@ -81,7 +83,7 @@ namespace repatriator_client
             hostNameText.Enabled = !connected;
             connectButton.Text = connected ? "Disconnect" : "Connect";
             chatInputText.Enabled = connected;
-            chatConvoText.Enabled = connected;
+            pictureBox.Enabled = connected;
         }
 
         private void chatInputText_KeyPress(object sender, KeyPressEventArgs e)
