@@ -39,8 +39,10 @@ namespace repatriator_client
                     Image image = Image.FromStream(new MemoryStream(message_buffer));
                     this.BeginInvoke(new Action(delegate()
                     {
+                        Image oldImage = pictureBox.Image;
                         pictureBox.Image = image;
-
+                        if (oldImage != null)
+                            oldImage.Dispose();
                     }));
                 }
                 catch (Exception ex)
