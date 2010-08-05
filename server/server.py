@@ -1,35 +1,92 @@
 #!/usr/bin/env python3
+
+import struct
 import socket, socketserver
+import queue
 
-from communication import *
+import pythoncom
+import edsdk
 
+camera = None
+
+keep_alive = True
 HOST, PORT = "localhost", 9999
 
-# http://docs.python.org/py3k/library/socket.html#socket-objects
-# http://docs.python.org/py3k/library/socketserver.html
 
-
-def server_main():
+def main():
+    threads = []
+    
     server = socketserver.TCPServer((HOST, PORT), ConnectionHandler)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
+    threads.append(threading.Thread(target=server.serve_forever, name="socket server"))
+    
+    def init_camera():
+        global camera
+        status("getting camera")
+        camera = edsdk.getFirstCamera()
+        status("got camera")
+        camera.setLiveViewCallback(live_view_handler)
+    threads.append(threading.Thread(target=init_camera, name="init camera"))
+    
+    for thread in threads:
+        thread.start()
+    
+    status("pumping messages")
+    pythoncom.PumpMessages()
+    
+    status("shutting down")
+    global keep_alive
+    keep_alive = False
+    
+    server.shutdown() # blocks
+    for thread in threads:
+        thread.join()
 
+def status(message):
+    print(message)
+
+current_connection = None
+current_connection_lock = threading.RLock()
+current_connection_broken = threading.Event()
 class ConnectionHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        connection = self.request
-        connection.settimeout(1.0)
-        while True:
-            try:
-                message_bytes = receive_message(connection)
-                message_str = bytes_to_str(message_bytes)
-                print(message_str)
-                send_message(connection, str_to_bytes(message_str.upper()))
-            except socket.timeout:
-                send_message(connection, str_to_bytes("timeout"))
+        global current_connection
+        with current_connection_lock:
+            if current_connection != None:
+                return
+            current_connection = self.request
+            current_connection_broken.clear()
+        current_connection_broken.wait()
+        with current_connection_lock:
+            current_connection = None
+def use_connection(func):
+    with current_connection_lock:
+        try:
+            func()
+        except socket.error:
+            current_connection_broken.set()
+
+live_view_message_header = b""
+def live_view_handler(image_bytes):
+    def func():
+        if current_connection == None:
+            return
+        send_message(current_connection, live_view_message_header, image_bytes)
+    use_connection(func)
+
+
+size_fmt = "I"
+size_size = struct.calcsize(size_fmt)
+def send_message(connection, *message_bytes_parts):
+    size = sum(len(message_bytes) for message_bytes in message_bytes_parts)
+    size_bytes = struct.pack(size_fmt, size)
+    connection.sendall(size_bytes)
+    for message_bytes in message_bytes_parts:
+        connection.sendall(message_bytes)
+def receive_message(connection):
+    size_bytes = connection.recv(size_size)
+    size = struct.unpack(size_fmt, size_bytes)[0]
+    message_bytes = connection.recv(size)
+    return message_bytes
 
 if __name__ == "__main__":
-    server_main()
-
-
+    main()
