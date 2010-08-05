@@ -4,14 +4,14 @@ import struct
 import socket, socketserver
 import queue
 
+import threading
+import time
 import pythoncom
 import edsdk
 
 camera = None
-
 keep_alive = True
 HOST, PORT = "localhost", 9999
-
 
 def main():
     threads = []
@@ -19,13 +19,49 @@ def main():
     server = socketserver.TCPServer((HOST, PORT), ConnectionHandler)
     threads.append(threading.Thread(target=server.serve_forever, name="socket server"))
     
-    def init_camera():
-        global camera
+    def run_camera():
+        status("co initializing ex")
+        pythoncom.CoInitializeEx(2)
         status("getting camera")
+        global camera
         camera = edsdk.getFirstCamera()
-        status("got camera")
-        camera.setLiveViewCallback(live_view_handler)
-    threads.append(threading.Thread(target=init_camera, name="init camera"))
+        status("got camera. starting live view")
+        camera.startLiveView()
+        pythoncom.PumpWaitingMessages()
+        frame_buffer = camera.liveViewMemoryView()
+
+        while current_connection is None:
+            time.sleep(0.20)
+
+        while keep_alive and current_connection is not None:
+            pythoncom.PumpWaitingMessages()
+
+            def func():
+                if frame_buffer[0] != b'\xff' or frame_buffer[1] != b'\xd8':
+                    status("invalid image data, skipping frame")
+                    return
+
+                buf = bytearray()
+                ff_flag = False
+                for b in frame_buffer:
+                    buf.append(ord(b))
+                    if b == b'\xff':
+                        ff_flag = True
+                    elif b == b'\xd9' and ff_flag:
+                        break
+                    else:
+                        ff_flag = False
+                else:
+                    raise Exception("could not find ff flag")
+
+                send_message(current_connection, buf)
+
+            use_connection(func)
+
+            camera.grabLiveViewFrame()
+            time.sleep(0.20)
+
+    threads.append(threading.Thread(target=run_camera, name="init camera"))
     
     for thread in threads:
         thread.start()
@@ -64,15 +100,6 @@ def use_connection(func):
             func()
         except socket.error:
             current_connection_broken.set()
-
-live_view_message_header = b""
-def live_view_handler(image_bytes):
-    def func():
-        if current_connection == None:
-            return
-        send_message(current_connection, live_view_message_header, image_bytes)
-    use_connection(func)
-
 
 size_fmt = "I"
 size_size = struct.calcsize(size_fmt)
