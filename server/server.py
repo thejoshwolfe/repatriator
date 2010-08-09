@@ -11,7 +11,15 @@ import edsdk
 
 camera = None
 keep_alive = True
-from config import HOST, PORT
+try:
+    from config import HOST, PORT
+except ImportError:
+    HOST = "localhost"
+    PORT = 9999
+    import os
+    f = open(os.path.join(os.path.split(__file__)[0], "config.py"), "w")
+    f.write("HOST = {0}\nPORT = {1}\n".format(HOST, PORT))
+    f.close()
 
 class MsgToClient:
     FullUpdate = 0
@@ -129,12 +137,13 @@ def use_connection(func):
 
 size_fmt = "I"
 size_size = struct.calcsize(size_fmt)
-def send_message(connection, *message_bytes_parts):
-    size = sum(len(message_bytes) for message_bytes in message_bytes_parts)
+def send_message(connection, message_bytes):
+    size = len(message_bytes)
     size_bytes = struct.pack(size_fmt, size)
+    print(str(size) + ": " + " ".join(str(b) for b in (size_bytes + message_bytes[:4])) + " ... " + \
+        " ".join(str(b) for b in message_bytes[-4:]))
     connection.sendall(size_bytes)
-    for message_bytes in message_bytes_parts:
-        connection.sendall(message_bytes)
+    connection.sendall(message_bytes)
 def receive_message(connection):
     size_bytes = connection.recv(size_size)
     size = struct.unpack(size_fmt, size_bytes)[0]
