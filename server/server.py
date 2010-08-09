@@ -13,6 +13,12 @@ camera = None
 keep_alive = True
 HOST, PORT = "localhost", 9999
 
+class MsgToClient:
+    FullUpdate = 0
+
+class MsgToServer:
+    TakePicture = 0
+
 def main():
     threads = []
     
@@ -20,12 +26,12 @@ def main():
     threads.append(threading.Thread(target=server.serve_forever, name="socket server"))
     
     def run_camera():
-        status("co initializing ex")
+        print("co initializing ex")
         pythoncom.CoInitializeEx(2)
-        status("getting camera")
+        print("getting camera")
         global camera
         camera = edsdk.getFirstCamera()
-        status("got camera. starting live view")
+        print("got camera. starting live view")
         camera.startLiveView()
         pythoncom.PumpWaitingMessages()
         frame_buffer = camera.liveViewMemoryView()
@@ -38,10 +44,11 @@ def main():
 
             def func():
                 if frame_buffer[0] != b'\xff' or frame_buffer[1] != b'\xd8':
-                    status("invalid image data, skipping frame")
+                    print("invalid image data, skipping frame")
                     return
 
                 buf = bytearray()
+                buf.append(0)
                 ff_flag = False
                 for b in frame_buffer:
                     buf.append(ord(b))
@@ -61,24 +68,44 @@ def main():
             camera.grabLiveViewFrame()
             time.sleep(0.20)
 
+    def handle_message(data):
+        assert len(data) >= 1
+
+        if data[0] == MsgToServer.TakePicture:
+            print("Taking picture...")
+        else:
+            raise Exception("bad header from client")
+    
+    def run_check_messages():
+        while current_connection is None:
+            time.sleep(0.20)
+
+        while keep_alive and current_connection is not None:
+            pythoncom.PumpWaitingMessages()
+
+            def func():
+                data = receive_message(current_connection)
+                if len(data) > 0:
+                    handle_message(data)
+
+            use_connection(func)
+
     threads.append(threading.Thread(target=run_camera, name="init camera"))
+    threads.append(threading.Thread(target=run_check_messages, name="check messages"))
     
     for thread in threads:
         thread.start()
     
-    status("pumping messages")
+    print("pumping messages")
     pythoncom.PumpMessages()
     
-    status("shutting down")
+    print("shutting down")
     global keep_alive
     keep_alive = False
     
     server.shutdown() # blocks
     for thread in threads:
         thread.join()
-
-def status(message):
-    print(message)
 
 current_connection = None
 current_connection_lock = threading.RLock()
@@ -95,11 +122,10 @@ class ConnectionHandler(socketserver.BaseRequestHandler):
         with current_connection_lock:
             current_connection = None
 def use_connection(func):
-    with current_connection_lock:
-        try:
-            func()
-        except socket.error:
-            current_connection_broken.set()
+    try:
+        func()
+    except socket.error:
+        current_connection_broken.set()
 
 size_fmt = "I"
 size_size = struct.calcsize(size_fmt)
