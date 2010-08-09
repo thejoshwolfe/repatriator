@@ -27,15 +27,15 @@ namespace repatriator_client
                 try
                 {
                     byte[] message_buffer = receiveMessage(socket);
-                    Message message = Message.decode(message_buffer);
+                    MessageToClient message = MessageToClient.decode(message_buffer);
                     switch (message.messageType)
                     {
-                        case MessageTypeToClient.fullUpdate:
-                            Image image = ((FullUpdateMessage)message).image;
+                        case MessageToClientType.fullUpdate:
+                            FullUpdateMessage fullUpdateMessage = ((FullUpdateMessage)message);
                             BeginInvoke(new Action(delegate()
                             {
                                 Image oldImage = pictureBox.Image;
-                                pictureBox.Image = image;
+                                pictureBox.Image = fullUpdateMessage.image;
                                 if (oldImage != null)
                                     oldImage.Dispose();
                             }));
@@ -81,8 +81,22 @@ namespace repatriator_client
             bool connected = socket != null;
             hostNameText.Enabled = !connected;
             connectButton.Text = connected ? "Disconnect" : "Connect";
+            takePictureButton.Enabled = connected;
             pictureBox.Enabled = connected;
         }
+        private void takePictureButton_Click(object sender, EventArgs e)
+        {
+            byte[] message_buffer = { (byte)MessageToServerType.takePicture };
+            sendMessage(socket, message_buffer);
+        }
+
+        private void sendMessage(Socket socket, byte[] message_buffer)
+        {
+            byte[] size_buffer = BitConverter.GetBytes(message_buffer.Length);
+            socket.Send(size_buffer);
+            socket.Send(message_buffer);
+        }
+
         private static byte[] receiveMessage(Socket socket)
         {
             byte[] size_buffer = BitConverter.GetBytes(0);
@@ -94,23 +108,23 @@ namespace repatriator_client
         }
     }
 
-    public abstract class Message
+    public abstract class MessageToClient
     {
-        public abstract MessageTypeToClient messageType { get; }
-        public static Message decode(byte[] message_buffer)
+        public abstract MessageToClientType messageType { get; }
+        public static MessageToClient decode(byte[] message_buffer)
         {
-            switch ((MessageTypeToClient)message_buffer[0])
+            switch ((MessageToClientType)message_buffer[0])
             {
-                case MessageTypeToClient.fullUpdate:
+                case MessageToClientType.fullUpdate:
                     Image image = Image.FromStream(new MemoryStream(message_buffer, 1, message_buffer.Length - 1));
                     return new FullUpdateMessage(image);
             }
             throw null;
         }
     }
-    public class FullUpdateMessage : Message
+    public class FullUpdateMessage : MessageToClient
     {
-        public override MessageTypeToClient messageType { get { return MessageTypeToClient.fullUpdate; } }
+        public override MessageToClientType messageType { get { return MessageToClientType.fullUpdate; } }
 
         public readonly Image image;
         public FullUpdateMessage(Image image)
@@ -119,11 +133,11 @@ namespace repatriator_client
         }
     }
 
-    public enum MessageTypeToServer : byte
+    public enum MessageToServerType : byte
     {
         takePicture = 0,
     }
-    public enum MessageTypeToClient : byte
+    public enum MessageToClientType : byte
     {
         fullUpdate = 0,
     }

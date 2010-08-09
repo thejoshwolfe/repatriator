@@ -32,14 +32,15 @@
             this.hostNameText = new System.Windows.Forms.TextBox();
             this.hostPortText = new System.Windows.Forms.TextBox();
             this.pictureBox = new System.Windows.Forms.PictureBox();
+            this.takePictureButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(205, 12);
+            this.connectButton.Location = new System.Drawing.Point(204, 12);
             this.connectButton.Name = "connectButton";
-            this.connectButton.Size = new System.Drawing.Size(75, 23);
+            this.connectButton.Size = new System.Drawing.Size(76, 23);
             this.connectButton.TabIndex = 2;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
@@ -49,13 +50,13 @@
             // 
             this.hostNameText.Location = new System.Drawing.Point(12, 12);
             this.hostNameText.Name = "hostNameText";
-            this.hostNameText.Size = new System.Drawing.Size(141, 20);
+            this.hostNameText.Size = new System.Drawing.Size(140, 20);
             this.hostNameText.TabIndex = 3;
             this.hostNameText.Text = "localhost";
             // 
             // hostPortText
             // 
-            this.hostPortText.Location = new System.Drawing.Point(159, 12);
+            this.hostPortText.Location = new System.Drawing.Point(158, 12);
             this.hostPortText.Name = "hostPortText";
             this.hostPortText.Size = new System.Drawing.Size(40, 20);
             this.hostPortText.TabIndex = 7;
@@ -63,17 +64,28 @@
             // 
             // pictureBox
             // 
-            this.pictureBox.Location = new System.Drawing.Point(12, 67);
+            this.pictureBox.Location = new System.Drawing.Point(12, 70);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(268, 195);
+            this.pictureBox.Size = new System.Drawing.Size(268, 192);
             this.pictureBox.TabIndex = 8;
             this.pictureBox.TabStop = false;
+            // 
+            // takePictureButton
+            // 
+            this.takePictureButton.Location = new System.Drawing.Point(204, 41);
+            this.takePictureButton.Name = "takePictureButton";
+            this.takePictureButton.Size = new System.Drawing.Size(76, 23);
+            this.takePictureButton.TabIndex = 9;
+            this.takePictureButton.Text = "Take Picture";
+            this.takePictureButton.UseVisualStyleBackColor = true;
+            this.takePictureButton.Click += new System.EventHandler(this.takePictureButton_Click);
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 274);
+            this.Controls.Add(this.takePictureButton);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.hostPortText);
             this.Controls.Add(this.hostNameText);
@@ -92,6 +104,7 @@
         private System.Windows.Forms.TextBox hostNameText;
         private System.Windows.Forms.TextBox hostPortText;
         private System.Windows.Forms.PictureBox pictureBox;
+        private System.Windows.Forms.Button takePictureButton;
 
     }
 }
