@@ -11,7 +11,7 @@ import edsdk
 
 camera = None
 keep_alive = True
-HOST, PORT = "localhost", 9999
+from config import HOST, PORT
 
 class MsgToClient:
     FullUpdate = 0
