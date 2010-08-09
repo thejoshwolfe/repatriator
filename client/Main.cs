@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Net.Sockets;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Threading;
 using System.IO;
@@ -31,19 +26,21 @@ namespace repatriator_client
             {
                 try
                 {
-                    byte[] size_buffer = BitConverter.GetBytes(0);
-                    socket.Receive(size_buffer);
-                    int size = BitConverter.ToInt32(size_buffer, 0);
-                    byte[] message_buffer = new byte[size];
-                    socket.Receive(message_buffer);
-                    Image image = Image.FromStream(new MemoryStream(message_buffer));
-                    this.BeginInvoke(new Action(delegate()
+                    byte[] message_buffer = receiveMessage(socket);
+                    Message message = Message.decode(message_buffer);
+                    switch (message.messageType)
                     {
-                        Image oldImage = pictureBox.Image;
-                        pictureBox.Image = image;
-                        if (oldImage != null)
-                            oldImage.Dispose();
-                    }));
+                        case MessageTypeToClient.fullUpdate:
+                            Image image = ((FullUpdateMessage)message).image;
+                            BeginInvoke(new Action(delegate()
+                            {
+                                Image oldImage = pictureBox.Image;
+                                pictureBox.Image = image;
+                                if (oldImage != null)
+                                    oldImage.Dispose();
+                            }));
+                            break;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -84,23 +81,50 @@ namespace repatriator_client
             bool connected = socket != null;
             hostNameText.Enabled = !connected;
             connectButton.Text = connected ? "Disconnect" : "Connect";
-            chatInputText.Enabled = connected;
             pictureBox.Enabled = connected;
         }
-
-        private void chatInputText_KeyPress(object sender, KeyPressEventArgs e)
+        private static byte[] receiveMessage(Socket socket)
         {
-            if (e.KeyChar == '\r')
-            {
-                string sendMessage = chatInputText.Text;
-                chatInputText.Text = "";
-
-                byte[] message_bytes = Encoding.UTF8.GetBytes(sendMessage);
-                int length = message_bytes.Length;
-                byte[] length_bytes = BitConverter.GetBytes(length);
-                socket.Send(length_bytes);
-                socket.Send(message_bytes);
-            }
+            byte[] size_buffer = BitConverter.GetBytes(0);
+            socket.Receive(size_buffer);
+            int size = BitConverter.ToInt32(size_buffer, 0);
+            byte[] message_buffer = new byte[size];
+            socket.Receive(message_buffer);
+            return message_buffer;
         }
+    }
+
+    public abstract class Message
+    {
+        public abstract MessageTypeToClient messageType { get; }
+        public static Message decode(byte[] message_buffer)
+        {
+            switch ((MessageTypeToClient)message_buffer[0])
+            {
+                case MessageTypeToClient.fullUpdate:
+                    Image image = Image.FromStream(new MemoryStream(message_buffer, 1, message_buffer.Length - 1));
+                    return new FullUpdateMessage(image);
+            }
+            throw null;
+        }
+    }
+    public class FullUpdateMessage : Message
+    {
+        public override MessageTypeToClient messageType { get { return MessageTypeToClient.fullUpdate; } }
+
+        public readonly Image image;
+        public FullUpdateMessage(Image image)
+        {
+            this.image = image;
+        }
+    }
+
+    public enum MessageTypeToServer : byte
+    {
+        takePicture = 0,
+    }
+    public enum MessageTypeToClient : byte
+    {
+        fullUpdate = 0,
     }
 }

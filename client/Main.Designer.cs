@@ -30,7 +30,6 @@
         {
             this.connectButton = new System.Windows.Forms.Button();
             this.hostNameText = new System.Windows.Forms.TextBox();
-            this.chatInputText = new System.Windows.Forms.TextBox();
             this.hostPortText = new System.Windows.Forms.TextBox();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -53,15 +52,6 @@
             this.hostNameText.Size = new System.Drawing.Size(141, 20);
             this.hostNameText.TabIndex = 3;
             this.hostNameText.Text = "localhost";
-            // 
-            // chatInputText
-            // 
-            this.chatInputText.Enabled = false;
-            this.chatInputText.Location = new System.Drawing.Point(12, 41);
-            this.chatInputText.Name = "chatInputText";
-            this.chatInputText.Size = new System.Drawing.Size(268, 20);
-            this.chatInputText.TabIndex = 5;
-            this.chatInputText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatInputText_KeyPress);
             // 
             // hostPortText
             // 
@@ -86,7 +76,6 @@
             this.ClientSize = new System.Drawing.Size(292, 274);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.hostPortText);
-            this.Controls.Add(this.chatInputText);
             this.Controls.Add(this.hostNameText);
             this.Controls.Add(this.connectButton);
             this.Name = "Main";
@@ -101,7 +90,6 @@
 
         private System.Windows.Forms.Button connectButton;
         private System.Windows.Forms.TextBox hostNameText;
-        private System.Windows.Forms.TextBox chatInputText;
         private System.Windows.Forms.TextBox hostPortText;
         private System.Windows.Forms.PictureBox pictureBox;
 
