@@ -18,7 +18,7 @@ except ImportError:
     PORT = 9999
     import os
     f = open(os.path.join(os.path.split(__file__)[0], "config.py"), "w")
-    f.write("HOST = {0}\nPORT = {1}\n".format(HOST, PORT))
+    f.write("HOST = {0}\nPORT = {1}\n".format(repr(HOST), repr(PORT)))
     f.close()
 
 class MsgToClient:
