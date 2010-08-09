@@ -140,8 +140,6 @@ size_size = struct.calcsize(size_fmt)
 def send_message(connection, message_bytes):
     size = len(message_bytes)
     size_bytes = struct.pack(size_fmt, size)
-    print(str(size) + ": " + " ".join(str(b) for b in (size_bytes + message_bytes[:4])) + " ... " + \
-        " ".join(str(b) for b in message_bytes[-4:]))
     connection.sendall(size_bytes)
     connection.sendall(message_bytes)
 def receive_message(connection):
