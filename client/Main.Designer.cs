@@ -33,6 +33,8 @@
             this.hostPortText = new System.Windows.Forms.TextBox();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.butterflyControl1 = new repatriator_client.ButterflyControl();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -80,11 +82,21 @@
             this.takePictureButton.UseVisualStyleBackColor = true;
             this.takePictureButton.Click += new System.EventHandler(this.takePictureButton_Click);
             // 
+            // elementHost1
+            // 
+            this.elementHost1.Location = new System.Drawing.Point(286, 12);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(220, 250);
+            this.elementHost1.TabIndex = 10;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = this.butterflyControl1;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 274);
+            this.ClientSize = new System.Drawing.Size(518, 276);
+            this.Controls.Add(this.elementHost1);
             this.Controls.Add(this.takePictureButton);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.hostPortText);
@@ -105,6 +117,8 @@
         private System.Windows.Forms.TextBox hostPortText;
         private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.Button takePictureButton;
+        private System.Windows.Forms.Integration.ElementHost elementHost1;
+        private ButterflyControl butterflyControl1;
 
     }
 }
