@@ -14,6 +14,8 @@ namespace repatriator_client
         public ButterflyControl()
         {
             InitializeComponent();
+
+            refreshTransforms();
         }
 
         private bool dragging = false;
@@ -33,11 +35,17 @@ namespace repatriator_client
                 return;
             Point currentMoustLocation = e.GetPosition(this);
             Vector delta = currentMoustLocation - lastMouseLocation;
-            angleY += delta.X * 0.003;
-            angleX += delta.Y * 0.003;
+            angleY += delta.X * 1;
+            angleX += delta.Y * 1;
             lastMouseLocation = currentMoustLocation;
 
-            // refresh something
+            refreshTransforms();
+        }
+
+        private void refreshTransforms()
+        {
+            innerRotation.Angle = angleX;
+            outterRotation.Angle = angleY;
         }
     }
 }
