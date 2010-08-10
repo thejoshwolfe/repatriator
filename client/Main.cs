@@ -24,27 +24,20 @@ namespace repatriator_client
         {
             while (socket != null)
             {
-                try
+                byte[] message_buffer = receiveMessage(socket);
+                MessageToClient message = MessageToClient.decode(message_buffer);
+                switch (message.messageType)
                 {
-                    byte[] message_buffer = receiveMessage(socket);
-                    MessageToClient message = MessageToClient.decode(message_buffer);
-                    switch (message.messageType)
-                    {
-                        case MessageToClientType.fullUpdate:
-                            FullUpdateMessage fullUpdateMessage = ((FullUpdateMessage)message);
-                            BeginInvoke(new Action(delegate()
-                            {
-                                Image oldImage = pictureBox.Image;
-                                pictureBox.Image = fullUpdateMessage.image;
-                                if (oldImage != null)
-                                    oldImage.Dispose();
-                            }));
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
+                    case MessageToClientType.fullUpdate:
+                        FullUpdateMessage fullUpdateMessage = ((FullUpdateMessage)message);
+                        BeginInvoke(new Action(delegate()
+                        {
+                            Image oldImage = pictureBox.Image;
+                            pictureBox.Image = fullUpdateMessage.image;
+                            if (oldImage != null)
+                                oldImage.Dispose();
+                        }));
+                        break;
                 }
             }
         }
@@ -99,12 +92,22 @@ namespace repatriator_client
 
         private static byte[] receiveMessage(Socket socket)
         {
-            byte[] size_buffer = BitConverter.GetBytes(0);
-            socket.Receive(size_buffer);
+            byte[] size_buffer = new byte[4];
+            receiveFullMessage(socket, size_buffer);
             int size = BitConverter.ToInt32(size_buffer, 0);
             byte[] message_buffer = new byte[size];
-            socket.Receive(message_buffer);
+            receiveFullMessage(socket, message_buffer);
             return message_buffer;
+        }
+
+        private static void receiveFullMessage(Socket socket, byte[] buffer)
+        {
+            int bytesReceived = 0;
+            int bytesToReceive = buffer.Length;
+            while (bytesReceived < bytesToReceive)
+            {
+                bytesReceived += socket.Receive(buffer, bytesReceived, bytesToReceive - bytesReceived, SocketFlags.None);
+            }
         }
     }
 
