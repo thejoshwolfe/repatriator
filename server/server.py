@@ -85,17 +85,17 @@ def main():
             raise Exception("bad header from client")
     
     def run_check_messages():
-        while current_connection is None:
-            time.sleep(0.20)
+        while keep_alive:
+            if current_connection is None:
+                time.sleep(0.20)
+                continue
 
-        while keep_alive and current_connection is not None:
             pythoncom.PumpWaitingMessages()
 
             def func():
                 data = receive_message(current_connection)
                 if len(data) > 0:
                     handle_message(data)
-
             use_connection(func)
 
     threads.append(threading.Thread(target=run_camera, name="init camera"))
