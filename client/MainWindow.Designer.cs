@@ -28,14 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.Label label1;
+            System.Windows.Forms.Label label2;
+            System.Windows.Forms.Label label3;
             this.connectButton = new System.Windows.Forms.Button();
-            this.hostNameText = new System.Windows.Forms.TextBox();
-            this.hostPortText = new System.Windows.Forms.TextBox();
+            this.serverText = new System.Windows.Forms.TextBox();
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
             this.downlaodAllButton = new System.Windows.Forms.Button();
             this.liftSliderZ = new System.Windows.Forms.Panel();
             this.lifeSliderZ = new System.Windows.Forms.TrackBar();
@@ -46,6 +47,12 @@
             this.miniMapSliderX = new System.Windows.Forms.TrackBar();
             this.miniMapSliderY = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.setupPanel = new System.Windows.Forms.Panel();
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.userNameText = new System.Windows.Forms.TextBox();
+            label1 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -57,32 +64,53 @@
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderY)).BeginInit();
             this.panel3.SuspendLayout();
+            this.setupPanel.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(404, 30);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(35, 13);
+            label1.TabIndex = 0;
+            label1.Text = "label1";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(40, 79);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(39, 13);
+            label2.TabIndex = 9;
+            label2.Text = "server:";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(20, 105);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(59, 13);
+            label3.TabIndex = 10;
+            label3.Text = "user name:";
             // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(204, 14);
+            this.connectButton.Location = new System.Drawing.Point(149, 128);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(76, 23);
             this.connectButton.TabIndex = 2;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
+            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
             // 
-            // hostNameText
+            // serverText
             // 
-            this.hostNameText.Location = new System.Drawing.Point(12, 14);
-            this.hostNameText.Name = "hostNameText";
-            this.hostNameText.Size = new System.Drawing.Size(140, 20);
-            this.hostNameText.TabIndex = 3;
-            this.hostNameText.Text = "localhost";
-            // 
-            // hostPortText
-            // 
-            this.hostPortText.Location = new System.Drawing.Point(158, 14);
-            this.hostPortText.Name = "hostPortText";
-            this.hostPortText.Size = new System.Drawing.Size(40, 20);
-            this.hostPortText.TabIndex = 7;
-            this.hostPortText.Text = "9999";
+            this.serverText.Location = new System.Drawing.Point(85, 76);
+            this.serverText.Name = "serverText";
+            this.serverText.Size = new System.Drawing.Size(140, 20);
+            this.serverText.TabIndex = 3;
+            this.serverText.Text = "localhost:9999";
             // 
             // liveViewPictureBox
             // 
@@ -117,24 +145,12 @@
             // 
             this.panel2.AutoScroll = true;
             this.panel2.BackColor = System.Drawing.Color.Maroon;
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Controls.Add(this.hostNameText);
-            this.panel2.Controls.Add(this.connectButton);
-            this.panel2.Controls.Add(this.hostPortText);
+            this.panel2.Controls.Add(label1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(427, 100);
             this.panel2.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(404, 30);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
             // 
             // downlaodAllButton
             // 
@@ -229,6 +245,7 @@
             // 
             // panel3
             // 
+            this.panel3.Controls.Add(this.setupPanel);
             this.panel3.Controls.Add(this.liveViewPictureBox);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(0, 0);
@@ -236,7 +253,38 @@
             this.panel3.Size = new System.Drawing.Size(427, 363);
             this.panel3.TabIndex = 12;
             // 
-            // Main
+            // setupPanel
+            // 
+            this.setupPanel.Controls.Add(this.statusLabel);
+            this.setupPanel.Controls.Add(label3);
+            this.setupPanel.Controls.Add(label2);
+            this.setupPanel.Controls.Add(this.userNameText);
+            this.setupPanel.Controls.Add(this.serverText);
+            this.setupPanel.Controls.Add(this.connectButton);
+            this.setupPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.setupPanel.Location = new System.Drawing.Point(0, 0);
+            this.setupPanel.Name = "setupPanel";
+            this.setupPanel.Size = new System.Drawing.Size(427, 363);
+            this.setupPanel.TabIndex = 9;
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Location = new System.Drawing.Point(19, 182);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(60, 13);
+            this.statusLabel.TabIndex = 11;
+            this.statusLabel.Text = "status label";
+            // 
+            // userNameText
+            // 
+            this.userNameText.Location = new System.Drawing.Point(85, 102);
+            this.userNameText.Name = "userNameText";
+            this.userNameText.Size = new System.Drawing.Size(140, 20);
+            this.userNameText.TabIndex = 8;
+            this.userNameText.Text = "quentin";
+            // 
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -244,7 +292,7 @@
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.liftSliderZ);
             this.Controls.Add(this.panel1);
-            this.Name = "Main";
+            this.Name = "MainWindow";
             this.Text = "Repatriator";
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
             this.panel1.ResumeLayout(false);
@@ -259,6 +307,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderY)).EndInit();
             this.panel3.ResumeLayout(false);
+            this.setupPanel.ResumeLayout(false);
+            this.setupPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -266,14 +316,12 @@
         #endregion
 
         private System.Windows.Forms.Button connectButton;
-        private System.Windows.Forms.TextBox hostNameText;
-        private System.Windows.Forms.TextBox hostPortText;
+        private System.Windows.Forms.TextBox serverText;
         private System.Windows.Forms.PictureBox liveViewPictureBox;
         private System.Windows.Forms.Button takePictureButton;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button downlaodAllButton;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel liftSliderZ;
         private System.Windows.Forms.TrackBar miniMapSliderY;
         private System.Windows.Forms.TrackBar miniMapSliderX;
@@ -283,6 +331,9 @@
         private System.Windows.Forms.PictureBox miniMapPictureBox;
         private System.Windows.Forms.TrackBar lifeSliderZ;
         private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel setupPanel;
+        private System.Windows.Forms.TextBox userNameText;
+        private System.Windows.Forms.Label statusLabel;
 
     }
 }

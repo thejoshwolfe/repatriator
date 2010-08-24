@@ -13,11 +13,12 @@ namespace repatriator_client
         private static readonly byte[] magicClientWord = { 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 };
         private static readonly byte[] magicServerWord = { 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 };
         private const byte status_loginSuccess = 0xa3;
-        private event Action connectionFailure;
-        private event Action connectionSuccess;
-        private event Action hostIsBogus;
-        private event Action loginFailure;
-        private event Action loginSuccess;
+
+        public event Action connectionFailure;
+        public event Action connectionSuccess;
+        public event Action hostIsBogus;
+        public event Action loginFailure;
+        public event Action loginSuccess;
 
         private string serverHostName;
         private int serverPortNumber;
@@ -27,16 +28,25 @@ namespace repatriator_client
         private Thread establishConnectionThread;
         private Thread receiveThread;
 
-        public ConnectionManager(string serverHostName, int serverPortNumber, string userName)
+        private ConnectionManager()
         {
-            this.serverHostName = serverHostName;
-            this.serverPortNumber = serverPortNumber;
-            this.userName = userName;
         }
 
         public bool hasValidSettings()
         {
-            return serverPortNumber != -1;
+            if (!(1 <= serverPortNumber && serverPortNumber <= 65535))
+                return false;
+            if (serverHostName.Length == 0)
+                return false;
+            if (userName.Length == 0)
+                return false;
+            return true;
+        }
+        public void setEverything(string serverHostName, int serverPortNumber, string userName)
+        {
+            this.serverHostName = serverHostName;
+            this.serverPortNumber = serverPortNumber;
+            this.userName = userName;
         }
 
         private void receive_run()
@@ -86,6 +96,8 @@ namespace repatriator_client
 
         public void start()
         {
+            if (!hasValidSettings())
+                throw new InvalidOperationException();
             establishConnectionThread = new Thread(establishConnection_run);
             establishConnectionThread.IsBackground = true;
             establishConnectionThread.Start();
@@ -141,7 +153,9 @@ namespace repatriator_client
                 // TODO: read the settings file
             }
 
-            return new ConnectionManager(serverHostName, serverPortNumer, userName);
+            ConnectionManager connectionManager = new ConnectionManager();
+            connectionManager.setEverything(serverHostName, serverPortNumer, userName);
+            return connectionManager;
         }
     }
 }
