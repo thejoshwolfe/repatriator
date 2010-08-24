@@ -16,8 +16,7 @@ namespace repatriator_client
         public Main()
         {
             InitializeComponent();
-            receiveThread = new Thread(receive_run);
-            receiveThread.IsBackground = true;
+            liveViewPictureBox.Image = Image.FromFile("mnwla.jpg");
         }
 
         private void receive_run()
@@ -32,8 +31,8 @@ namespace repatriator_client
                         FullUpdateMessage fullUpdateMessage = ((FullUpdateMessage)message);
                         BeginInvoke(new Action(delegate()
                         {
-                            Image oldImage = pictureBox.Image;
-                            pictureBox.Image = fullUpdateMessage.image;
+                            Image oldImage = liveViewPictureBox.Image;
+                            liveViewPictureBox.Image = fullUpdateMessage.image;
                             if (oldImage != null)
                                 oldImage.Dispose();
                         }));
@@ -59,6 +58,8 @@ namespace repatriator_client
                     socket = null;
                     return;
                 }
+                receiveThread = new Thread(receive_run);
+                receiveThread.IsBackground = true;
                 receiveThread.Start();
             }
             else
@@ -75,7 +76,7 @@ namespace repatriator_client
             hostNameText.Enabled = !connected;
             connectButton.Text = connected ? "Disconnect" : "Connect";
             takePictureButton.Enabled = connected;
-            pictureBox.Enabled = connected;
+            liveViewPictureBox.Enabled = connected;
         }
         private void takePictureButton_Click(object sender, EventArgs e)
         {
