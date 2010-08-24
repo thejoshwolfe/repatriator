@@ -1,0 +1,175 @@
+Configuration:
+
+    config.py file in the same folder as server.py:
+
+    # address to bind the server to
+    HOST = '127.0.0.1'
+    # port to bind the server to
+    PORT = 9999
+
+    Try omitting this file first, and then use it if you need to.
+    
+How to communicate with the server:
+    
+    1.  Connect.
+    
+    2.  Send a ConnectionRequest with valid login information. If you want to
+        operate the repatriator hardware, make sure you say so in this message.
+    
+    3.  Get back a ConnectionResult. If the status is ConnectionResult.Success,
+        check the permissions you are granted. If they include
+        Privilege.OperateHardware and you requested use of the hardware, the
+        server will turn on the power strip, activate the camera, all the
+        motors, and any attached lights.
+
+        This setup takes some time, so it will be a few seconds before you see
+        live view frames. It should theoretically be a constant amount of time,
+        so you should be able to set up a progress bar based on time.
+
+    4.  If you have privileges and requested hardware usage, the server will
+        begin sending you FullUpdate messages with live view and current
+        hardware position.
+
+        At any time you may send TakePicture, DirectoryListingRequest, and
+        FileDownloadRequest messages. When you TakePicture, the FullUpdate 
+        frames will stop until the picture taking is complete. The picture
+        will be saved and you can get it via DirectoryListingRequest and
+        FileDownloadRequest.
+
+        If you have privileges for admin, you may begin sending admin messages
+        at this point. No messages are sent back regardless of whether the
+        action was sucessful or not.
+
+    6.  Disconnect when done. The server will move the motors back to the zero
+        position and then turn off the power strip, killing power to the camera,
+        motors, and lights.
+
+        However, you can close the client after disconnecting and not worry
+        about this.
+        
+Messages:
+    
+    From the server to the client:
+        
+        ConnectionResult
+            int8 - identifies this message as a ConnectionRequest
+            int64 - byte count of the entire message including this field
+            [ 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 ] - magic incantation
+            int8 - major version number of server
+            int8 - minor version number of server
+            int8 - revision version number of server
+            int8 - reserved
+            int32 - connection status
+            int32 - number of permissions granted
+            for each permission granted:
+                int32 permission enum value 
+
+        FullUpdate - contains a live view frame and all motor positions
+            int8 - identifies this message as a Frame
+            int64 - byte count of the entire message including this field
+            int64 - position of motor A
+            int64 - position of motor B
+            int64 - position of motor X
+            int64 - position of motor Y
+            int64 - position of motor Z
+            int64 - byte count for following JPEG image
+            <jpeg format image>
+
+        DirectoryListingResult
+            int8 - identifies this message as a DirectoryListingResult
+            int64 - byte count of the entire message including this field
+            int32 - number of files returned
+            for each file returned:
+                int32 - length of utf8 string filename (starts with '/' and uses '/' for path separator)
+                <utf8 string filename>
+
+        FileDownloadResult
+            int8 - identifies this message as a DirectoryListingResult
+            int64 - byte count of the entire message including this field
+            int64 - byte count of the following file
+            <file binary data as requested by FileDownloadRequest>
+
+    From the client to the server:
+
+        ConnectionRequest - used to initialize a session with the repatriator
+            [ 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 ] - magic incantation
+            int64 - byte count of the entire message including this field
+            int8 - major version number of client
+            int8 - minor version number of client
+            int8 - revision version number of client
+            int8 - reserved
+            int32 - length of utf8 username string below
+            <utf8 username string>
+            int32 - length of utf8 password string below
+            <utf8 password string>
+            int8 - boolean - do you want the hardware to turn on? False if you're only doing admin.
+
+        TakePicture - tells the server to take a picture
+            int8 - identifies this message as a TakePicture
+            int64 - byte count of the entire message including this field
+
+        MotorMovement - tells the server to move the motors
+            int8 - identifies this message as a MotorMovement
+            int64 - byte count of the entire message including this field
+            int64 - position of motor A
+            int64 - position of motor B
+            int64 - position of motor X
+            int64 - position of motor Y
+            int64 - position of motor Z
+
+        DirectoryListingRequest - returns all the files a user can download
+            int8 - identifies this message as a DirectoryListingRequest
+            int64 - byte count of the entire message including this field
+
+        FileDownloadRequest - requests download of a particular file
+            int8 - identifies this message as a FileDownloadRequest
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 string filename
+            <utf8 string filename requested>
+
+        AddUser - creates a new user in the system
+            int8 - identifies this message as an AddUser
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 username below
+            <username - utf8 string>
+            int32 - length of utf8 password below
+            <password - utf8 string>
+            int32 - number of permissions granted
+            for each permission granted:
+                int32 permission enum value 
+            
+        UpdateUser - updates a user in the system with new info
+            int8 - identifies this message as an UpdateUser
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 username below
+            <username - utf8 string>
+            int32 - length of utf8 password below. if 0, don't change password.
+            <password - utf8 string>
+            int32 - number of permissions granted
+            [int32 permission enum value for permission in permissions granted]
+
+        DeleteUser - deletes a user from the system
+            int8 - identifies this message as a DeleteUser
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 username below
+            <username - utf8 string>
+
+How the server handles authentication:
+    
+    Auth data is represented as a dictionary:
+        
+        {
+            'username': {
+                'salt': '32 character random character string',
+                'password_hash': sha256(salt + password),
+                'privileges': set([one or more values from the privilege enum]),
+            },
+            ...
+        }
+
+    When it changes, it is converted to json and dumped to auth.json. This file
+    is parsed upon server load. There is a default admin account:
+
+        user: default_admin
+        pass: temp1234
+

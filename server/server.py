@@ -1,36 +1,32 @@
 #!/usr/bin/env python3
 
+from power import set_power_switch
+from settings import settings
+
 import struct
 import socket, socketserver
 import queue
-
+import os
 import threading
 import time
 import pythoncom
 import edsdk
 
+def get_active_camera():
+    global camera
+    # release camera
+    if camera is not None:
+        camera.
 camera = None
 keep_alive = True
-try:
-    from config import HOST, PORT
-except ImportError:
-    HOST = "localhost"
-    PORT = 9999
-    import os
-    f = open(os.path.join(os.path.split(__file__)[0], "config.py"), "w")
-    f.write("HOST = {0}\nPORT = {1}\n".format(repr(HOST), repr(PORT)))
-    f.close()
 
-class MsgToClient:
-    FullUpdate = 0
-
-class MsgToServer:
-    TakePicture = 0
 
 def main():
+    import_settings()
+
     threads = []
     
-    server = socketserver.TCPServer((HOST, PORT), ConnectionHandler)
+    server = socketserver.TCPServer((settings['HOST'], settings['PORT']), ConnectionHandler)
     threads.append(threading.Thread(target=server.serve_forever, name="socket server"))
     
     def run_camera():
@@ -85,17 +81,17 @@ def main():
             raise Exception("bad header from client")
     
     def run_check_messages():
-        while keep_alive:
-            if current_connection is None:
-                time.sleep(0.20)
-                continue
+        while current_connection is None:
+            time.sleep(0.20)
 
+        while keep_alive and current_connection is not None:
             pythoncom.PumpWaitingMessages()
 
             def func():
                 data = receive_message(current_connection)
                 if len(data) > 0:
                     handle_message(data)
+
             use_connection(func)
 
     threads.append(threading.Thread(target=run_camera, name="init camera"))

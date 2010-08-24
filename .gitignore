@@ -3,4 +3,5 @@ obj
 *.suo
 *.pyc
 *.dll
+*.swp
 server/config.py
