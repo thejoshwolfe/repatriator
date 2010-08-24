@@ -1,6 +1,6 @@
 ﻿namespace repatriator_client
 {
-    partial class Main
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -67,7 +67,6 @@
             this.connectButton.TabIndex = 2;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
-            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
             // 
             // hostNameText
             // 
@@ -103,7 +102,6 @@
             this.takePictureButton.TabIndex = 9;
             this.takePictureButton.Text = "Take Picture";
             this.takePictureButton.UseVisualStyleBackColor = true;
-            this.takePictureButton.Click += new System.EventHandler(this.takePictureButton_Click);
             // 
             // panel1
             // 
