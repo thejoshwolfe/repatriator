@@ -16,11 +16,8 @@ namespace repatriator_client
             InitializeComponent();
 
             connectionManager = ConnectionManager.load();
-            connectionManager.connectionFailure += connectionManager_connectionFailure;
-            connectionManager.connectionSuccess += new Action(connectionManager_connectionSuccess);
-            connectionManager.hostIsBogus += new Action(connectionManager_hostIsBogus);
-            connectionManager.loginFailure += new Action(connectionManager_loginFailure);
-            connectionManager.loginSuccess += new Action(connectionManager_loginSuccess);
+            connectionManager.connectionUpdate += new Action<ConnectionStatus>(connectionManager_connectionUpdate);
+            connectionManager.loginFinished += new Action<LoginStatus>(connectionManager_loginFinished);
 
             // auto connect if we're good to go
             maybeStartConnectionManager();
@@ -44,25 +41,32 @@ namespace repatriator_client
             }));
         }
 
-        private void connectionManager_connectionFailure()
+        private void connectionManager_connectionUpdate(ConnectionStatus status)
         {
-            updateStatus_safe("connection trouble");
+            switch (status)
+            {
+                case ConnectionStatus.Trouble:
+                    updateStatus_safe("connection trouble");
+                    break;
+                case ConnectionStatus.Success:
+                    updateStatus_safe("connected");
+                    break;
+            }
         }
-        private void connectionManager_connectionSuccess()
+        private void connectionManager_loginFinished(LoginStatus status)
         {
-            updateStatus_safe("connected");
-        }
-        private void connectionManager_hostIsBogus()
-        {
-            updateStatus_safe("bad server specified");
-        }
-        private void connectionManager_loginFailure()
-        {
-            updateStatus_safe("invalid login");
-        }
-        private void connectionManager_loginSuccess()
-        {
-            updateStatus_safe("logged in");
+            switch (status)
+            {
+                case LoginStatus.ServerIsBogus:
+                    updateStatus_safe("bad server specified");
+                    break;
+                case LoginStatus.LoginIsInvalid:
+                    updateStatus_safe("invalid login");
+                    break;
+                case LoginStatus.Success:
+                    updateStatus_safe("logged in");
+                    break;
+            }
         }
 
         private void connectButton_Click(object sender, EventArgs e)

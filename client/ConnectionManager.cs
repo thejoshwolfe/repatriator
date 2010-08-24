@@ -14,22 +14,28 @@ namespace repatriator_client
         private static readonly byte[] magicServerWord = { 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 };
         private const byte status_loginSuccess = 0xa3;
 
-        public event Action connectionFailure;
-        public event Action connectionSuccess;
-        public event Action hostIsBogus;
-        public event Action loginFailure;
-        public event Action loginSuccess;
+        public event Action<ConnectionStatus> connectionUpdate;
+        public event Action<LoginStatus> loginFinished;
 
         private string serverHostName;
         private int serverPortNumber;
         private string userName;
 
-        private Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private Socket socket;
         private Thread establishConnectionThread;
         private Thread receiveThread;
 
+        private ConnectionState connectionState = ConnectionState.Inactive;
+
         private ConnectionManager()
         {
+            createSocket();
+        }
+
+        private void createSocket()
+        {
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.ReceiveTimeout = 5;
         }
 
         public bool hasValidSettings()
@@ -51,9 +57,10 @@ namespace repatriator_client
 
         private void receive_run()
         {
-            while (socket.Connected)
+            while (true)
             {
-                byte eventCode = readByte();
+                byte typeCode = readByte();
+                int messageLength = readInt();
             }
         }
         private void establishConnection_run()
@@ -67,37 +74,60 @@ namespace repatriator_client
                 catch (SocketException)
                 {
                 }
-                if (socket.Connected)
-                    break;
-                connectionFailure();
+                if (!socket.Connected)
+                {
+                    connectionUpdate(ConnectionStatus.Trouble);
+                    continue;
+                }
+                connectionUpdate(ConnectionStatus.Success);
+                // so far so good
+                try
+                {
+                    write(magicClientWord);
+                    if (!readMagicWord())
+                    {
+                        terminateConnection();
+                        loginFinished(LoginStatus.ServerIsBogus);
+                        return;
+                    }
+                    // this is a real host
+                    writeString(userName);
+                    byte status = readByte();
+                    if (status != status_loginSuccess)
+                    {
+                        terminateConnection();
+                        loginFinished(LoginStatus.LoginIsInvalid);
+                        return;
+                    }
+                    // login suceeded
+                    connectionState = ConnectionState.GoodConnection;
+                    loginFinished(LoginStatus.Success);
+                    receiveThread = new Thread(receive_run);
+                    receiveThread.IsBackground = true;
+                    receiveThread.Start();
+                    return;
+                }
+                catch (SocketException)
+                {
+                    // server isn't communication in time
+                    terminateConnection();
+                    loginFinished(LoginStatus.ServerIsBogus);
+                    return;
+                }
             }
-            connectionSuccess();
-            // so far so good
-            write(magicClientWord);
-            if (!readMagicWord())
-            {
-                hostIsBogus();
-                return;
-            }
-            // this is a real host
-            writeString(userName);
-            byte status = readByte();
-            if (status != status_loginSuccess)
-            {
-                loginFailure();
-                return;
-            }
-            // login suceeded
-            loginSuccess();
-            receiveThread = new Thread(receive_run);
-            receiveThread.IsBackground = true;
-            receiveThread.Start();
+        }
+        private void terminateConnection()
+        {
+            socket.Close();
+            createSocket();
+            connectionState = ConnectionState.Inactive;
         }
 
         public void start()
         {
-            if (!hasValidSettings())
+            if (!hasValidSettings() || connectionState != ConnectionState.Inactive)
                 throw new InvalidOperationException();
+            connectionState = ConnectionState.Trying;
             establishConnectionThread = new Thread(establishConnection_run);
             establishConnectionThread.IsBackground = true;
             establishConnectionThread.Start();
@@ -134,6 +164,11 @@ namespace repatriator_client
         {
             return read(1)[0];
         }
+        private int readInt()
+        {
+            byte[] buffer = read(4);
+            return BitConverter.ToInt32(buffer, 0);
+        }
         private bool readMagicWord()
         {
             int length = magicServerWord.Length;
@@ -157,5 +192,17 @@ namespace repatriator_client
             connectionManager.setEverything(serverHostName, serverPortNumer, userName);
             return connectionManager;
         }
+        private enum ConnectionState
+        {
+            Inactive, Trying, GoodConnection,
+        }
+    }
+    public enum ConnectionStatus
+    {
+        Trouble, Success,
+    }
+    public enum LoginStatus
+    {
+        ServerIsBogus, LoginIsInvalid, Success,
     }
 }

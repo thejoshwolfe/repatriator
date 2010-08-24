@@ -50,6 +50,7 @@
             this.setupPanel = new System.Windows.Forms.Panel();
             this.statusLabel = new System.Windows.Forms.Label();
             this.userNameText = new System.Windows.Forms.TextBox();
+            this.cancelConncetionButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -96,7 +97,7 @@
             // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(149, 128);
+            this.connectButton.Location = new System.Drawing.Point(85, 128);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(76, 23);
             this.connectButton.TabIndex = 2;
@@ -108,7 +109,7 @@
             // 
             this.serverText.Location = new System.Drawing.Point(85, 76);
             this.serverText.Name = "serverText";
-            this.serverText.Size = new System.Drawing.Size(140, 20);
+            this.serverText.Size = new System.Drawing.Size(157, 20);
             this.serverText.TabIndex = 3;
             this.serverText.Text = "localhost:9999";
             // 
@@ -255,6 +256,7 @@
             // 
             // setupPanel
             // 
+            this.setupPanel.Controls.Add(this.cancelConncetionButton);
             this.setupPanel.Controls.Add(this.statusLabel);
             this.setupPanel.Controls.Add(label3);
             this.setupPanel.Controls.Add(label2);
@@ -280,9 +282,18 @@
             // 
             this.userNameText.Location = new System.Drawing.Point(85, 102);
             this.userNameText.Name = "userNameText";
-            this.userNameText.Size = new System.Drawing.Size(140, 20);
+            this.userNameText.Size = new System.Drawing.Size(157, 20);
             this.userNameText.TabIndex = 8;
             this.userNameText.Text = "quentin";
+            // 
+            // cancelConncetionButton
+            // 
+            this.cancelConncetionButton.Location = new System.Drawing.Point(167, 128);
+            this.cancelConncetionButton.Name = "cancelConncetionButton";
+            this.cancelConncetionButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelConncetionButton.TabIndex = 12;
+            this.cancelConncetionButton.Text = "Cancel";
+            this.cancelConncetionButton.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
@@ -334,6 +345,7 @@
         private System.Windows.Forms.Panel setupPanel;
         private System.Windows.Forms.TextBox userNameText;
         private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.Button cancelConncetionButton;
 
     }
 }
