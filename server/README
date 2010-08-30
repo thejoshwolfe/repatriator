@@ -62,7 +62,7 @@ Messages:
 
         ConnectionResult
             int8 - identifies this message as a ConnectionResult
-            int64 - byte count of the entire message including this field (at least 29)
+            int64 - byte count of the entire message including this field
             int8 - major version number of server
             int8 - minor version number of server
             int8 - revision version number of server
