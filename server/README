@@ -53,7 +53,7 @@ Messages:
         
         ConnectionResult
             int8 - identifies this message as a ConnectionRequest
-            int64 - byte count of the entire message including this field
+            int64 - byte count of the entire message including this field (at least 29)
             [ 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 ] - magic incantation
             int8 - major version number of server
             int8 - minor version number of server
@@ -65,7 +65,7 @@ Messages:
                 int32 permission enum value 
 
         FullUpdate - contains a live view frame and all motor positions
-            int8 - identifies this message as a Frame
+            int8 - identifies this message as a FullUpdate
             int64 - byte count of the entire message including this field
             int64 - position of motor A
             int64 - position of motor B
@@ -106,11 +106,11 @@ Messages:
 
         TakePicture - tells the server to take a picture
             int8 - identifies this message as a TakePicture
-            int64 - byte count of the entire message including this field
+            int64 - byte count of the entire message including this field (always 9)
 
         MotorMovement - tells the server to move the motors
             int8 - identifies this message as a MotorMovement
-            int64 - byte count of the entire message including this field
+            int64 - byte count of the entire message including this field (always 49)
             int64 - position of motor A
             int64 - position of motor B
             int64 - position of motor X
@@ -119,7 +119,7 @@ Messages:
 
         DirectoryListingRequest - returns all the files a user can download
             int8 - identifies this message as a DirectoryListingRequest
-            int64 - byte count of the entire message including this field
+            int64 - byte count of the entire message including this field (always 9)
 
         FileDownloadRequest - requests download of a particular file
             int8 - identifies this message as a FileDownloadRequest
