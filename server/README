@@ -10,13 +10,17 @@ Configuration:
     Try omitting this file first, and then use it if you need to.
     
 How to communicate with the server:
-    
+
     1.  Connect.
-    
-    2.  Send a ConnectionRequest with valid login information. If you want to
+
+    2.  Send a MagicalRequest.
+
+    3.  Get a MagicalResponse.
+
+    4.  Send a ConnectionRequest with valid login information. If you want to
         operate the repatriator hardware, make sure you say so in this message.
-    
-    3.  Get back a ConnectionResult. If the status is ConnectionResult.Success,
+
+    5.  Get back a ConnectionResult. If the status is ConnectionResult.Success,
         check the permissions you are granted. If they include
         Privilege.OperateHardware and you requested use of the hardware, the
         server will turn on the power strip, activate the camera, all the
@@ -26,7 +30,7 @@ How to communicate with the server:
         live view frames. It should theoretically be a constant amount of time,
         so you should be able to set up a progress bar based on time.
 
-    4.  If you have privileges and requested hardware usage, the server will
+    6.  If you have privileges and requested hardware usage, the server will
         begin sending you FullUpdate messages with live view and current
         hardware position.
 
@@ -40,21 +44,23 @@ How to communicate with the server:
         at this point. No messages are sent back regardless of whether the
         action was sucessful or not.
 
-    6.  Disconnect when done. The server will move the motors back to the zero
+    7.  Disconnect when done. The server will move the motors back to the zero
         position and then turn off the power strip, killing power to the camera,
         motors, and lights.
 
         However, you can close the client after disconnecting and not worry
         about this.
-        
+
 Messages:
-    
+
     From the server to the client:
-        
+
+        MagicalResponse
+            [ 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 ]
+
         ConnectionResult
-            int8 - identifies this message as a ConnectionRequest
+            int8 - identifies this message as a ConnectionResult
             int64 - byte count of the entire message including this field (at least 29)
-            [ 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 ] - magic incantation
             int8 - major version number of server
             int8 - minor version number of server
             int8 - revision version number of server
@@ -91,8 +97,11 @@ Messages:
 
     From the client to the server:
 
+        MagicalRequest
+            [ 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 ]
+
         ConnectionRequest - used to initialize a session with the repatriator
-            [ 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 ] - magic incantation
+            int8 - identifies this message as a ConnectionRequest
             int64 - byte count of the entire message including this field
             int8 - major version number of client
             int8 - minor version number of client
