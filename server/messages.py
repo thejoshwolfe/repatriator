@@ -1,5 +1,6 @@
 from version import version
 import struct
+import sys
 
 __all__ = []
 
@@ -47,7 +48,9 @@ class ClientMessage:
         if msg_length != len(raw_data):
             raise ClientMessage.ParseError("Message length value is wrong.")
 
-        return MessageClass(raw_data[9:], msg_length-9)
+        msg = MessageClass(raw_data[9:], msg_length-9)
+        msg.message_type = raw_data[0]
+        return msg
 
 __all__.append('MagicalRequest')
 class MagicalRequest(ClientMessage):
@@ -160,8 +163,11 @@ class ServerMessage:
 
 __all__.append('MagicalResponse')
 class MagicalResponse(Message):
+    def __init__(self,):
+        self.message_type = ServerMessage.MagicalResponse
+
     def _serialize(self):
-        return bytearray([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
+        return bytes([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
 
 __all__.append('ConnectionResult')
 class ConnectionResult(Message):
@@ -171,7 +177,9 @@ class ConnectionResult(Message):
     Success = 2
 
     def __init__(self, status, privileges=set())
-        self.message_type = Message.ConnectionResult
+        self.message_type = ServerMessage.ConnectionResult
+        self.privileges = privileges
+        self.status = status
         
     def _serialize(self):
         magic = bytes([0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07])
@@ -179,20 +187,62 @@ class ConnectionResult(Message):
 
         buf = bytearray()
         buf.append(magic)
-        buf.append(struct.pack(">b", major))
-        buf.append(struct.pack(">b", minor))
-        buf.append(struct.pack(">b", revision))
-        buf.append(struct.pack(">b", 0))
-        buf.append(struct.pack(">i", status))
-        buf.append(struct.pack(">i", len(privileges)))
-        for privilege in privileges:
+        buf.append(struct.pack(">i", major))
+        buf.append(struct.pack(">i", minor))
+        buf.append(struct.pack(">i", revision))
+        buf.append(struct.pack(">i", self.status))
+        buf.append(struct.pack(">i", len(self.privileges)))
+        for privilege in self.privileges:
             buf.append(struct.pack(">i", privilege))
 
         return buf
 
 __all__.append('FullUpdate')
 class FullUpdate(Message):
-    pass
+    def __init__(self, camera, motor_a_pos=0, motor_b_pos=0, motor_x_pos=0, motor_y_pos=0, motor_z_pos=0):
+        self.message_type = ServerMessage.FullUpdate
+        self.motor_a_pos = motor_a_pos
+        self.motor_b_pos = motor_b_pos
+        self.motor_x_pos = motor_x_pos
+        self.motor_y_pos = motor_y_pos
+        self.motor_z_pos = motor_z_pos
+
+        frame_buffer = camera.liveViewMemoryView()
+        self.jpeg = bytearray()
+
+        # get live view frame
+        if frame_buffer[0] != b'\xff' or frame_buffer[1] != b'\xd8':
+            raise IOError("bad image data: invalid header")
+
+        ff_flag = False
+        for b in frame_buffer:
+            self.jpeg.append(ord(b))
+            if b == b'\xff':
+                ff_flag = True
+            elif b == b'\xd9' and ff_flag:
+                break
+            else:
+                ff_flag = False
+        else:
+            self.jpeg = bytearray()
+            raise IOError("bad image data: could not find ff flag")
+
+    def _serialize(self):
+        buf = bytearray()
+        #int64 - position of motor A
+        buf.append(struct.pack(">q", self.motor_a_pos))
+        #int64 - position of motor B
+        buf.append(struct.pack(">q", self.motor_b_pos))
+        #int64 - position of motor X
+        buf.append(struct.pack(">q", self.motor_x_pos))
+        #int64 - position of motor Y
+        buf.append(struct.pack(">q", self.motor_y_pos))
+        #int64 - position of motor Z
+        buf.append(struct.pack(">q", self.motor_z_pos))
+        #int64 - byte count for following JPEG image
+        buf.append(struct.pack(">q", len(self.jpeg)))
+        #<jpeg format image>
+        buf.append(self.jpeg)
 
 __all__.append('DirectoryListingResult')
 class DirectoryListingResult(Message):

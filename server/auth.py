@@ -30,7 +30,7 @@ class Privilege:
     OperateHardware = 0
     ManageUsers = 1
 
-class UserAlreadyExists:
+class UserAlreadyExists(Exception):
     pass
 
 class User:
@@ -51,6 +51,9 @@ class User:
 
     def revoke_privilege(self, privilege):
         self.attrs['privileges'].remove(privilege)
+
+    def privileges(self):
+        return self.attrs['privileges']
 
     def has_privilege(self, privilege):
         return privilege in self.attrs['privileges']
