@@ -22,11 +22,14 @@ namespace repatriator_client
 
         public event Action<ConnectionStatus> connectionUpdate;
         public event Action<LoginStatus> loginFinished;
+        public event Action fullUpdated;
+        public event Action directoryListUpdated;
 
         private string serverHostName;
         private int serverPortNumber;
         private string userName;
         private string password;
+        private string downloadDirectory;
 
         private Socket socket;
         private StreamManager socketStream;
@@ -34,6 +37,10 @@ namespace repatriator_client
         private Thread receiveThread;
 
         private ConnectionState connectionState = ConnectionState.Inactive;
+
+        private long a, b, x, y, z;
+        private Image image;
+        private DirectoryItem[] directoryList = {};
 
         private ConnectionManager()
         {
@@ -55,22 +62,69 @@ namespace repatriator_client
                 return false;
             if (userName.Length == 0)
                 return false;
+            if (!Directory.Exists(downloadDirectory))
+                return false;
             return true;
         }
-        public void setEverything(string serverHostName, int serverPortNumber, string userName, string password)
+        public void setEverything(string serverHostName, int serverPortNumber, string userName, string password, string downloadDirectory)
         {
             this.serverHostName = serverHostName;
             this.serverPortNumber = serverPortNumber;
             this.userName = userName;
             this.password = password;
+            this.downloadDirectory = downloadDirectory;
         }
 
         private void receive_run()
         {
             while (true)
             {
-                EventResponse response = socketStream.readEventResponse();
-                
+                readAndDispatchEvent();
+            }
+        }
+        private void readAndDispatchEvent()
+        {
+            EventResponse eventResponse = socketStream.readEventResponse();
+            if (eventResponse is FullUpdateEventResponse)
+                fullUpdate((FullUpdateEventResponse)eventResponse);
+            else if (eventResponse is DirectoryListingEventResponse)
+                updateDirectoryList((DirectoryListingEventResponse)eventResponse);
+            else if (eventResponse is FileDownloadEventResponse)
+                handleFileDownloaded((FileDownloadEventResponse)eventResponse);
+            else
+                throw null;
+        }
+
+        private void fullUpdate(FullUpdateEventResponse response)
+        {
+            a = response.a;
+            b = response.b;
+            x = response.x;
+            y = response.y;
+            z = response.z;
+            image = response.image;
+            fullUpdated();
+        }
+        private void updateDirectoryList(DirectoryListingEventResponse directoryListingEventResponse)
+        {
+            directoryList = directoryListingEventResponse.directoryList;
+            directoryListUpdated();
+        }
+        private void handleFileDownloaded(FileDownloadEventResponse fileDownloadEventResponse)
+        {
+            string filename = getNextDownloadFilename();
+            fileDownloadEventResponse.image.Save(filename);
+        }
+        private int nextDownloadNumber = 0;
+        private string getNextDownloadFilename()
+        {
+            HashSet<string> existingNames = new HashSet<string>(Directory.GetFiles(downloadDirectory));
+            while (true)
+            {
+                string filename = downloadDirectory + "/img_" + nextDownloadNumber.ToString("0000");
+                if (!File.Exists(filename))
+                    return filename;
+                nextDownloadNumber += 1;
             }
         }
         private void establishConnection_run()
@@ -160,6 +214,7 @@ namespace repatriator_client
             string userName = "";
             string password = "";
             string settingsPath = Path.Combine(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]), "settings.txt");
+            string downloadDirectory = "";
 
             if (File.Exists(settingsPath))
             {
@@ -167,7 +222,7 @@ namespace repatriator_client
             }
 
             ConnectionManager connectionManager = new ConnectionManager();
-            connectionManager.setEverything(serverHostName, serverPortNumer, userName, password);
+            connectionManager.setEverything(serverHostName, serverPortNumer, userName, password, downloadDirectory);
             return connectionManager;
         }
         private enum ConnectionState
@@ -276,6 +331,11 @@ namespace repatriator_client
                 byte[] bytes = read(length);
                 return Encoding.UTF8.GetString(bytes);
             }
+            public Image readImage()
+            {
+                long imageLength = readLong();
+                return Image.FromStream(new MemoryStream(read((int)imageLength), false));
+            }
             public bool readMagicalResponse()
             {
                 byte typeCode = readByte();
@@ -310,11 +370,34 @@ namespace repatriator_client
                 switch (rawResponse.typeCode)
                 {
                     case ResponseTypes.FullUpdate:
-                        return new FullUpdateEventResponse(reader);
+                        {
+                            FullUpdateEventResponse response = new FullUpdateEventResponse();
+                            response.a = reader.readLong();
+                            response.b = reader.readLong();
+                            response.x = reader.readLong();
+                            response.y = reader.readLong();
+                            response.z = reader.readLong();
+                            response.image = reader.readImage();
+                            return response;
+                        }
                     case ResponseTypes.DirectoryListingResult:
-                        return new DirectoryListingEventResponse(reader);
+                        {
+                            DirectoryListingEventResponse response = new DirectoryListingEventResponse();
+                            response.directoryList = new DirectoryItem[reader.readInt()];
+                            for (int i = 0; i < response.directoryList.Length; i++)
+                            {
+                                response.directoryList[i] = new DirectoryItem();
+                                response.directoryList[i].filename = reader.readString();
+                                response.directoryList[i].thumbNail = reader.readImage();
+                            }
+                            return response;
+                        }
                     case ResponseTypes.FileDownloadResult:
-                        return new FileDownloadEventResponse(reader);
+                        {
+                            FileDownloadEventResponse response = new FileDownloadEventResponse();
+                            response.image = reader.readImage();
+                            return response;
+                        }
                     default:
                         throw null;
                 }
@@ -411,43 +494,6 @@ namespace repatriator_client
                 return new FakeStreamReader(buffer);
             }
         }
-        private class EventResponse
-        {
-        }
-        private class FullUpdateEventResponse : EventResponse
-        {
-            public readonly long a, b, x, y, z;
-            public readonly Image image;
-            public FullUpdateEventResponse(FakeStreamReader reader)
-            {
-                a = reader.readLong();
-                b = reader.readLong();
-                x = reader.readLong();
-                y = reader.readLong();
-                z = reader.readLong();
-                long imageLength = reader.readLong();
-                image = Image.FromStream(new MemoryStream(reader.read((int)imageLength), false));
-            }
-        }
-        private class DirectoryListingEventResponse : EventResponse
-        {
-            public readonly string[] filenames;
-            public DirectoryListingEventResponse(FakeStreamReader reader)
-            {
-                filenames = new string[reader.readInt()];
-                for (int i = 0; i < filenames.Length; i++)
-                    filenames[i] = reader.readString();
-            }
-        }
-        private class FileDownloadEventResponse : EventResponse
-        {
-            public readonly Image image;
-            public FileDownloadEventResponse(FakeStreamReader reader)
-            {
-                long imageLength = reader.readLong();
-                image = Image.FromStream(new MemoryStream(reader.read((int)imageLength), false));
-            }
-        }
     }
     public enum ConnectionStatus
     {
@@ -456,5 +502,26 @@ namespace repatriator_client
     public enum LoginStatus
     {
         ConnectionTrouble, ServerIsBogus, LoginIsInvalid, InsufficientPrivileges, Success,
+    }
+    public class EventResponse
+    {
+    }
+    public class FullUpdateEventResponse : EventResponse
+    {
+        public long a, b, x, y, z;
+        public Image image;
+    }
+    public class DirectoryListingEventResponse : EventResponse
+    {
+        public DirectoryItem[] directoryList;
+    }
+    public class FileDownloadEventResponse : EventResponse
+    {
+        public Image image;
+    }
+    public class DirectoryItem
+    {
+        public string filename;
+        public Image thumbNail;
     }
 }

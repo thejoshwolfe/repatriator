@@ -32,6 +32,7 @@
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label4;
+            System.Windows.Forms.Label label5;
             this.connectButton = new System.Windows.Forms.Button();
             this.serverText = new System.Windows.Forms.TextBox();
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
@@ -49,6 +50,7 @@
             this.miniMapSliderY = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
             this.setupPanel = new System.Windows.Forms.Panel();
+            this.downloadDirectoryText = new System.Windows.Forms.TextBox();
             this.passwordText = new System.Windows.Forms.TextBox();
             this.cancelConncetionButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
@@ -57,6 +59,7 @@
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
+            label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -107,9 +110,18 @@
             label4.TabIndex = 14;
             label4.Text = "password:";
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(9, 157);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(70, 13);
+            label5.TabIndex = 16;
+            label5.Text = "download dir:";
+            // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(85, 157);
+            this.connectButton.Location = new System.Drawing.Point(85, 201);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(76, 23);
             this.connectButton.TabIndex = 2;
@@ -268,6 +280,8 @@
             // 
             // setupPanel
             // 
+            this.setupPanel.Controls.Add(label5);
+            this.setupPanel.Controls.Add(this.downloadDirectoryText);
             this.setupPanel.Controls.Add(label4);
             this.setupPanel.Controls.Add(this.passwordText);
             this.setupPanel.Controls.Add(this.cancelConncetionButton);
@@ -283,6 +297,14 @@
             this.setupPanel.Size = new System.Drawing.Size(427, 363);
             this.setupPanel.TabIndex = 9;
             // 
+            // downloadDirectoryText
+            // 
+            this.downloadDirectoryText.Location = new System.Drawing.Point(85, 154);
+            this.downloadDirectoryText.Name = "downloadDirectoryText";
+            this.downloadDirectoryText.Size = new System.Drawing.Size(157, 20);
+            this.downloadDirectoryText.TabIndex = 15;
+            this.downloadDirectoryText.Text = "C:\\TEMP";
+            // 
             // passwordText
             // 
             this.passwordText.Location = new System.Drawing.Point(85, 128);
@@ -294,7 +316,7 @@
             // 
             // cancelConncetionButton
             // 
-            this.cancelConncetionButton.Location = new System.Drawing.Point(167, 157);
+            this.cancelConncetionButton.Location = new System.Drawing.Point(167, 201);
             this.cancelConncetionButton.Name = "cancelConncetionButton";
             this.cancelConncetionButton.Size = new System.Drawing.Size(75, 23);
             this.cancelConncetionButton.TabIndex = 12;
@@ -304,7 +326,7 @@
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(19, 201);
+            this.statusLabel.Location = new System.Drawing.Point(19, 245);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(60, 13);
             this.statusLabel.TabIndex = 11;
@@ -370,6 +392,7 @@
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Button cancelConncetionButton;
         private System.Windows.Forms.TextBox passwordText;
+        private System.Windows.Forms.TextBox downloadDirectoryText;
 
     }
 }

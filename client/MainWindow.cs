@@ -84,7 +84,8 @@ namespace repatriator_client
                 return;
             string userName = userNameText.Text;
             string password = passwordText.Text;
-            connectionManager.setEverything(serverName, serverPort, userName, password);
+            string downloadDirectory = downloadDirectoryText.Text;
+            connectionManager.setEverything(serverName, serverPort, userName, password, downloadDirectory);
             maybeStartConnectionManager();
         }
     }
