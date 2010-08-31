@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Net.Sockets;
 using System.Text;
+using System.Drawing;
 
 namespace repatriator_client
 {
@@ -12,12 +13,12 @@ namespace repatriator_client
     {
         private static readonly byte[] magicalRequest = { 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 };
         private static readonly byte[] magicalResponse = { 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 };
-        private const byte clientMajorVersion = 0;
-        private const byte clientMinorVersion = 0;
-        private const byte clientRevisionVersion = 0;
-        private const byte serverMajorVersion = 0;
-        private const byte serverMinorVersion = 0;
-        private const byte serverRevisionVersion = 0;
+        private const int clientMajorVersion = 0;
+        private const int clientMinorVersion = 0;
+        private const int clientBuildVersion = 0;
+        private const int serverMajorVersion = 0;
+        private const int serverMinorVersion = 0;
+        private const int serverBuildVersion = 0;
 
         public event Action<ConnectionStatus> connectionUpdate;
         public event Action<LoginStatus> loginFinished;
@@ -68,8 +69,8 @@ namespace repatriator_client
         {
             while (true)
             {
-                byte typeCode = socketStream.readByte();
-                int messageLength = socketStream.readInt();
+                EventResponse response = socketStream.readEventResponse();
+                
             }
         }
         private void establishConnection_run()
@@ -195,9 +196,9 @@ namespace repatriator_client
         }
         private class ConnectionResult
         {
-            public byte serverMajorVersion;
-            public byte serverMinorVersion;
-            public byte serverRevisionVersion;
+            public int serverMajorVersion;
+            public int serverMinorVersion;
+            public int serverBuildVersion;
             public ServerConnectionStatus connectionStatus;
             public HashSet<Permission> permissions = new HashSet<Permission>();
         }
@@ -209,8 +210,8 @@ namespace repatriator_client
         }
         private enum Permission
         {
-            Hardware = 0,
-            Admin = 1,
+            OperateHardware = 0,
+            ManageUsers = 1,
         }
         private abstract class StreamManager
         {
@@ -241,10 +242,9 @@ namespace repatriator_client
             public void writeConnectionRequest(string userName, string password)
             {
                 FakeStreamWriter buffer = new FakeStreamWriter();
-                buffer.writeByte(clientMajorVersion);
-                buffer.writeByte(clientMinorVersion);
-                buffer.writeByte(clientRevisionVersion);
-                buffer.writeByte(0);
+                buffer.writeInt(clientMajorVersion);
+                buffer.writeInt(clientMinorVersion);
+                buffer.writeInt(clientBuildVersion);
                 buffer.writeString(userName);
                 buffer.writeString(password);
                 byte[] bytes = buffer.toByteArray();
@@ -270,6 +270,12 @@ namespace repatriator_client
                 byte[] buffer = read(8);
                 return BitConverter.ToInt64(buffer, 0);
             }
+            public string readString()
+            {
+                int length = readInt();
+                byte[] bytes = read(length);
+                return Encoding.UTF8.GetString(bytes);
+            }
             public bool readMagicalResponse()
             {
                 byte typeCode = readByte();
@@ -288,15 +294,30 @@ namespace repatriator_client
                     throw null;
                 FakeStreamReader reader = response.getReader();
                 ConnectionResult result = new ConnectionResult();
-                result.serverMajorVersion = reader.readByte();
-                result.serverMinorVersion = reader.readByte();
-                result.serverRevisionVersion = reader.readByte();
-                reader.readByte();
+                result.serverMajorVersion = reader.readInt();
+                result.serverMinorVersion = reader.readInt();
+                result.serverBuildVersion = reader.readInt();
                 result.connectionStatus = (ServerConnectionStatus)Enum.ToObject(typeof(ServerConnectionStatus), reader.readInt());
                 int permissionsCount = reader.readInt();
                 for (int i = 0; i < permissionsCount; i++)
                     result.permissions.Add((Permission)Enum.ToObject(typeof(Permission), reader.readInt()));
                 return result;
+            }
+            public EventResponse readEventResponse()
+            {
+                RawResponse rawResponse = readRawResponse();
+                FakeStreamReader reader = rawResponse.getReader();
+                switch (rawResponse.typeCode)
+                {
+                    case ResponseTypes.FullUpdate:
+                        return new FullUpdateEventResponse(reader);
+                    case ResponseTypes.DirectoryListingResult:
+                        return new DirectoryListingEventResponse(reader);
+                    case ResponseTypes.FileDownloadResult:
+                        return new FileDownloadEventResponse(reader);
+                    default:
+                        throw null;
+                }
             }
             private RawResponse readRawResponse()
             {
@@ -388,6 +409,43 @@ namespace repatriator_client
             public FakeStreamReader getReader()
             {
                 return new FakeStreamReader(buffer);
+            }
+        }
+        private class EventResponse
+        {
+        }
+        private class FullUpdateEventResponse : EventResponse
+        {
+            public readonly long a, b, x, y, z;
+            public readonly Image image;
+            public FullUpdateEventResponse(FakeStreamReader reader)
+            {
+                a = reader.readLong();
+                b = reader.readLong();
+                x = reader.readLong();
+                y = reader.readLong();
+                z = reader.readLong();
+                long imageLength = reader.readLong();
+                image = Image.FromStream(new MemoryStream(reader.read((int)imageLength), false));
+            }
+        }
+        private class DirectoryListingEventResponse : EventResponse
+        {
+            public readonly string[] filenames;
+            public DirectoryListingEventResponse(FakeStreamReader reader)
+            {
+                filenames = new string[reader.readInt()];
+                for (int i = 0; i < filenames.Length; i++)
+                    filenames[i] = reader.readString();
+            }
+        }
+        private class FileDownloadEventResponse : EventResponse
+        {
+            public readonly Image image;
+            public FileDownloadEventResponse(FakeStreamReader reader)
+            {
+                long imageLength = reader.readLong();
+                image = Image.FromStream(new MemoryStream(reader.read((int)imageLength), false));
             }
         }
     }
