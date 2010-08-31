@@ -1,6 +1,9 @@
 from version import version
 import struct
 
+__all__ = []
+
+__all__.append('ClientMessage')
 class ClientMessage:
     MagicalRequest = 0
     ConnectionRequest = 1
@@ -11,6 +14,7 @@ class ClientMessage:
     AddUser = 6
     UpdateUser = 7
     DeleteUser = 8
+    FileDeleteRequest = 9
 
     TypeForId = {
         ClientMessage.MagicalRequest: MagicalRequest,
@@ -22,6 +26,7 @@ class ClientMessage:
         ClientMessage.AddUser: AddUser,
         ClientMessage.UpdateUser: UpdateUser,
         ClientMessage.DeleteUser: DeleteUser,
+        ClientMessage.FileDeleteRequest: FileDeleteRequest,
     }
 
     class ParseError(Exception):
@@ -44,6 +49,7 @@ class ClientMessage:
 
         return MessageClass(raw_data[9:], msg_length-9)
 
+__all__.append('MagicalRequest')
 class MagicalRequest(ClientMessage):
     magical_bytes = [0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4]
 
@@ -51,6 +57,7 @@ class MagicalRequest(ClientMessage):
         if MagicalRequest.magical_bytes != data:
             raise ClientMessage.ParseError("Magical bytes didn't match up.")
 
+__all__.append('ConnectionRequest')
 class ConnectionRequest(ClientMessage):
     def __init__(self, data):
         bytes_left = len(data)
@@ -98,28 +105,40 @@ class ConnectionRequest(ClientMessage):
             raise ClientMessage.ParseError("Message is missing admin flag.")
         self.admin_flag = data[offset]
 
+__all__.append('TakePicture')
 class TakePicture(ClientMessage):
     def __init__(self, data, size):
         pass
+__all__.append('MotorMovement')
 class MotorMovement(ClientMessage):
     def __init__(self, data, size):
         pass
+__all__.append('DirectoryListingRequest')
 class DirectoryListingRequest(ClientMessage):
     def __init__(self, data, size):
         pass
+__all__.append('FileDownloadRequest')
 class FileDownloadRequest(ClientMessage):
     def __init__(self, data, size):
         pass
+__all__.append('FileDeleteRequest')
+class FileDeleteRequest(ClientMessage):
+    def __init__(self, data, size):
+        pass
+__all__.append('AddUser')
 class AddUser(ClientMessage):
     def __init__(self, data, size):
         pass
+__all__.append('UpdateUser')
 class UpdateUser(ClientMessage):
     def __init__(self, data, size):
         pass
+__all__.append('DeleteUser')
 class DeleteUser(ClientMessage):
     def __init__(self, data, size):
         pass
 
+__all__.append('ServerMessage')
 class ServerMessage:
     MagicalResponse = 0
     ConnectionResult = 1
@@ -139,10 +158,12 @@ class ServerMessage:
         buf.insert(struct.pack('>b', self.message_type))
         return buf
 
+__all__.append('MagicalResponse')
 class MagicalResponse(Message):
     def _serialize(self):
         return bytearray([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
 
+__all__.append('ConnectionResult')
 class ConnectionResult(Message):
     InvalidLogin = 0 
     # for example, requested operating hardware but don't have Privilege.OperateHardware
@@ -169,9 +190,14 @@ class ConnectionResult(Message):
 
         return buf
 
+__all__.append('FullUpdate')
 class FullUpdate(Message):
     pass
+
+__all__.append('DirectoryListingResult')
 class DirectoryListingResult(Message):
     pass
+
+__all__.append('FileDownloadResult')
 class FileDownloadResult(Message):
     pass

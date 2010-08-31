@@ -137,6 +137,12 @@ Messages:
             int64 - byte count of the entire message including this field
             int32 - length of utf8 string filename
             <utf8 string filename requested>
+        
+        FileDeleteRequest - requests deletion of a file on the server
+            int8 - identifies this message as a FileDeleteRequest
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 string filename
+            <utf8 string filename requested>
 
         AddUser - creates a new user in the system
             int8 - identifies this message as an AddUser
