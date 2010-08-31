@@ -57,6 +57,9 @@ namespace repatriator_client
         {
             switch (status)
             {
+                case LoginStatus.ConnectionTrouble:
+                    updateStatus_safe("connection trouble. i give up.");
+                    break;
                 case LoginStatus.ServerIsBogus:
                     updateStatus_safe("bad server specified");
                     break;
@@ -80,7 +83,8 @@ namespace repatriator_client
             if (!int.TryParse(nameAndPort[1], out serverPort))
                 return;
             string userName = userNameText.Text;
-            connectionManager.setEverything(serverName, serverPort, userName);
+            string password = passwordText.Text;
+            connectionManager.setEverything(serverName, serverPort, userName, password);
             maybeStartConnectionManager();
         }
     }

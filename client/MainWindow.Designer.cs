@@ -31,6 +31,7 @@
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
+            System.Windows.Forms.Label label4;
             this.connectButton = new System.Windows.Forms.Button();
             this.serverText = new System.Windows.Forms.TextBox();
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
@@ -48,12 +49,14 @@
             this.miniMapSliderY = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
             this.setupPanel = new System.Windows.Forms.Panel();
+            this.passwordText = new System.Windows.Forms.TextBox();
+            this.cancelConncetionButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
             this.userNameText = new System.Windows.Forms.TextBox();
-            this.cancelConncetionButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -95,9 +98,18 @@
             label3.TabIndex = 10;
             label3.Text = "user name:";
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(24, 131);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(55, 13);
+            label4.TabIndex = 14;
+            label4.Text = "password:";
+            // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(85, 128);
+            this.connectButton.Location = new System.Drawing.Point(85, 157);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(76, 23);
             this.connectButton.TabIndex = 2;
@@ -256,6 +268,8 @@
             // 
             // setupPanel
             // 
+            this.setupPanel.Controls.Add(label4);
+            this.setupPanel.Controls.Add(this.passwordText);
             this.setupPanel.Controls.Add(this.cancelConncetionButton);
             this.setupPanel.Controls.Add(this.statusLabel);
             this.setupPanel.Controls.Add(label3);
@@ -269,10 +283,28 @@
             this.setupPanel.Size = new System.Drawing.Size(427, 363);
             this.setupPanel.TabIndex = 9;
             // 
+            // passwordText
+            // 
+            this.passwordText.Location = new System.Drawing.Point(85, 128);
+            this.passwordText.Name = "passwordText";
+            this.passwordText.Size = new System.Drawing.Size(157, 20);
+            this.passwordText.TabIndex = 13;
+            this.passwordText.Text = "temp1234";
+            this.passwordText.UseSystemPasswordChar = true;
+            // 
+            // cancelConncetionButton
+            // 
+            this.cancelConncetionButton.Location = new System.Drawing.Point(167, 157);
+            this.cancelConncetionButton.Name = "cancelConncetionButton";
+            this.cancelConncetionButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelConncetionButton.TabIndex = 12;
+            this.cancelConncetionButton.Text = "Cancel";
+            this.cancelConncetionButton.UseVisualStyleBackColor = true;
+            // 
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(19, 182);
+            this.statusLabel.Location = new System.Drawing.Point(19, 201);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(60, 13);
             this.statusLabel.TabIndex = 11;
@@ -285,15 +317,6 @@
             this.userNameText.Size = new System.Drawing.Size(157, 20);
             this.userNameText.TabIndex = 8;
             this.userNameText.Text = "quentin";
-            // 
-            // cancelConncetionButton
-            // 
-            this.cancelConncetionButton.Location = new System.Drawing.Point(167, 128);
-            this.cancelConncetionButton.Name = "cancelConncetionButton";
-            this.cancelConncetionButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelConncetionButton.TabIndex = 12;
-            this.cancelConncetionButton.Text = "Cancel";
-            this.cancelConncetionButton.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
@@ -346,6 +369,7 @@
         private System.Windows.Forms.TextBox userNameText;
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Button cancelConncetionButton;
+        private System.Windows.Forms.TextBox passwordText;
 
     }
 }
