@@ -89,6 +89,8 @@ Messages:
             for each file returned:
                 int32 - length of utf8 string filename (starts with '/' and uses '/' for path separator)
                 <utf8 string filename>
+                int64 - byte count for the following JPEG image
+                <jpeg format image>
 
         FileDownloadResult
             int8 - identifies this message as a DirectoryListingResult
