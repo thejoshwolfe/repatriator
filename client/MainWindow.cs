@@ -38,6 +38,8 @@ namespace repatriator_client
             statusLabel.Text = connecting ? "connecting" : "not connected";
             serverText.Enabled = !connecting;
             userNameText.Enabled = !connecting;
+            passwordText.Enabled = !connecting;
+            downloadDirectoryText.Enabled = !connecting;
             connectButton.Enabled = !connecting;
         }
         private void updateStatus_safe(string message)

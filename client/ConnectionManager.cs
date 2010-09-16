@@ -129,7 +129,10 @@ namespace repatriator_client
         }
         private void establishConnection_run()
         {
-            loginFinished(establishConnection());
+            LoginStatus result = establishConnection();
+            if (result != LoginStatus.Success)
+                terminateConnection();
+            loginFinished(result);
         }
         private LoginStatus establishConnection()
         {
@@ -149,16 +152,12 @@ namespace repatriator_client
                 {
                     socketStream.writeMagicalRequest();
                     if (!socketStream.readMagicalResponse())
-                    {
-                        terminateConnection();
                         return LoginStatus.ServerIsBogus;
-                    }
                     // this is a real host
                     socketStream.writeConnectionRequest(userName, password);
                     ConnectionResult connectionResult = socketStream.readConnectionResult();
                     if (connectionResult.connectionStatus != ServerConnectionStatus.Success)
                     {
-                        terminateConnection();
                         switch (connectionResult.connectionStatus)
                         {
                             case ServerConnectionStatus.InvalidLogin:
@@ -179,7 +178,6 @@ namespace repatriator_client
                 catch (SocketException)
                 {
                     // server isn't communicating in time
-                    terminateConnection();
                     return LoginStatus.ServerIsBogus;
                 }
             }
