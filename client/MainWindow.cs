@@ -35,7 +35,7 @@ namespace repatriator_client
         }
         private void updateConnectionWidgets(bool connecting)
         {
-            statusLabel.Text = connecting ? "connecting" : "not connected";
+            updateStatus_safe(connecting ? "connecting" : "not connected");
             serverText.Enabled = !connecting;
             userNameText.Enabled = !connecting;
             passwordText.Enabled = !connecting;
@@ -44,10 +44,15 @@ namespace repatriator_client
         }
         private void updateStatus_safe(string message)
         {
-            BeginInvoke(new Action(delegate()
+            Action action = new Action(delegate()
             {
                 statusLabel.Text = message;
-            }));
+                Console.WriteLine(message);
+            });
+            if (InvokeRequired)
+                BeginInvoke(action);
+            else
+                action();
         }
 
         private void connectionManager_connectionUpdate(ConnectionStatus status)
