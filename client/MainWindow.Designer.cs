@@ -338,7 +338,7 @@
             this.userNameText.Name = "userNameText";
             this.userNameText.Size = new System.Drawing.Size(157, 20);
             this.userNameText.TabIndex = 8;
-            this.userNameText.Text = "quentin";
+            this.userNameText.Text = "default_admin";
             // 
             // MainWindow
             // 

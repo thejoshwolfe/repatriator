@@ -24,6 +24,13 @@ namespace repatriator_client
             }
             return result.ToArray();
         }
+        public static string Repeat(this string s, int count)
+        {
+            StringBuilder stringBuilder = new StringBuilder(s.Length * count);
+            for (int i = 0; i < count; i++)
+                stringBuilder.Append(s);
+            return stringBuilder.ToString();
+        }
         public static bool arrayEquals(byte[] a, byte[] b)
         {
             if (a.Length != b.Length)

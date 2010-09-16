@@ -10,6 +10,7 @@ namespace repatriator_client
     public partial class MainWindow : Form
     {
         private ConnectionManager connectionManager;
+        private int retryFailures = 0;
 
         public MainWindow()
         {
@@ -26,12 +27,18 @@ namespace repatriator_client
         private void maybeStartConnectionManager()
         {
             bool goodToGo = connectionManager.hasValidSettings();
-            statusLabel.Text = goodToGo ? "connecting" : "not connected";
-            serverText.Enabled = !goodToGo;
-            userNameText.Enabled = !goodToGo;
-            connectButton.Enabled = !goodToGo;
-            if (goodToGo)
-                connectionManager.start();
+            updateConnectionWidgets(goodToGo);
+            if (!goodToGo)
+                return;
+            retryFailures = 0;
+            connectionManager.start();
+        }
+        private void updateConnectionWidgets(bool connecting)
+        {
+            statusLabel.Text = connecting ? "connecting" : "not connected";
+            serverText.Enabled = !connecting;
+            userNameText.Enabled = !connecting;
+            connectButton.Enabled = !connecting;
         }
         private void updateStatus_safe(string message)
         {
@@ -46,7 +53,8 @@ namespace repatriator_client
             switch (status)
             {
                 case ConnectionStatus.Trouble:
-                    updateStatus_safe("connection trouble");
+                    retryFailures++;
+                    updateStatus_safe("connection trouble" + ".".Repeat(retryFailures));
                     break;
                 case ConnectionStatus.Success:
                     updateStatus_safe("connected");
@@ -70,6 +78,17 @@ namespace repatriator_client
                     updateStatus_safe("logged in");
                     break;
             }
+            BeginInvoke(new Action(delegate()
+            {
+                if (status == LoginStatus.Success)
+                {
+                    setupPanel.Visible = false;
+                }
+                else
+                {
+                    updateConnectionWidgets(false);
+                }
+            }));
         }
 
         private void connectButton_Click(object sender, EventArgs e)

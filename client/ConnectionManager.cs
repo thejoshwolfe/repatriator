@@ -40,7 +40,7 @@ namespace repatriator_client
 
         private long a, b, x, y, z;
         private Image image;
-        private DirectoryItem[] directoryList = {};
+        private DirectoryItem[] directoryList = { };
 
         private ConnectionManager()
         {
@@ -136,13 +136,8 @@ namespace repatriator_client
             const int connectionRetryCount = 5;
             for (int i = 0; i < connectionRetryCount; i++)
             {
-                try
-                {
-                    socket.Connect(serverHostName, serverPortNumber);
-                }
-                catch (SocketException)
-                {
-                }
+                try { socket.Connect(serverHostName, serverPortNumber); }
+                catch (SocketException) { }
                 if (!socket.Connected)
                 {
                     connectionUpdate(ConnectionStatus.Trouble);
@@ -183,7 +178,7 @@ namespace repatriator_client
                 }
                 catch (SocketException)
                 {
-                    // server isn't communication in time
+                    // server isn't communicating in time
                     terminateConnection();
                     return LoginStatus.ServerIsBogus;
                 }
@@ -291,7 +286,7 @@ namespace repatriator_client
             public void writeMagicalRequest()
             {
                 writeByte(RequestTypes.MagicalRequest);
-                writeLong(magicalRequest.Length + 9);
+                writeLong(1 + 8 + magicalRequest.Length);
                 write(magicalRequest);
             }
             public void writeConnectionRequest(string userName, string password)
@@ -305,7 +300,7 @@ namespace repatriator_client
                 byte[] bytes = buffer.toByteArray();
 
                 writeByte(RequestTypes.ConnectionRequest);
-                writeLong(bytes.Length + 9);
+                writeLong(1 + 8 + bytes.Length);
                 write(bytes);
             }
 
