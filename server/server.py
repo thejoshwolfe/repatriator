@@ -14,7 +14,7 @@ import time
 import pythoncom
 import edsdk
 
-class Server(socketserver.BaseRequestHandler):
+class Server:
     def _write_message(self, message):
         """
         actually writes the message to the open connection
@@ -31,7 +31,7 @@ class Server(socketserver.BaseRequestHandler):
         return header + self.request.recv(msg_size - 9)
 
     def _run_writer(self):
-        while not finished:
+        while not self.finished:
             try:
                 item = self.message_queue.get(block=False)
                 self._write_message(item)
@@ -52,10 +52,11 @@ class Server(socketserver.BaseRequestHandler):
         except ClientMessage.ParseError as ex:
             sys.stderr.write(str(ex) + "\n")
 
-        if message is not None and self.on_message:
+        if message is not None and self.on_message is not None:
             self.on_message(message)
 
     def __init__(self, on_message=None, on_connection_open=None, on_connection_close=None):
+        print("init server")
         self.on_message = on_message
         self.on_connection_open = on_connection_open
         self.on_connection_close = on_connection_close
@@ -64,8 +65,13 @@ class Server(socketserver.BaseRequestHandler):
 
         self.writer_thread = threading.Thread(target=self._run_writer, name="message writer")
         self.reader_thread = threading.Thread(target=self._run_reader, name="message reader")
+
+    def open(self):
         self.writer_thread.start()
         self.reader_thread.start()
+
+        if self.on_connection_open is not None:
+            self.on_connection_open()
 
     def send_message(self, message):
         """
@@ -73,29 +79,25 @@ class Server(socketserver.BaseRequestHandler):
         """
         self.message_queue.put(message)
         
-    def handle(self):
-        if on_connection_open is not None:
-            on_connection_open()
-
-        self.writer_thread
-
-    def finish(self):
-        if on_connection_close is not None:
-            on_connection_close()
-
+    def close(self):
         self.finished = True
         self.writer_thread.join()
         self.reader_thread.join()
 
+        if self.on_connection_close is not None:
+            self.on_connection_close()
 
 
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
     # nothing to do
+    print("got a magical request, doing nothing")
     pass
 
 def handle_ConnectionRequest(msg):
     global user
+
+    print("Got connection request message")
 
     user = auth.login(msg.username, msg.password)
     if user is None:
@@ -113,27 +115,35 @@ def handle_ConnectionRequest(msg):
         initialize_hardware()
 
 def handle_TakePicture(msg):
+    print("Got take picture message")
     pass
 
 def handle_MotorMovement(msg):
+    print("Got motor movement message")
     pass
 
 def handle_DirectoryListingRequest(msg):
+    print("Got directory listing message")
     pass
 
 def handle_FileDownloadRequest(msg):
+    print("Got file dowrload message")
     pass
 
 def handle_AddUser(msg):
+    print("Got add user message")
     pass
 
 def handle_UpdateUser(msg):
+    print("Got update user message")
     pass
 
 def handle_DeleteUser(msg):
+    print("Got tdelete user message")
     pass
 
 def handle_FileDeleteRequest(msg):
+    print("Got file delete request message")
     pass
 
 message_handlers = {
@@ -150,21 +160,31 @@ message_handlers = {
 }
 
 def start_server():
-    global user, server, server_thread
+    global user, server, server_thread, message_queue, camera_thread
 
     # initialize variables
     user = None
+    camera_thread = None
+    message_queue = queue.Queue()
 
     # wait for a connection
-    server = socketserver.TCPServer((settings['HOST'], settings['PORT']), Server)
-    server.on_message = queue.Queue().put
-    server.on_connection_open = on_connection_open
-    server.on_connection_close = on_connection_close
+    class _Server(socketserver.BaseRequestHandler):
+        def handle(self):
+            self.server = Server(message_queue, on_connection_open, on_connection_close)
+            self.server.request = self.request
+            self.server.open()
+        def finish(self):
+            self.server.close()
+
+    server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
     server_thread = threading.Thread(target=server.serve_forever, name="socket server")
     server_thread.start()
+    print("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
 def run_camera():
-    global camera, message_handlers
+    global camera, message_handlers, message_queue
+
+    print("running camera")
 
     pythoncom.CoInitializeEx(2)
     camera = edsdk.getFirstCamera()
@@ -172,6 +192,7 @@ def run_camera():
 
     next_frame = time.time()
 
+    print("entering message loop")
     while not finished:
         pythoncom.PumpWaitingMessages()
 
@@ -191,6 +212,7 @@ def run_camera():
             continue
 
 def on_connection_open():
+    print("on_connection_open")
     pass
 
 def on_connection_close():
@@ -198,9 +220,8 @@ def on_connection_close():
 
     # clean up
     finished = True
-    camera_thread.join()
-    server_thread.join()
-    del server
+    if camera_thread is not None:
+        camera_thread.join()
     set_power_switch(on=False)
 
     # get ready to listen for next time
