@@ -1,3 +1,6 @@
+import socket
+import os
+
 # settings dict.
 # name: default
 settings = {
@@ -5,6 +8,8 @@ settings = {
     'HOST': socket.gethostbyname(socket.gethostname()),
     # port to bind the server to
     'PORT': 9999,
+    # folder to store data
+    'DATA_FOLDER': os.path.join(os.path.dirname(__file__), 'data'),
 }
 try:
     import config

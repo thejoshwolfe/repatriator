@@ -17,19 +17,6 @@ class ClientMessage:
     DeleteUser = 8
     FileDeleteRequest = 9
 
-    TypeForId = {
-        ClientMessage.MagicalRequest: MagicalRequest,
-        ClientMessage.ConnectionRequest: ConnectionRequest,
-        ClientMessage.TakePicture: TakePicture,
-        ClientMessage.MotorMovement: MotorMovement,
-        ClientMessage.DirectoryListingRequest: DirectoryListingRequest,
-        ClientMessage.FileDownloadRequest: FileDownloadRequest,
-        ClientMessage.AddUser: AddUser,
-        ClientMessage.UpdateUser: UpdateUser,
-        ClientMessage.DeleteUser: DeleteUser,
-        ClientMessage.FileDeleteRequest: FileDeleteRequest,
-    }
-
     class ParseError(Exception):
         pass
 
@@ -42,7 +29,7 @@ class ClientMessage:
         if len(raw_data) < 9:
             raise ClientMessage.ParseError("Message is missing header data.")
 
-        MessageClass = ClientMessage.TypeForId[raw_data[0]]
+        MessageClass = type_for_id[raw_data[0]]
         msg_length = struct.unpack(raw_data[1:9], ">q")
 
         if msg_length != len(raw_data):
@@ -162,7 +149,7 @@ class ServerMessage:
         return buf
 
 __all__.append('MagicalResponse')
-class MagicalResponse(Message):
+class MagicalResponse(ServerMessage):
     def __init__(self,):
         self.message_type = ServerMessage.MagicalResponse
 
@@ -170,13 +157,16 @@ class MagicalResponse(Message):
         return bytes([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
 
 __all__.append('ConnectionResult')
-class ConnectionResult(Message):
+class ConnectionResult(ServerMessage):
     InvalidLogin = 0 
     # for example, requested operating hardware but don't have Privilege.OperateHardware
     InsufficientPrivileges = 1 
     Success = 2
 
-    def __init__(self, status, privileges=set())
+    def __init__(self, status, privileges=None):
+        if privileges is None:
+            privileges = set()
+
         self.message_type = ServerMessage.ConnectionResult
         self.privileges = privileges
         self.status = status
@@ -198,7 +188,7 @@ class ConnectionResult(Message):
         return buf
 
 __all__.append('FullUpdate')
-class FullUpdate(Message):
+class FullUpdate(ServerMessage):
     def __init__(self, camera, motor_a_pos=0, motor_b_pos=0, motor_x_pos=0, motor_y_pos=0, motor_z_pos=0):
         self.message_type = ServerMessage.FullUpdate
         self.motor_a_pos = motor_a_pos
@@ -245,9 +235,23 @@ class FullUpdate(Message):
         buf.append(self.jpeg)
 
 __all__.append('DirectoryListingResult')
-class DirectoryListingResult(Message):
+class DirectoryListingResult(ServerMessage):
     pass
 
 __all__.append('FileDownloadResult')
-class FileDownloadResult(Message):
+class FileDownloadResult(ServerMessage):
     pass
+
+ClientMessage.TypeForId = {
+    ClientMessage.MagicalRequest: MagicalRequest,
+    ClientMessage.ConnectionRequest: ConnectionRequest,
+    ClientMessage.TakePicture: TakePicture,
+    ClientMessage.MotorMovement: MotorMovement,
+    ClientMessage.DirectoryListingRequest: DirectoryListingRequest,
+    ClientMessage.FileDownloadRequest: FileDownloadRequest,
+    ClientMessage.AddUser: AddUser,
+    ClientMessage.UpdateUser: UpdateUser,
+    ClientMessage.DeleteUser: DeleteUser,
+    ClientMessage.FileDeleteRequest: FileDeleteRequest,
+}
+

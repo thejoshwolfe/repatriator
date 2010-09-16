@@ -5,3 +5,4 @@ obj
 *.dll
 *.swp
 server/config.py
+server/data/
