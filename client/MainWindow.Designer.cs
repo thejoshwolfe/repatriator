@@ -135,7 +135,7 @@
             this.serverText.Name = "serverText";
             this.serverText.Size = new System.Drawing.Size(157, 20);
             this.serverText.TabIndex = 3;
-            this.serverText.Text = "localhost:9999";
+            this.serverText.Text = "localhost:57051";
             // 
             // liveViewPictureBox
             // 
