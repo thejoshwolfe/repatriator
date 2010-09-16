@@ -109,5 +109,10 @@ namespace repatriator_client
             connectionManager.setEverything(serverName, serverPort, userName, password, downloadDirectory);
             maybeStartConnectionManager();
         }
+
+        private void cancelConncetionButton_Click(object sender, EventArgs e)
+        {
+            connectionManager.cancel();
+        }
     }
 }

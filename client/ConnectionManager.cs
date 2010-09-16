@@ -143,6 +143,8 @@ namespace repatriator_client
                 catch (SocketException) { }
                 if (!socket.Connected)
                 {
+                    if (connectionState == ConnectionState.Cancelling)
+                        return LoginStatus.Cancelled;
                     connectionUpdate(ConnectionStatus.Trouble);
                     continue;
                 }
@@ -177,6 +179,8 @@ namespace repatriator_client
                 }
                 catch (SocketException)
                 {
+                    if (connectionState == ConnectionState.Cancelling)
+                        return LoginStatus.Cancelled;
                     // server isn't communicating in time
                     return LoginStatus.ServerIsBogus;
                 }
@@ -199,6 +203,14 @@ namespace repatriator_client
             establishConnectionThread.IsBackground = true;
             establishConnectionThread.Start();
         }
+        public void cancel()
+        {
+            // TODO thread-safe this
+            if (connectionState != ConnectionState.Trying)
+                return;
+            connectionState = ConnectionState.Cancelling;
+            socket.Close();
+        }
 
         public static ConnectionManager load()
         {
@@ -220,7 +232,7 @@ namespace repatriator_client
         }
         private enum ConnectionState
         {
-            Inactive, Trying, GoodConnection,
+            Inactive, Trying, Cancelling, GoodConnection,
         }
         private static class RequestTypes
         {
@@ -494,7 +506,7 @@ namespace repatriator_client
     }
     public enum LoginStatus
     {
-        ConnectionTrouble, ServerIsBogus, LoginIsInvalid, InsufficientPrivileges, Success,
+        ConnectionTrouble, ServerIsBogus, LoginIsInvalid, InsufficientPrivileges, Cancelled, Success,
     }
     public class EventResponse
     {

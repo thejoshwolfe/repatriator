@@ -322,6 +322,7 @@
             this.cancelConncetionButton.TabIndex = 12;
             this.cancelConncetionButton.Text = "Cancel";
             this.cancelConncetionButton.UseVisualStyleBackColor = true;
+            this.cancelConncetionButton.Click += new System.EventHandler(this.cancelConncetionButton_Click);
             // 
             // statusLabel
             // 
