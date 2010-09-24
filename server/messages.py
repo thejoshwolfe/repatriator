@@ -35,13 +35,13 @@ class ClientMessage:
         if msg_length != len(raw_data):
             raise ClientMessage.ParseError("Message length value is wrong.")
 
-        msg = MessageClass(raw_data[9:], msg_length-9)
+        msg = MessageClass(raw_data[9:])
         msg.message_type = raw_data[0]
         return msg
 
 __all__.append('MagicalRequest')
 class MagicalRequest(ClientMessage):
-    magical_bytes = [0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4]
+    magical_bytes = bytes([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
 
     def __init__(self, data):
         if MagicalRequest.magical_bytes != data:

@@ -8,7 +8,7 @@ import auth
 import struct
 import socket, socketserver
 import queue
-import os
+import os, sys
 import threading
 import time
 import pythoncom
@@ -159,18 +159,23 @@ message_handlers = {
     ClientMessage.FileDeleteRequest: handle_FileDeleteRequest,
 }
 
-def start_server():
-    global user, server, server_thread, message_queue, camera_thread
+def reset_state():
+    global user, message_queue, camera_thread
 
     # initialize variables
     user = None
     camera_thread = None
     message_queue = queue.Queue()
 
+def start_server():
+    global user, server, server_thread, message_queue, camera_thread
+
+    reset_state()
+
     # wait for a connection
     class _Server(socketserver.BaseRequestHandler):
         def handle(self):
-            self.server = Server(message_queue, on_connection_open, on_connection_close)
+            self.server = Server(message_queue.put, on_connection_open, on_connection_close)
             self.server.request = self.request
             self.server.open()
         def finish(self):
@@ -224,8 +229,7 @@ def on_connection_close():
         camera_thread.join()
     set_power_switch(on=False)
 
-    # get ready to listen for next time
-    start_server()
+    reset_state()
 
 def initialize_hardware():
     global finished, camera_thread
