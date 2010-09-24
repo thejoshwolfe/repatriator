@@ -20,6 +20,8 @@ namespace repatriator_client
             connectionManager.connectionUpdate += new Action<ConnectionStatus>(connectionManager_connectionUpdate);
             connectionManager.loginFinished += new Action<LoginStatus>(connectionManager_loginFinished);
 
+            butterflyElemtnHost.Child = new ButterflyControl();
+
             // auto connect if we're good to go
             maybeStartConnectionManager();
         }
