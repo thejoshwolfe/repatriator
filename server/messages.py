@@ -29,8 +29,8 @@ class ClientMessage:
         if len(raw_data) < 9:
             raise ClientMessage.ParseError("Message is missing header data.")
 
-        MessageClass = type_for_id[raw_data[0]]
-        msg_length = struct.unpack(raw_data[1:9], ">q")
+        MessageClass = ClientMessage.TypeForId[raw_data[0]]
+        msg_length = struct.unpack_from(">q", raw_data, 1)[0]
 
         if msg_length != len(raw_data):
             raise ClientMessage.ParseError("Message length value is wrong.")
@@ -72,7 +72,7 @@ class ConnectionRequest(ClientMessage):
         #<utf8 username string>
         if bytes_left < 4:
             raise ClientMessage.ParseError("Message is missing username data.")
-        username_len = struct.unpack(data[4:8], ">i")
+        username_len = struct.unpack_from(">i", data, 4)[0]
         move_pointer(4)
         if bytes_left < username_len:
             raise ClientMessage.ParseError("Message is missing username string.")
@@ -83,7 +83,7 @@ class ConnectionRequest(ClientMessage):
         #<utf8 password string>
         if bytes_left < 4:
             raise ClientMessage.ParseError("Message is missing password data.")
-        password_len = struct.unpack(data[4:8], ">i")
+        password_len = struct.unpack_from(">i", data, 4)[0]
         move_pointer(4)
         if bytes_left < password_len:
             raise ClientMessage.ParseError("Message is missing password string.")

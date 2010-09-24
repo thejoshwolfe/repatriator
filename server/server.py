@@ -27,7 +27,7 @@ class Server:
         blocks until one is received.
         """
         header = self.request.recv(9)
-        msg_size = struct.unpack(header[1:], ">q")
+        msg_size = struct.unpack_from(">q", header, 1)[0]
         return header + self.request.recv(msg_size - 9)
 
     def _run_writer(self):
