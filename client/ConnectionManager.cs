@@ -324,6 +324,7 @@ namespace repatriator_client
                 buffer.writeInt(clientBuildVersion);
                 buffer.writeString(userName);
                 buffer.writeString(password);
+                buffer.writeByte(1); // turn on the hardware
                 byte[] bytes = buffer.toByteArray();
 
                 writeByte(RequestTypes.ConnectionRequest);
