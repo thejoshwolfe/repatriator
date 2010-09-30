@@ -5,6 +5,7 @@ import hashlib
 import threading
 from settings import settings
 import os, sys
+from logging import debug, warning, error
 
 def _random_string(length):
     """
@@ -110,7 +111,7 @@ try:
         # need to convert the lists in json to sets
         _lists_to_sets()
     except ValueError as ex:
-        sys.stderr.write("Corrupt auth data, resetting auth database.\n")
+        error("Corrupt auth data, resetting auth database.")
         _in.close()
         raise IOError
     _in.close()

@@ -1,4 +1,5 @@
 Installation:
+
     install python 3.1 32-bit to C:\Python31 or somewhere else.
     install pywin32-214.win32-py3.1.exe.
     copy C:\Python31\Lib\site-packages\pywin32_system32\pywintypes31.dll
@@ -108,6 +109,14 @@ Messages:
             int64 - byte count of the entire message including this field
             int64 - byte count of the following file
             <file binary data as requested by FileDownloadRequest>
+
+        ErrorMessage
+            int 8 - identifies this message as an ErrorMessage
+            int64 - byte count of the entire message including this field
+            int32 - error number
+            int32 - length of utf8 description of error below
+            <utf8 error message string>
+
 
     From the client to the server:
 
