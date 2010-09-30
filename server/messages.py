@@ -47,7 +47,7 @@ class ClientMessage:
 
         msg = MessageClass(raw_data[9:])
         msg.message_type = raw_data[0]
-        debug("message identified as a " + str(msg))
+        debug("message identified as a " + msg.__class__.__name__)
         return msg
 
 __all__.append('MagicalRequest')
@@ -169,7 +169,7 @@ class MagicalResponse(ServerMessage):
         self.message_type = ServerMessage.MagicalResponse
 
     def _serialize(self):
-        return bytes([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
+        return bytes([0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07])
 
 __all__.append('ConnectionResult')
 class ConnectionResult(ServerMessage):

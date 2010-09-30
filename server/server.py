@@ -12,9 +12,11 @@ def set_up_logging():
     }
     log_level = log_levels[settings['LOG_LEVEL']]
     log_file = os.path.join(settings['DATA_FOLDER'], "server.log")
-    log_format = '%(asctime)s %(levelname)s: %(message)s'
+    log_format = '%(asctime)s "%(threadName)s" %(levelname)s: %(message)s'
     logging.basicConfig(filename=log_file, level=log_level, format=log_format)
 set_up_logging()
+from logging import debug, warning, error
+debug("\n\n")
 
 # now import our stuff
 from power import set_power_switch
@@ -29,7 +31,6 @@ import queue
 import threading
 import time
 from functools import wraps
-from logging import debug, warning, error
 
 # dependencies
 import pythoncom
@@ -71,10 +72,17 @@ class Server:
             try:
                 debug("writer waiting for message")
                 item = self.message_queue.get(block=True)
+
+                # make sure we're not done
+                if self.finished:
+                    debug("writer thread exiting")
+                    return
+
                 debug("writer found a message on the queue")
                 self._write_message(item)
             except socket.error:
-                warning("socket.error when writing message")
+                debug("socket.error when writing message, exiting thread")
+                self.close()
                 return
 
     def _run_reader(self):
@@ -82,6 +90,8 @@ class Server:
             try:
                 data = self._read_message()
             except socket.error:
+                debug("socket.error when reading message, exiting thread")
+                self.close()
                 return
 
             message = None
@@ -119,13 +129,16 @@ class Server:
         self.message_queue.put(message)
         
     def close(self):
-        self.finished = True
-        self.writer_thread.join()
-        self.reader_thread.join()
+        if not self.finished:
+            self.finished = True
+            try:
+                self.writer_thread.join()
+                self.reader_thread.join()
+            except RuntimeError:
+                pass
 
-        if self.on_connection_close is not None:
-            self.on_connection_close()
-
+            if self.on_connection_close is not None:
+                self.on_connection_close()
 
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
@@ -255,8 +268,6 @@ def start_server():
 
             global server
             server = self.server
-        def finish(self):
-            self.server.close()
 
     _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
     global server_thread
@@ -267,7 +278,6 @@ def start_server():
     message_thread = threading.Thread(target=run_message_loop, name="message handler")
     message_thread.start()
 
-    debug("\n\n")
     debug("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
 def run_message_loop():
@@ -314,10 +324,12 @@ def run_camera():
             continue
 
 def on_connection_open():
-    debug("on_connection_open")
+    debug("connection opening")
 
 def on_connection_close():
     global finished, camera_thread, server_thread
+
+    debug("connection closing")
 
     # clean up
     finished = True
