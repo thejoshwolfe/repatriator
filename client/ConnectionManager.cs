@@ -519,7 +519,7 @@ namespace repatriator_client
             private static string bytesToText(byte[] bytes, int index, int length)
             {
                 StringBuilder stringBuidler = new StringBuilder(bytes.Length * 3);
-                for (int i = index + 1; i < index + length - 1; i++)
+                for (int i = index; i < index + length; i++)
                     stringBuidler.Append(bytes[i].ToString("x2")).Append(' ');
                 return stringBuidler.ToString();
             }
