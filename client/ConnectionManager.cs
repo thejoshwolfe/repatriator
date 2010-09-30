@@ -484,7 +484,7 @@ namespace repatriator_client
                         Logging.error("can't read anything");
                         throw new SocketException();
                     }
-                    Logging.debug(Logging.bytesToString(buffer));
+                    Logging.debug("read: " + Logging.bytesToString(buffer));
                     offset += readSize;
                     remainingSize -= readSize;
                 }
