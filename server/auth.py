@@ -97,6 +97,7 @@ def login(username, password):
             user = User()
             user.username = username
             user.attrs = _auth_data[username]
+            return user
     
     return None
 
