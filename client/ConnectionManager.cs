@@ -451,7 +451,7 @@ namespace repatriator_client
             private Socket socket;
             private static bool logging = true;
             private static string lastLoggingMode = null;
-            private static StreamWriter logFile = logging ? new StreamWriter("S:\\tmp\\log.log", true) : null;
+            private static StreamWriter logFile = logging ? new StreamWriter("C:\\anaonetotototoot.txt", true) : null;
             public SocketStreamManager(Socket socket)
             {
                 this.socket = socket;
