@@ -8,47 +8,60 @@ namespace repatriator_client
 {
     public static class Logging
     {
-        private static bool logging = true;
-        private static string lastLoggingMode = null;
+        private const int LEVEL_debug = 3;
+        private const int LEVEL_warning = 2;
+        private const int LEVEL_error = 1;
+        private const int LEVEL_none = 0;
+        private static int logLevel = LEVEL_debug;
         private static StreamWriter logFile;
         private static object _lock = new object();
         static Logging()
         {
-            if (!logging)
+            if (logLevel == LEVEL_none)
                 return;
             string path = "C:\\aoeu.txt";
             logFile = new StreamWriter(path, true);
+            logFile.Write("\n");
+            logFile.Write("startup: " + DateTime.Now.ToString() + "\n");
         }
-        public static void logCommunication(string header, byte[] bytes, int index, int length)
+        public static void debug(string message)
         {
-            if (!logging)
+            if (logLevel < LEVEL_debug)
                 return;
-            string text = bytesToText(bytes, index, length);
-            logSomething(header, text);
+            logSomething("DEBUG", message);
         }
-        public static void logMessage(string header, string message)
+        public static void error(string message)
         {
-            if (!logging)
+            if (logLevel < LEVEL_error)
                 return;
-            logSomething(header, message);
+            logSomething("ERROR", message);
         }
-        private static void logSomething(string header, string text)
+        public static void error(Exception ex)
+        {
+            if (logLevel < LEVEL_error)
+                return;
+            logSomething("ERROR", ex.GetType().Name + ": " + ex.Message);
+        }
+        public static void warning(string message)
+        {
+            if (logLevel < LEVEL_warning)
+                return;
+            logSomething("WARNING", message);
+        }
+        private static void logSomething(string header, string message)
         {
             lock (_lock)
             {
-                if (header != lastLoggingMode)
-                {
-                    logFile.Write("\n" + header + ": ");
-                }
-                lastLoggingMode = header;
-                logFile.Write(text);
+                logFile.Write(header + ": ");
+                logFile.Write(message);
+                logFile.Write("\n");
                 logFile.Flush();
             }
         }
-        private static string bytesToText(byte[] bytes, int index, int length)
+        public static string bytesToString(byte[] bytes)
         {
             StringBuilder stringBuidler = new StringBuilder(bytes.Length * 3);
-            for (int i = index; i < index + length; i++)
+            for (int i = 0; i < bytes.Length; i++)
                 stringBuidler.Append(bytes[i].ToString("x2")).Append(' ');
             return stringBuidler.ToString();
         }

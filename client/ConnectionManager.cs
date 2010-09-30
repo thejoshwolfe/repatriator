@@ -50,7 +50,7 @@ namespace repatriator_client
         private void createSocket()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.ReceiveTimeout = 5;
+            socket.ReceiveTimeout = 5000;
             socketStream = new SocketStreamManager(socket);
         }
 
@@ -177,11 +177,12 @@ namespace repatriator_client
                     receiveThread.Start();
                     return LoginStatus.Success;
                 }
-                catch (SocketException)
+                catch (SocketException ex)
                 {
                     if (connectionState == ConnectionState.Cancelling)
                         return LoginStatus.Cancelled;
-                    // server isn't communicating in time
+                    Logging.error("exception communicating with server");
+                    Logging.error(ex);
                     return LoginStatus.ServerIsBogus;
                 }
             }
@@ -451,7 +452,6 @@ namespace repatriator_client
             public SocketStreamManager(Socket socket)
             {
                 this.socket = socket;
-                Logging.logMessage("\ninit", "instance = " + this.GetHashCode() + ". ");
             }
             public override void write(byte[] bytes)
             {
@@ -462,13 +462,13 @@ namespace repatriator_client
                     int amountWritten = socket.Send(bytes, index, amountToWrite, 0);
                     if (amountWritten == 0)
                     {
-                        Logging.logMessage("error", "can't send anything. ");
+                        Logging.error("can't send anything. ");
                         throw new SocketException();
                     }
-                    Logging.logCommunication("write", bytes, index, amountWritten);
                     index += amountWritten;
                     amountToWrite -= amountWritten;
                 }
+                Logging.debug("write: " + Logging.bytesToString(bytes));
             }
             public override byte[] read(int length)
             {
@@ -481,10 +481,10 @@ namespace repatriator_client
                     int readSize = socket.Receive(buffer, offset, remainingSize, SocketFlags.None);
                     if (readSize == 0)
                     {
-                        Logging.logMessage("error", "can't read anything. ");
+                        Logging.error("can't read anything");
                         throw new SocketException();
                     }
-                    Logging.logCommunication("read", buffer, offset, readSize);
+                    Logging.debug(Logging.bytesToString(buffer));
                     offset += readSize;
                     remainingSize -= readSize;
                 }

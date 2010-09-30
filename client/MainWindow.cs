@@ -49,7 +49,7 @@ namespace repatriator_client
             Action action = new Action(delegate()
             {
                 statusLabel.Text = message;
-                Logging.logMessage("status", message + ". ");
+                Logging.debug(message);
             });
             if (InvokeRequired)
                 BeginInvoke(action);
