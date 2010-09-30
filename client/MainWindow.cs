@@ -83,9 +83,17 @@ namespace repatriator_client
                 case LoginStatus.LoginIsInvalid:
                     updateStatus_safe("invalid login");
                     break;
+                case LoginStatus.InsufficientPrivileges:
+                    updateStatus_safe("insufficient privileges");
+                    break;
+                case LoginStatus.Cancelled:
+                    updateStatus_safe("cancelled");
+                    break;
                 case LoginStatus.Success:
                     updateStatus_safe("logged in");
                     break;
+                default:
+                    throw new Exception();
             }
             BeginInvoke(new Action(delegate()
             {
