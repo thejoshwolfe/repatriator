@@ -66,6 +66,7 @@ class ConnectionRequest(ClientMessage):
         offset = len(data) - bytes_left
 
         def move_pointer(amount):
+            nonlocal bytes_left, offset
             bytes_left -= offset
             offset += amount
 
@@ -187,18 +188,16 @@ class ConnectionResult(ServerMessage):
         self.status = status
         
     def _serialize(self):
-        magic = bytes([0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07])
         major, minor, revision = version
 
         buf = bytearray()
-        buf.append(magic)
-        buf.append(struct.pack(">i", major))
-        buf.append(struct.pack(">i", minor))
-        buf.append(struct.pack(">i", revision))
-        buf.append(struct.pack(">i", self.status))
-        buf.append(struct.pack(">i", len(self.privileges)))
+        buf.extend(struct.pack(">i", major))
+        buf.extend(struct.pack(">i", minor))
+        buf.extend(struct.pack(">i", revision))
+        buf.extend(struct.pack(">i", self.status))
+        buf.extend(struct.pack(">i", len(self.privileges)))
         for privilege in self.privileges:
-            buf.append(struct.pack(">i", privilege))
+            buf.extend(struct.pack(">i", privilege))
 
         return buf
 
@@ -234,20 +233,13 @@ class FullUpdate(ServerMessage):
 
     def _serialize(self):
         buf = bytearray()
-        #int64 - position of motor A
-        buf.append(struct.pack(">q", self.motor_a_pos))
-        #int64 - position of motor B
-        buf.append(struct.pack(">q", self.motor_b_pos))
-        #int64 - position of motor X
-        buf.append(struct.pack(">q", self.motor_x_pos))
-        #int64 - position of motor Y
-        buf.append(struct.pack(">q", self.motor_y_pos))
-        #int64 - position of motor Z
-        buf.append(struct.pack(">q", self.motor_z_pos))
-        #int64 - byte count for following JPEG image
-        buf.append(struct.pack(">q", len(self.jpeg)))
-        #<jpeg format image>
-        buf.append(self.jpeg)
+        buf.extend(struct.pack(">q", self.motor_a_pos))
+        buf.extend(struct.pack(">q", self.motor_b_pos))
+        buf.extend(struct.pack(">q", self.motor_x_pos))
+        buf.extend(struct.pack(">q", self.motor_y_pos))
+        buf.extend(struct.pack(">q", self.motor_z_pos))
+        buf.extend(struct.pack(">q", len(self.jpeg)))
+        buf.extend(self.jpeg)
         return buf
 
 __all__.append('DirectoryListingResult')
@@ -279,9 +271,9 @@ class ErrorMessage(ServerMessage):
 
     def _serialize(self):
         buf = bytearray()
-        buf.append(struct.pack(">i", self.code))
-        buf.append(struct.pack(">i", len(self.description)))
-        buf.append(self.description.encode())
+        buf.extend(struct.pack(">i", self.code))
+        buf.extend(struct.pack(">i", len(self.description)))
+        buf.extend(self.description.encode())
         return buf
 
 
