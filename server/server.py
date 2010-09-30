@@ -12,7 +12,8 @@ def set_up_logging():
     }
     log_level = log_levels[settings['LOG_LEVEL']]
     log_file = os.path.join(settings['DATA_FOLDER'], "server.log")
-    logging.basicConfig(filename=log_file, level=log_level)
+    log_format = '%(asctime)s %(levelname)s: %(message)s'
+    logging.basicConfig(filename=log_file, level=log_level, format=log_format)
 set_up_logging()
 
 # now import our stuff
@@ -39,7 +40,12 @@ class Server:
         """
         actually writes the message to the open connection
         """
-        self.request.sendall(message.serialize())
+        raw_data = message.serialize()
+        debug("outgoing message (" + message.__class__.__name__ + ")")
+        debug("--------------------------------")
+        debug(raw_data)
+        debug("--------------------------------")
+        self.request.sendall(raw_data)
 
     def _read_amt(self, byte_count):
         """
@@ -63,27 +69,29 @@ class Server:
     def _run_writer(self):
         while not self.finished:
             try:
-                item = self.message_queue.get(block=False)
+                debug("writer waiting for message")
+                item = self.message_queue.get(block=True)
+                debug("writer found a message on the queue")
                 self._write_message(item)
-            except queue.Empty:
-                time.sleep(0.05)
             except socket.error:
+                warning("socket.error when writing message")
                 return
 
     def _run_reader(self):
-        try:
-            data = self._read_message()
-        except socket.error:
-            return
+        while not self.finished:
+            try:
+                data = self._read_message()
+            except socket.error:
+                return
 
-        message = None
-        try:
-            message = ClientMessage.parse(data)
-        except ClientMessage.ParseError as ex:
-            sys.stderr.write(str(ex) + "\n")
+            message = None
+            try:
+                message = ClientMessage.parse(data)
+            except ClientMessage.ParseError as ex:
+                sys.stderr.write(str(ex) + "\n")
 
-        if message is not None and self.on_message is not None:
-            self.on_message(message)
+            if message is not None and self.on_message is not None:
+                self.on_message(message)
 
     def __init__(self, on_message=None, on_connection_open=None, on_connection_close=None):
         debug("init server")
@@ -107,6 +115,7 @@ class Server:
         """
         message is a ServerMessage which will be put on the outgoing message queue.
         """
+        debug("adding message to outgoing queue")
         self.message_queue.put(message)
         
     def close(self):
@@ -120,12 +129,14 @@ class Server:
 
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
+    global server
+
     # nothing to do
-    debug("got a magical request, doing nothing")
-    pass
+    debug("got a magical request, sending a magical response")
+    server.send_message(MagicalResponse())
 
 def handle_ConnectionRequest(msg):
-    global user
+    global user, server
 
     debug("Got connection request message")
 
@@ -151,6 +162,7 @@ def must_have_privilege(privilege):
             if user.has_privilege(privilege):
                 return function(msg, *args, **kwargs)
             else:
+                warning("User doesn't have privilege " + str(privilege) + ": sending authorization denied message")
                 return server.send_message(ErrorMessage(ErrorMessage.NotAuthorized))
         return wraps(function)(_wrapped)
     return decorated
@@ -208,17 +220,30 @@ message_handlers = {
     ClientMessage.FileDeleteRequest: handle_FileDeleteRequest,
 }
 
+need_camera_thread = {
+    ClientMessage.MagicalRequest: False,
+    ClientMessage.ConnectionRequest: False,
+    ClientMessage.TakePicture: True,
+    ClientMessage.MotorMovement: True,
+    ClientMessage.DirectoryListingRequest: False,
+    ClientMessage.FileDownloadRequest: False,
+    ClientMessage.AddUser: False,
+    ClientMessage.UpdateUser: False,
+    ClientMessage.DeleteUser: False,
+    ClientMessage.FileDeleteRequest: False,
+}
+
 def reset_state():
-    global user, message_queue, camera_thread
+    global user, message_queue, camera_thread, camera_thread_queue, finished
 
     # initialize variables
+    finished = False
     user = None
     camera_thread = None
     message_queue = queue.Queue()
+    camera_thread_queue = queue.Queue()
 
 def start_server():
-    global user, server, server_thread, message_queue, camera_thread
-
     reset_state()
 
     # wait for a connection
@@ -227,16 +252,40 @@ def start_server():
             self.server = Server(message_queue.put, on_connection_open, on_connection_close)
             self.server.request = self.request
             self.server.open()
+
+            global server
+            server = self.server
         def finish(self):
             self.server.close()
 
-    server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
-    server_thread = threading.Thread(target=server.serve_forever, name="socket server")
+    _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
+    global server_thread
+    server_thread = threading.Thread(target=_server.serve_forever, name="socket server")
     server_thread.start()
+
+    global message_thread
+    message_thread = threading.Thread(target=run_message_loop, name="message handler")
+    message_thread.start()
+
+    debug("\n\n")
     debug("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
+def run_message_loop():
+    global message_handlers, message_queue, camera_thread, finished
+
+    debug("entering message loop")
+    while not finished:
+        msg = message_queue.get(block=True)
+        # choose which thread to run the message handler in
+        if need_camera_thread[msg.message_type]:
+            # transfer to camera thread    
+            camera_thread_queue.put(msg)
+        else:
+            # handle directly
+            message_handlers[msg.message_type](msg)
+
 def run_camera():
-    global camera, message_handlers, message_queue
+    global camera, message_handlers, message_queue, finished
 
     debug("running camera")
 
@@ -246,7 +295,6 @@ def run_camera():
 
     next_frame = time.time()
 
-    debug("entering message loop")
     while not finished:
         pythoncom.PumpWaitingMessages()
 
@@ -257,9 +305,9 @@ def run_camera():
             camera.grabLiveViewFrame()
             next_frame = now + 0.20
 
-        # process messages
+        # process messages that have to be run in camera thread
         try:
-            msg = message_queue.get(block=False)
+            msg = camera_thread_queue.get(block=False)
             message_handlers[msg.message_type](msg)
         except queue.Empty:
             time.sleep(0.05)

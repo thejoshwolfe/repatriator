@@ -157,13 +157,15 @@ class ServerMessage:
         """
         buf = self._serialize()
         message_length = 1 + 8 + len(buf)
-        buf.insert(struct.pack('>q', message_length))
-        buf.insert(struct.pack('>b', self.message_type))
-        return buf
+        out = bytearray()
+        out.extend(struct.pack('>q', message_length))
+        out.extend(struct.pack('>b', self.message_type))
+        out.extend(buf)
+        return out
 
 __all__.append('MagicalResponse')
 class MagicalResponse(ServerMessage):
-    def __init__(self,):
+    def __init__(self):
         self.message_type = ServerMessage.MagicalResponse
 
     def _serialize(self):
