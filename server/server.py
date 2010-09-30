@@ -127,15 +127,16 @@ class Server:
         """
         debug("adding message to outgoing queue")
         self.message_queue.put(message)
+
+    def wait(self):
+        for thread in (self.writer_thread, self.reader_thread):
+            if threading.current_thread != thread:
+                thread.join()
         
     def close(self):
         if not self.finished:
             self.finished = True
-            try:
-                self.writer_thread.join()
-                self.reader_thread.join()
-            except RuntimeError:
-                pass
+            self.wait()
 
             if self.on_connection_close is not None:
                 self.on_connection_close()
@@ -253,6 +254,7 @@ def reset_state():
     finished = False
     user = None
     camera_thread = None
+    message_thread = None
     message_queue = queue.Queue()
     camera_thread_queue = queue.Queue()
 
@@ -260,14 +262,16 @@ def start_server():
     reset_state()
 
     # wait for a connection
-    class _Server(socketserver.BaseRequestHandler):
+    class _Server(socketserver.StreamRequestHandler):
         def handle(self):
             self.server = Server(message_queue.put, on_connection_open, on_connection_close)
             self.server.request = self.request
             self.server.open()
-
             global server
             server = self.server
+
+            self.server.wait()
+
 
     _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
     global server_thread
@@ -333,8 +337,15 @@ def on_connection_close():
 
     # clean up
     finished = True
+
     if camera_thread is not None:
         camera_thread.join()
+        camera_thread = None
+
+    if message_thread is not None:
+        message_thread.join()
+        message_thread = None
+
     set_power_switch(on=False)
 
     reset_state()

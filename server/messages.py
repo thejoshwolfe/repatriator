@@ -261,9 +261,13 @@ class FileDownloadResult(ServerMessage):
 __all__.append('ErrorMessage')
 class ErrorMessage(ServerMessage):
     NotAuthorized = 0
+    HardwareInUse = 1
+    FileDoesNotExist = 2
 
     descriptions = {
-        NotAuthorized: "Not authorized to perform this operation",
+        NotAuthorized: "Not authorized to perform this operation.",
+        HardwareInUse: "The hardware is already in use - wait till someone logs off.",
+        FileDoesNotExist: "The file does not exist.",
     }
 
     def __init__(self, code, description=None):
