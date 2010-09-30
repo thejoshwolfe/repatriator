@@ -1,16 +1,36 @@
 #!/usr/bin/env python3
 
-from power import set_power_switch
+# set up logging first
 from settings import settings
+import logging
+import os, sys
+def set_up_logging():
+    log_levels = {
+        'DEBUG': logging.DEBUG,
+        'WARNING': logging.WARNING,
+        'ERROR': logging.ERROR,
+    }
+    log_level = log_levels[settings['LOG_LEVEL']]
+    log_file = os.path.join(settings['DATA_FOLDER'], "server.log")
+    logging.basicConfig(filename=log_file, level=log_level)
+set_up_logging()
+
+# now import our stuff
+from power import set_power_switch
 from messages import *
 import auth
+from auth import Privilege
 
+# python stuff
 import struct
 import socket, socketserver
 import queue
-import os, sys
 import threading
 import time
+from functools import wraps
+from logging import debug, warning, error
+
+# dependencies
 import pythoncom
 import edsdk
 
@@ -20,15 +40,25 @@ class Server:
         actually writes the message to the open connection
         """
         self.request.sendall(message.serialize())
+
+    def _read_amt(self, byte_count):
+        """
+        blocks until byte_count bytes have been read
+        """
+        full_msg = bytearray()
+        while len(full_msg) < byte_count:
+            block = self.request.recv(byte_count - len(full_msg))
+            full_msg.extend(block)
+        return full_msg
     
     def _read_message(self):
         """
         actually reads the message from the open connection.
         blocks until one is received.
         """
-        header = self.request.recv(9)
+        header = self._read_amt(9)
         msg_size = struct.unpack_from(">q", header, 1)[0]
-        return header + self.request.recv(msg_size - 9)
+        return header + self._read_amt(msg_size - 9)
 
     def _run_writer(self):
         while not self.finished:
@@ -56,7 +86,7 @@ class Server:
             self.on_message(message)
 
     def __init__(self, on_message=None, on_connection_open=None, on_connection_close=None):
-        print("init server")
+        debug("init server")
         self.on_message = on_message
         self.on_connection_open = on_connection_open
         self.on_connection_close = on_connection_close
@@ -91,13 +121,13 @@ class Server:
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
     # nothing to do
-    print("got a magical request, doing nothing")
+    debug("got a magical request, doing nothing")
     pass
 
 def handle_ConnectionRequest(msg):
     global user
 
-    print("Got connection request message")
+    debug("Got connection request message")
 
     user = auth.login(msg.username, msg.password)
     if user is None:
@@ -105,7 +135,7 @@ def handle_ConnectionRequest(msg):
         return
     
     # if they request hardware to turn on, make sure they have privileges
-    if msg.admin_flag and not user.has_privilege(auth.Privilege.OperateHardware):
+    if msg.admin_flag and not user.has_privilege(Privilege.OperateHardware):
         server.send_message(ConnectionResult(ConnectionResult.InsufficientPrivileges, user.privileges()))
         return
         
@@ -114,36 +144,55 @@ def handle_ConnectionRequest(msg):
     if msg.admin_flag:
         initialize_hardware()
 
+def must_have_privilege(privilege):
+    def decorated(function):
+        def _wrapped(msg, *args, **kwargs):
+            global user
+            if user.has_privilege(privilege):
+                return function(msg, *args, **kwargs)
+            else:
+                return server.send_message(ErrorMessage(ErrorMessage.NotAuthorized))
+        return wraps(function)(_wrapped)
+    return decorated
+
+@must_have_privilege(Privilege.OperateHardware)
 def handle_TakePicture(msg):
-    print("Got take picture message")
+    debug("Got take picture message")
     pass
 
+@must_have_privilege(Privilege.OperateHardware)
 def handle_MotorMovement(msg):
-    print("Got motor movement message")
+    debug("Got motor movement message")
     pass
 
+@must_have_privilege(Privilege.OperateHardware)
 def handle_DirectoryListingRequest(msg):
-    print("Got directory listing message")
+    debug("Got directory listing message")
     pass
 
+@must_have_privilege(Privilege.OperateHardware)
 def handle_FileDownloadRequest(msg):
-    print("Got file dowrload message")
+    debug("Got file download message")
     pass
 
+@must_have_privilege(Privilege.ManageUsers)
 def handle_AddUser(msg):
-    print("Got add user message")
+    debug("Got add user message")
     pass
 
+@must_have_privilege(Privilege.ManageUsers)
 def handle_UpdateUser(msg):
-    print("Got update user message")
+    debug("Got update user message")
     pass
 
+@must_have_privilege(Privilege.ManageUsers)
 def handle_DeleteUser(msg):
-    print("Got tdelete user message")
+    debug("Got delete user message")
     pass
 
+@must_have_privilege(Privilege.ManageUsers)
 def handle_FileDeleteRequest(msg):
-    print("Got file delete request message")
+    debug("Got file delete request message")
     pass
 
 message_handlers = {
@@ -184,12 +233,12 @@ def start_server():
     server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
     server_thread = threading.Thread(target=server.serve_forever, name="socket server")
     server_thread.start()
-    print("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
+    debug("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
 def run_camera():
     global camera, message_handlers, message_queue
 
-    print("running camera")
+    debug("running camera")
 
     pythoncom.CoInitializeEx(2)
     camera = edsdk.getFirstCamera()
@@ -197,7 +246,7 @@ def run_camera():
 
     next_frame = time.time()
 
-    print("entering message loop")
+    debug("entering message loop")
     while not finished:
         pythoncom.PumpWaitingMessages()
 
@@ -217,8 +266,7 @@ def run_camera():
             continue
 
 def on_connection_open():
-    print("on_connection_open")
-    pass
+    debug("on_connection_open")
 
 def on_connection_close():
     global finished, camera_thread, server_thread
@@ -238,8 +286,6 @@ def initialize_hardware():
     finished = False
     camera_thread = threading.Thread(target=run_camera, name="camera")
     camera_thread.start()
-
-
 
 if __name__ == "__main__":
     start_server()

@@ -1,6 +1,8 @@
 from version import version
 import struct
 import sys
+import logging
+from logging import debug, warning, error
 
 __all__ = []
 
@@ -26,17 +28,26 @@ class ClientMessage:
         raw_data is a byte array
         returns a subclass of ClientMessage with the relevant data.
         """
+        debug("Incoming client message. raw data:")
+        debug("----------------------------------")
+        debug(raw_data)
+        debug("----------------------------------")
+
         if len(raw_data) < 9:
+            warning("Client message is missing header data")
             raise ClientMessage.ParseError("Message is missing header data.")
 
         MessageClass = ClientMessage.TypeForId[raw_data[0]]
         msg_length = struct.unpack_from(">q", raw_data, 1)[0]
+        debug("Message length: " + str(msg_length) + ", actual length: " + str(len(raw_data)))
 
         if msg_length != len(raw_data):
+            warning("Client message length value is wrong")
             raise ClientMessage.ParseError("Message length value is wrong.")
 
         msg = MessageClass(raw_data[9:])
         msg.message_type = raw_data[0]
+        debug("message identified as a " + str(msg))
         return msg
 
 __all__.append('MagicalRequest')
@@ -45,6 +56,7 @@ class MagicalRequest(ClientMessage):
 
     def __init__(self, data):
         if MagicalRequest.magical_bytes != data:
+            warning("Client message magical bytes didn't match up.")
             raise ClientMessage.ParseError("Magical bytes didn't match up.")
 
 __all__.append('ConnectionRequest')
@@ -135,6 +147,7 @@ class ServerMessage:
     FullUpdate = 2
     DirectoryListingResult = 3
     FileDownloadResult = 4
+    ErrorMessage = 5
 
     def serialize(self):
         """
@@ -233,6 +246,7 @@ class FullUpdate(ServerMessage):
         buf.append(struct.pack(">q", len(self.jpeg)))
         #<jpeg format image>
         buf.append(self.jpeg)
+        return buf
 
 __all__.append('DirectoryListingResult')
 class DirectoryListingResult(ServerMessage):
@@ -241,6 +255,29 @@ class DirectoryListingResult(ServerMessage):
 __all__.append('FileDownloadResult')
 class FileDownloadResult(ServerMessage):
     pass
+
+__all__.append('ErrorMessage')
+class ErrorMessage(ServerMessage):
+    NotAuthorized = 0
+
+    descriptions = {
+        NotAuthorized: "Not authorized to perform this operation",
+    }
+
+    def __init__(self, code, description=None):
+        self.code = code
+        if description is None:
+            self.description = self.descriptions[code]
+        else:
+            self.description = description
+
+    def _serialize(self):
+        buf = bytearray()
+        buf.append(struct.pack(">i", self.code))
+        buf.append(struct.pack(">i", len(self.description)))
+        buf.append(self.description.encode())
+        return buf
+
 
 ClientMessage.TypeForId = {
     ClientMessage.MagicalRequest: MagicalRequest,
