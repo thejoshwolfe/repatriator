@@ -1,3 +1,14 @@
+Installation:
+    install python 3.1 32-bit to C:\Python31 or somewhere else.
+    install pywin32-214.win32-py3.1.exe.
+    copy C:\Python31\Lib\site-packages\pywin32_system32\pywintypes31.dll
+        to C:\Windows\System32\
+    extract "EDSDK 2.7 Windows.zip"\EDSDK\Dll\*.dll to server\
+    install pyedsdk. a shortcut is to use:
+        wolfebin get -k pyedsdk-0.1
+        then extract the zip into C:\Python31\Lib\site-packages.
+        the long way is to follow the install instructions in pyedsdk.
+
 Configuration:
 
     config.py file in the same folder as server.py:
