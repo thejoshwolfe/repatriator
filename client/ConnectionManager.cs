@@ -486,7 +486,7 @@ namespace repatriator_client
                     int readSize = socket.Receive(buffer, offset, remainingSize, SocketFlags.None);
                     if (readSize == 0)
                     {
-                        logMessage("error", "can't send anything");
+                        logMessage("error", "can't read anything");
                         throw new SocketException();
                     }
                     logCommunication("read", buffer, offset, readSize);
