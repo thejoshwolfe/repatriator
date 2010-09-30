@@ -8,6 +8,7 @@ __all__ = []
 
 __all__.append('ClientMessage')
 class ClientMessage:
+    DummyCloseConnection = -1
     MagicalRequest = 0
     ConnectionRequest = 1
     TakePicture = 2
@@ -141,6 +142,7 @@ class DeleteUser(ClientMessage):
 
 __all__.append('ServerMessage')
 class ServerMessage:
+    DummyCloseConnection = -1
     MagicalResponse = 0
     ConnectionResult = 1
     FullUpdate = 2
@@ -161,6 +163,10 @@ class ServerMessage:
         out.extend(struct.pack('>q', message_length))
         out.extend(buf)
         return out
+
+__all__.append('DummyCloseConnection')
+class DummyCloseConnection:
+    message_type = ServerMessage.DummyCloseConnection
 
 __all__.append('MagicalResponse')
 class MagicalResponse(ServerMessage):

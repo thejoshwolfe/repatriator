@@ -68,30 +68,27 @@ class Server:
         return header + self._read_amt(msg_size - 9)
 
     def _run_writer(self):
-        while not self.finished:
+        while True:
             try:
-                debug("writer waiting for message")
                 item = self.message_queue.get(block=True)
 
-                # make sure we're not done
-                if self.finished:
-                    debug("writer thread exiting")
+                if item.message_type == ServerMessage.DummyCloseConnection:
+                    debug("closing connection and exiting thread")
+                    self.request.shutdown(2)
                     return
 
-                debug("writer found a message on the queue")
                 self._write_message(item)
             except socket.error:
-                debug("socket.error when writing message, exiting thread")
-                self.close()
+                error("socket.error when writing message, exiting thread")
+                self.message_queue.put(DummyCloseConnection())
                 return
 
     def _run_reader(self):
-        while not self.finished:
+        while True:
             try:
                 data = self._read_message()
             except socket.error:
                 debug("socket.error when reading message, exiting thread")
-                self.close()
                 return
 
             message = None
@@ -109,7 +106,6 @@ class Server:
         self.on_connection_open = on_connection_open
         self.on_connection_close = on_connection_close
         self.message_queue = queue.Queue()
-        self.finished = False # set to true to tell threads to stop running
 
         self.writer_thread = threading.Thread(target=self._run_writer, name="message writer")
         self.reader_thread = threading.Thread(target=self._run_reader, name="message reader")
@@ -132,14 +128,9 @@ class Server:
         for thread in (self.writer_thread, self.reader_thread):
             if threading.current_thread != thread:
                 thread.join()
-        
-    def close(self):
-        if not self.finished:
-            self.finished = True
-            self.wait()
 
-            if self.on_connection_close is not None:
-                self.on_connection_close()
+    def close(self):
+        self.message_queue.put(DummyCloseConnection())
 
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
@@ -159,12 +150,14 @@ def handle_ConnectionRequest(msg):
     if user is None:
         warning("Invalid login: " + msg.username + ", Password: <hidden>")
         server.send_message(ConnectionResult(ConnectionResult.InvalidLogin))
+        server.close()
         return
     
     # if they request hardware to turn on, make sure they have privileges
     if msg.hardware_flag and not user.has_privilege(Privilege.OperateHardware):
         warning(msg.username + " requested hardware access but doesn't have permission")
         server.send_message(ConnectionResult(ConnectionResult.InsufficientPrivileges, user.privileges()))
+        server.close()
         return
         
     debug("Successful login for user " + msg.username)
@@ -252,15 +245,20 @@ need_camera_thread = {
 }
 
 def reset_state():
-    global user, message_queue, camera_thread, camera_thread_queue, finished
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished
 
     # initialize variables
     finished = False
     user = None
     camera_thread = None
     message_thread = None
-    message_queue = queue.Queue()
     camera_thread_queue = queue.Queue()
+    message_queue = queue.Queue()
+
+def start_message_loop():
+    global message_thread
+    message_thread = threading.Thread(target=run_message_loop, name="message handler")
+    message_thread.start()
 
 def start_server():
     reset_state()
@@ -268,6 +266,7 @@ def start_server():
     # wait for a connection
     class _Server(socketserver.StreamRequestHandler):
         def handle(self):
+            debug("_Server.handle called")
             self.server = Server(message_queue.put, on_connection_open, on_connection_close)
             self.server.request = self.request
             self.server.open()
@@ -275,17 +274,16 @@ def start_server():
             server = self.server
 
             self.server.wait()
-
+        def finish(self):
+            if on_connection_close:
+                on_connection_close()
 
     _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
     global server_thread
     server_thread = threading.Thread(target=_server.serve_forever, name="socket server")
     server_thread.start()
 
-    global message_thread
-    message_thread = threading.Thread(target=run_message_loop, name="message handler")
-    message_thread.start()
-
+    start_message_loop()
     debug("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
 def run_message_loop():
@@ -294,6 +292,11 @@ def run_message_loop():
     debug("entering message loop")
     while not finished:
         msg = message_queue.get(block=True)
+        
+        # check for message indicating thread is done
+        if msg.message_type == ClientMessage.DummyCloseConnection:
+            return
+
         # choose which thread to run the message handler in
         if need_camera_thread[msg.message_type]:
             # transfer to camera thread    
@@ -345,11 +348,22 @@ def on_connection_close():
     # clean up
     finished = True
 
-    for thread in (camera_thread, message_thread):
-        if thread is not None:
-            thread.join()
+    debug("waiting for camera thread to join")
+    if camera_thread is not None:
+        camera_thread.join()
+
+    debug("waiting for message thread to join")
+    if message_thread is not None:
+        message_queue.put(DummyCloseConnection)
+        message_thread.join()
+
     set_power_switch(on=False)
+
+    debug("resetting state")
     reset_state()
+    start_message_loop()
+
+    debug("ready for a new connection")
 
 def initialize_hardware():
     global finished, camera_thread
