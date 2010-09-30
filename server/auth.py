@@ -43,7 +43,7 @@ def _save_json():
     _sets_to_lists()
 
     _out = open(_auth_file, "w")
-    json.dumps(_auth_data)
+    _out.write(json.dumps(_auth_data))
     _out.close()
 
     _lists_to_sets()

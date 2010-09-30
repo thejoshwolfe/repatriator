@@ -98,7 +98,7 @@ class Server:
             try:
                 message = ClientMessage.parse(data)
             except ClientMessage.ParseError as ex:
-                sys.stderr.write(str(ex) + "\n")
+                error("when parsing client message: " + str(ex))
 
             if message is not None and self.on_message is not None:
                 self.on_message(message)
@@ -153,20 +153,24 @@ def handle_ConnectionRequest(msg):
     global user, server
 
     debug("Got connection request message")
+    debug("version: {0}".format(str(msg.version)))
 
     user = auth.login(msg.username, msg.password)
     if user is None:
+        warning("Invalid login: " + msg.username + ", Password: <hidden>")
         server.send_message(ConnectionResult(ConnectionResult.InvalidLogin))
         return
     
     # if they request hardware to turn on, make sure they have privileges
-    if msg.admin_flag and not user.has_privilege(Privilege.OperateHardware):
+    if msg.hardware_flag and not user.has_privilege(Privilege.OperateHardware):
+        warning(msg.username + " requested hardware access but doesn't have permission")
         server.send_message(ConnectionResult(ConnectionResult.InsufficientPrivileges, user.privileges()))
         return
         
+    debug("Successful login for user " + msg.username)
     server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges()))
 
-    if msg.admin_flag:
+    if msg.hardware_flag:
         initialize_hardware()
 
 def must_have_privilege(privilege):
@@ -304,11 +308,14 @@ def run_camera():
     debug("running camera")
 
     pythoncom.CoInitializeEx(2)
+    debug("edsdk: getting first camera")
     camera = edsdk.getFirstCamera()
+    debug("edsdk: starting live view")
     camera.startLiveView()
 
     next_frame = time.time()
 
+    debug("entering loop to send live view frames")
     while not finished:
         pythoncom.PumpWaitingMessages()
 
@@ -338,16 +345,10 @@ def on_connection_close():
     # clean up
     finished = True
 
-    if camera_thread is not None:
-        camera_thread.join()
-        camera_thread = None
-
-    if message_thread is not None:
-        message_thread.join()
-        message_thread = None
-
+    for thread in (camera_thread, message_thread):
+        if thread is not None:
+            thread.join()
     set_power_switch(on=False)
-
     reset_state()
 
 def initialize_hardware():
