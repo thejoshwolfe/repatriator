@@ -279,13 +279,29 @@ namespace repatriator_client
             {
                 write(new byte[] { value });
             }
-            public void writeInt(int i)
+            public void writeInt(int value)
             {
-                write(BitConverter.GetBytes(i));
+                byte[] bytes = {
+                    (byte)((value >> 24) & 0xff),
+                    (byte)((value >> 16) & 0xff),
+                    (byte)((value >> 8) & 0xff),
+                    (byte)((value >> 0) & 0xff),
+                };
+                write(bytes);
             }
-            public void writeLong(long l)
+            public void writeLong(long value)
             {
-                write(BitConverter.GetBytes(l));
+                byte[] bytes = {
+                    (byte)((value >> 56) & 0xff),
+                    (byte)((value >> 48) & 0xff),
+                    (byte)((value >> 40) & 0xff),
+                    (byte)((value >> 32) & 0xff),
+                    (byte)((value >> 24) & 0xff),
+                    (byte)((value >> 16) & 0xff),
+                    (byte)((value >> 8) & 0xff),
+                    (byte)((value >> 0) & 0xff),
+                };
+                write(bytes);
             }
             public void writeString(string s)
             {
@@ -322,13 +338,27 @@ namespace repatriator_client
             }
             public int readInt()
             {
-                byte[] buffer = read(4);
-                return BitConverter.ToInt32(buffer, 0);
+                byte[] bytes = read(4);
+                int value = 0;
+                value += (bytes[0] & 0xff) << 24;
+                value += (bytes[1] & 0xff) << 16;
+                value += (bytes[2] & 0xff) << 8;
+                value += (bytes[3] & 0xff) << 0;
+                return value;
             }
             public long readLong()
             {
-                byte[] buffer = read(8);
-                return BitConverter.ToInt64(buffer, 0);
+                byte[] bytes = read(8);
+                long value = 0;
+                value += (long)(bytes[0] & 0xff) << 56;
+                value += (long)(bytes[1] & 0xff) << 48;
+                value += (long)(bytes[2] & 0xff) << 40;
+                value += (long)(bytes[3] & 0xff) << 32;
+                value += (long)(bytes[4] & 0xff) << 24;
+                value += (long)(bytes[5] & 0xff) << 16;
+                value += (long)(bytes[6] & 0xff) << 8;
+                value += (long)(bytes[7] & 0xff) << 0;
+                return value;
             }
             public string readString()
             {
