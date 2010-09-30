@@ -67,25 +67,22 @@ class ConnectionRequest(ClientMessage):
 
         def move_pointer(amount):
             nonlocal bytes_left, offset
-            bytes_left -= offset
+            bytes_left -= amount
             offset += amount
 
         #int8 - major version number of client
         #int8 - minor version number of client
         #int8 - revision version number of client
-        #int8 - reserved
-        if bytes_left < 4:
+        if bytes_left < 4*3:
             raise ClientMessage.ParseError("Message is missing version data.")
-        self.version = [x for x in data[offset:offset+3]]
-        if data[offset+3] != 0:
-            raise ClientMessage.ParseError("Reserved field should be zero.")
-        move_pointer(4)
+        self.version = struct.unpack_from(">iii", data, offset)[0]
+        move_pointer(4*3)
 
         #int32 - length of utf8 username string below
         #<utf8 username string>
         if bytes_left < 4:
             raise ClientMessage.ParseError("Message is missing username data.")
-        username_len = struct.unpack_from(">i", data, 4)[0]
+        username_len = struct.unpack_from(">i", data, offset)[0]
         move_pointer(4)
         if bytes_left < username_len:
             raise ClientMessage.ParseError("Message is missing username string.")
@@ -96,9 +93,10 @@ class ConnectionRequest(ClientMessage):
         #<utf8 password string>
         if bytes_left < 4:
             raise ClientMessage.ParseError("Message is missing password data.")
-        password_len = struct.unpack_from(">i", data, 4)[0]
+        password_len = struct.unpack_from(">i", data, offset)[0]
         move_pointer(4)
         if bytes_left < password_len:
+            debug("bytes_left: {0}, password_len: {1}, len(data): {2}".format(bytes_left, password_len, len(data)))
             raise ClientMessage.ParseError("Message is missing password string.")
         self.password = data[offset:offset+password_len].decode('utf8')
         move_pointer(password_len)
@@ -106,7 +104,7 @@ class ConnectionRequest(ClientMessage):
         #int8 - boolean - do you want the hardware to turn on? False if you're only doing admin.
         if bytes_left < 1:
             raise ClientMessage.ParseError("Message is missing admin flag.")
-        self.admin_flag = data[offset]
+        self.hardware_flag = struct.unpack_from("?", data, offset)[0]
 
 __all__.append('TakePicture')
 class TakePicture(ClientMessage):
@@ -273,7 +271,7 @@ class ErrorMessage(ServerMessage):
         buf = bytearray()
         buf.extend(struct.pack(">i", self.code))
         buf.extend(struct.pack(">i", len(self.description)))
-        buf.extend(self.description.encode())
+        buf.extend(self.description.encode('utf8'))
         return buf
 
 
