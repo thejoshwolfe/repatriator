@@ -158,8 +158,8 @@ class ServerMessage:
         buf = self._serialize()
         message_length = 1 + 8 + len(buf)
         out = bytearray()
-        out.extend(struct.pack('>q', message_length))
         out.extend(struct.pack('>b', self.message_type))
+        out.extend(struct.pack('>q', message_length))
         out.extend(buf)
         return out
 
