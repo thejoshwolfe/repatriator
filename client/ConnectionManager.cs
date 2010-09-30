@@ -50,7 +50,7 @@ namespace repatriator_client
         private void createSocket()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.ReceiveTimeout = 5;
+            socket.ReceiveTimeout = 5000;
             socketStream = new SocketStreamManager(socket);
         }
 
@@ -177,11 +177,12 @@ namespace repatriator_client
                     receiveThread.Start();
                     return LoginStatus.Success;
                 }
-                catch (SocketException)
+                catch (SocketException ex)
                 {
                     if (connectionState == ConnectionState.Cancelling)
                         return LoginStatus.Cancelled;
-                    // server isn't communicating in time
+                    Logging.error("exception communicating with server");
+                    Logging.error(ex);
                     return LoginStatus.ServerIsBogus;
                 }
             }
@@ -374,7 +375,6 @@ namespace repatriator_client
             public bool readMagicalResponse()
             {
                 byte typeCode = readByte();
-                Console.WriteLine("read byte");
                 if (typeCode != ResponseTypes.MagicalResponse)
                     return false;
                 long length = readLong();
@@ -449,14 +449,9 @@ namespace repatriator_client
         private class SocketStreamManager : StreamManager
         {
             private Socket socket;
-            private static bool logging = true;
-            private static string lastLoggingMode = null;
-            private static StreamWriter logFile = logging ? new StreamWriter("C:\\anaonetotototoot.txt", true) : null;
             public SocketStreamManager(Socket socket)
             {
                 this.socket = socket;
-                if (logging)
-                    logMessage("\ninit", "instance = " + this.GetHashCode() + ". ");
             }
             public override void write(byte[] bytes)
             {
@@ -467,13 +462,13 @@ namespace repatriator_client
                     int amountWritten = socket.Send(bytes, index, amountToWrite, 0);
                     if (amountWritten == 0)
                     {
-                        logMessage("error", "can't send anything. ");
+                        Logging.error("can't send anything. ");
                         throw new SocketException();
                     }
-                    logCommunication("write", bytes, index, amountWritten);
                     index += amountWritten;
                     amountToWrite -= amountWritten;
                 }
+                Logging.debug("write: " + Logging.bytesToString(bytes));
             }
             public override byte[] read(int length)
             {
@@ -486,42 +481,14 @@ namespace repatriator_client
                     int readSize = socket.Receive(buffer, offset, remainingSize, SocketFlags.None);
                     if (readSize == 0)
                     {
-                        logMessage("error", "can't read anything. ");
+                        Logging.error("can't read anything");
                         throw new SocketException();
                     }
-                    logCommunication("read", buffer, offset, readSize);
+                    Logging.debug(Logging.bytesToString(buffer));
                     offset += readSize;
                     remainingSize -= readSize;
                 }
                 return buffer;
-            }
-            private static void logCommunication(string header, byte[] bytes, int index, int length)
-            {
-                if (!logging)
-                    return;
-                string text = bytesToText(bytes, index, length);
-                logSomething(header, text);
-            }
-            private static void logMessage(string header, string message)
-            {
-                if (!logging)
-                    return;
-                logSomething(header, message);
-            }
-            private static void logSomething(string header, string text)
-            {
-                if (header != lastLoggingMode)
-                    logFile.Write("\n" + header + ": ");
-                lastLoggingMode = header;
-                logFile.Write(text);
-                logFile.Flush();
-            }
-            private static string bytesToText(byte[] bytes, int index, int length)
-            {
-                StringBuilder stringBuidler = new StringBuilder(bytes.Length * 3);
-                for (int i = index; i < index + length; i++)
-                    stringBuidler.Append(bytes[i].ToString("x2")).Append(' ');
-                return stringBuidler.ToString();
             }
         }
         private class FakeStreamWriter : StreamManager

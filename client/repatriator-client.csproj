@@ -55,6 +55,7 @@
       <DependentUpon>ButterflyControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConnectionManager.cs" />
+    <Compile Include="Logging.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
