@@ -75,7 +75,7 @@ class ConnectionRequest(ClientMessage):
         #int8 - revision version number of client
         if bytes_left < 4*3:
             raise ClientMessage.ParseError("Message is missing version data.")
-        self.version = struct.unpack_from(">iii", data, offset)[0]
+        self.version = struct.unpack_from(">iii", data, offset)
         move_pointer(4*3)
 
         #int32 - length of utf8 username string below
