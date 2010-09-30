@@ -68,6 +68,8 @@ namespace repatriator_client
                 case ConnectionStatus.Success:
                     updateStatus_safe("connected");
                     break;
+                default:
+                    throw new Exception();
             }
         }
         private void connectionManager_loginFinished(LoginStatus status)
@@ -98,13 +100,9 @@ namespace repatriator_client
             BeginInvoke(new Action(delegate()
             {
                 if (status == LoginStatus.Success)
-                {
                     setupPanel.Visible = false;
-                }
                 else
-                {
                     updateConnectionWidgets(false);
-                }
             }));
         }
 
