@@ -12,8 +12,6 @@ settings = {
     'DATA_FOLDER': os.path.join(os.path.dirname(__file__), 'data'),
     # log level: 'DEBUG', 'WARNING', 'ERROR'
     'LOG_LEVEL': 'ERROR',
-    # which file to log to
-    'LOG_FILE': 'server.log',
 }
 try:
     import config

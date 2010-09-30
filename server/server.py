@@ -11,7 +11,7 @@ def set_up_logging():
         'ERROR': logging.ERROR,
     }
     log_level = log_levels[settings['LOG_LEVEL']]
-    log_file = os.path.join(settings['DATA_FOLDER'], settings['LOG_FILE'])
+    log_file = os.path.join(settings['DATA_FOLDER'], "server.log")
     logging.basicConfig(filename=log_file, level=log_level)
 set_up_logging()
 
@@ -40,15 +40,25 @@ class Server:
         actually writes the message to the open connection
         """
         self.request.sendall(message.serialize())
+
+    def _read_amt(self, byte_count):
+        """
+        blocks until byte_count bytes have been read
+        """
+        full_msg = bytearray()
+        while len(full_msg) < byte_count:
+            block = self.request.recv(byte_count - len(full_msg))
+            full_msg.extend(block)
+        return full_msg
     
     def _read_message(self):
         """
         actually reads the message from the open connection.
         blocks until one is received.
         """
-        header = self.request.recv(9)
+        header = self._read_amt(9)
         msg_size = struct.unpack_from(">q", header, 1)[0]
-        return header + self.request.recv(msg_size - 9)
+        return header + self._read_amt(msg_size - 9)
 
     def _run_writer(self):
         while not self.finished:
