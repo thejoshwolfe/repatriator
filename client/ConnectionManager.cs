@@ -456,7 +456,7 @@ namespace repatriator_client
             {
                 this.socket = socket;
                 if (logging)
-                    logMessage("init", "instance = " + this.GetHashCode());
+                    logMessage("\ninit", "instance = " + this.GetHashCode() + ". ");
             }
             public override void write(byte[] bytes)
             {
@@ -467,7 +467,7 @@ namespace repatriator_client
                     int amountWritten = socket.Send(bytes, index, amountToWrite, 0);
                     if (amountWritten == 0)
                     {
-                        logMessage("error", "can't send anything");
+                        logMessage("error", "can't send anything. ");
                         throw new SocketException();
                     }
                     logCommunication("write", bytes, index, amountWritten);
@@ -486,7 +486,7 @@ namespace repatriator_client
                     int readSize = socket.Receive(buffer, offset, remainingSize, SocketFlags.None);
                     if (readSize == 0)
                     {
-                        logMessage("error", "can't read anything");
+                        logMessage("error", "can't read anything. ");
                         throw new SocketException();
                     }
                     logCommunication("read", buffer, offset, readSize);
@@ -506,12 +506,12 @@ namespace repatriator_client
             {
                 if (!logging)
                     return;
-                logSomething(header, message + "\n");
+                logSomething(header, message);
             }
             private static void logSomething(string header, string text)
             {
                 if (header != lastLoggingMode)
-                    logFile.Write("\n\n" + header + ":\n");
+                    logFile.Write("\n" + header + ": ");
                 lastLoggingMode = header;
                 logFile.Write(text);
                 logFile.Flush();
