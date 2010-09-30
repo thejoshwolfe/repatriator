@@ -443,7 +443,7 @@ namespace repatriator_client
             {
                 byte typeCode = readByte();
                 long length = readLong();
-                byte[] buffer = read((int)length);
+                byte[] buffer = read((int)(length - 9));
                 return new RawResponse(typeCode, buffer);
             }
         }
