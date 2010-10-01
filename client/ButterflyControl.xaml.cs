@@ -116,8 +116,8 @@ namespace repatriator_client
 
         private void refreshTransforms()
         {
-            innerRotation.Angle = angleX;
-            outterRotation.Angle = angleY;
+            innerRotation.Angle = angleY;
+            outterRotation.Angle = angleX;
         }
     }
 }
