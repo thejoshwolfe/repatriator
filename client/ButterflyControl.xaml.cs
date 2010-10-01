@@ -26,6 +26,35 @@ namespace repatriator_client
 
         private void mouseIntercepterCanvas_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (dragging)
+                return; // this should never happen
+            startDragging();
+        }
+        private void mouseIntercepterCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!dragging)
+                return;
+            stopDragging();
+        }
+        private void mouseIntercepterCanvas_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (!dragging)
+                return;
+            // I would love to treat leaving the same as moving. It would prevent the user from escaping our grasp.
+            // However, I couldn't get it to behave reliably and I didn't take the time to figure out how to make it work right.
+            // Treating leaving as stopping works reliably, although it's probably more annoying to users.
+            stopDragging();
+        }
+        private void mouseIntercepterCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (!dragging)
+                return;
+            reactToDragging();
+        }
+
+
+        private void startDragging()
+        {
             dragging = true;
 
             // store the center of the control
@@ -41,21 +70,8 @@ namespace repatriator_client
             // start with the cursor in the center
             System.Windows.Forms.Cursor.Position = lockCursorPosition;
         }
-        private void mouseIntercepterCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void reactToDragging()
         {
-            dragging = false;
-
-            // restore position of cursor to where the user wanted it
-            System.Windows.Forms.Cursor.Position = restoreCursorPosition;
-
-            // show the cursor
-            System.Windows.Forms.Cursor.Show();
-        }
-        private void mouseIntercepterCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (!dragging)
-                return;
-
             // calculate the movement (in absolute coordinates)
             System.Drawing.Point currentMouseLocation = System.Windows.Forms.Cursor.Position;
             int deltaX = currentMouseLocation.X - lockCursorPosition.X;
@@ -66,6 +82,16 @@ namespace repatriator_client
             System.Windows.Forms.Cursor.Position = lockCursorPosition;
 
             refreshTransforms();
+        }
+        private void stopDragging()
+        {
+            dragging = false;
+
+            // restore position of cursor to where the user wanted it
+            System.Windows.Forms.Cursor.Position = restoreCursorPosition;
+
+            // show the cursor
+            System.Windows.Forms.Cursor.Show();
         }
 
         private void refreshTransforms()

@@ -390,6 +390,7 @@
                 Background="Transparent"
                 MouseDown="mouseIntercepterCanvas_MouseDown"
                 MouseUp="mouseIntercepterCanvas_MouseUp"
-                MouseMove="mouseIntercepterCanvas_MouseMove"/>
+                MouseMove="mouseIntercepterCanvas_MouseMove"
+                MouseLeave="mouseIntercepterCanvas_MouseLeave"/>
     </Grid>
 </UserControl>
