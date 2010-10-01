@@ -10,9 +10,22 @@ namespace repatriator_client
 {
     public partial class ButterflyControl : UserControl
     {
-        private const double angleStep = 1.0;
-        private double angleX = 0.0;
-        private double angleY = 0.0;
+        // angles are in degrees. oh well.
+        private const double pixelsToDegrees = 1.0;
+        private int angleX = 180;
+        private int angleY = 180;
+
+        public int AngleX
+        {
+            get { return angleX; }
+        }
+        public int AngleY
+        {
+            get { return angleY; }
+        }
+
+        public event Action AnglesMoved;
+
         public ButterflyControl()
         {
             InitializeComponent();
@@ -76,12 +89,19 @@ namespace repatriator_client
             System.Drawing.Point currentMouseLocation = System.Windows.Forms.Cursor.Position;
             int deltaX = currentMouseLocation.X - lockCursorPosition.X;
             int deltaY = currentMouseLocation.Y - lockCursorPosition.Y;
-            angleY += deltaX * angleStep;
-            angleX += deltaY * angleStep;
+            int angleDeltaX = (int)(deltaX * pixelsToDegrees);
+            int angleDeltaY = (int)(deltaY * pixelsToDegrees);
+            updateAngles(angleDeltaX, angleDeltaY);
             // hold the cursor in the center of the control
             System.Windows.Forms.Cursor.Position = lockCursorPosition;
 
             refreshTransforms();
+        }
+        private void updateAngles(int angleDeltaX, int angleDeltaY)
+        {
+            angleX = Utils.wrapOverflow(angleX + angleDeltaX, 360);
+            angleY = Utils.wrapOverflow(angleY + angleDeltaY, 360);
+            AnglesMoved();
         }
         private void stopDragging()
         {

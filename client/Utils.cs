@@ -40,5 +40,13 @@ namespace repatriator_client
                     return false;
             return true;
         }
+        /// <summary>adds or subtracts multiples of the max value so that 0 &lt;= value &lt; maxValue.</summary>
+        public static int wrapOverflow(int value, int maxValue)
+        {
+            if (value < 0)
+                return value + maxValue * (-value / maxValue + 1);
+            else
+                return value - maxValue * (value / maxValue);
+        }
     }
 }

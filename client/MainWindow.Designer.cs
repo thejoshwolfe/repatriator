@@ -41,9 +41,9 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.downlaodAllButton = new System.Windows.Forms.Button();
             this.liftSliderZ = new System.Windows.Forms.Panel();
+            this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
             this.lifeSliderZ = new System.Windows.Forms.TrackBar();
             this.miniMapPictureBox = new System.Windows.Forms.PictureBox();
-            this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
             this.butterflySliderX = new System.Windows.Forms.TrackBar();
             this.butterflySliderY = new System.Windows.Forms.TrackBar();
             this.miniMapSliderX = new System.Windows.Forms.TrackBar();
@@ -204,6 +204,15 @@
             this.liftSliderZ.Size = new System.Drawing.Size(117, 363);
             this.liftSliderZ.TabIndex = 11;
             // 
+            // butterflyElemtnHost
+            // 
+            this.butterflyElemtnHost.Location = new System.Drawing.Point(26, 127);
+            this.butterflyElemtnHost.Name = "butterflyElemtnHost";
+            this.butterflyElemtnHost.Size = new System.Drawing.Size(79, 68);
+            this.butterflyElemtnHost.TabIndex = 3;
+            this.butterflyElemtnHost.Text = "elementHost1";
+            this.butterflyElemtnHost.Child = null;
+            // 
             // lifeSliderZ
             // 
             this.lifeSliderZ.LargeChange = 0;
@@ -221,33 +230,28 @@
             this.miniMapPictureBox.TabIndex = 6;
             this.miniMapPictureBox.TabStop = false;
             // 
-            // butterflyElemtnHost
-            // 
-            this.butterflyElemtnHost.Location = new System.Drawing.Point(26, 127);
-            this.butterflyElemtnHost.Name = "butterflyElemtnHost";
-            this.butterflyElemtnHost.Size = new System.Drawing.Size(79, 68);
-            this.butterflyElemtnHost.TabIndex = 3;
-            this.butterflyElemtnHost.Text = "elementHost1";
-            this.butterflyElemtnHost.Child = null;
-            // 
             // butterflySliderX
             // 
             this.butterflySliderX.LargeChange = 0;
             this.butterflySliderX.Location = new System.Drawing.Point(26, 102);
+            this.butterflySliderX.Maximum = 360;
             this.butterflySliderX.Name = "butterflySliderX";
             this.butterflySliderX.Size = new System.Drawing.Size(79, 45);
             this.butterflySliderX.TabIndex = 5;
             this.butterflySliderX.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.butterflySliderX.Value = 180;
             // 
             // butterflySliderY
             // 
             this.butterflySliderY.LargeChange = 0;
             this.butterflySliderY.Location = new System.Drawing.Point(3, 127);
+            this.butterflySliderY.Maximum = 360;
             this.butterflySliderY.Name = "butterflySliderY";
             this.butterflySliderY.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.butterflySliderY.Size = new System.Drawing.Size(45, 68);
             this.butterflySliderY.TabIndex = 4;
             this.butterflySliderY.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.butterflySliderY.Value = 180;
             // 
             // miniMapSliderX
             // 

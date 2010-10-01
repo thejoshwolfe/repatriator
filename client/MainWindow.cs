@@ -12,6 +12,8 @@ namespace repatriator_client
         private ConnectionManager connectionManager;
         private int retryFailures = 0;
 
+        private ButterflyControl butterflyControl;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -20,7 +22,9 @@ namespace repatriator_client
             connectionManager.connectionUpdate += new Action<ConnectionStatus>(connectionManager_connectionUpdate);
             connectionManager.loginFinished += new Action<LoginStatus>(connectionManager_loginFinished);
 
-            butterflyElemtnHost.Child = new ButterflyControl();
+            butterflyControl = new ButterflyControl();
+            butterflyControl.AnglesMoved += new Action(butterflyControl_AnglesMoved);
+            butterflyElemtnHost.Child = butterflyControl;
 
             // auto connect if we're good to go
             maybeStartConnectionManager();
@@ -104,6 +108,13 @@ namespace repatriator_client
                 else
                     updateConnectionWidgets(false);
             }));
+        }
+
+        private void butterflyControl_AnglesMoved()
+        {
+            butterflySliderX.Value = butterflyControl.AngleX;
+            // invert the Y. maybe we shouldn't do this.
+            butterflySliderY.Value = butterflySliderY.Maximum - butterflyControl.AngleY;
         }
 
         private void connectButton_Click(object sender, EventArgs e)
