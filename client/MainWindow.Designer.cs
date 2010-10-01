@@ -190,10 +190,10 @@
             // liftSliderZ
             // 
             this.liftSliderZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.liftSliderZ.Controls.Add(this.butterflyElemtnHost);
             this.liftSliderZ.Controls.Add(this.takePictureButton);
             this.liftSliderZ.Controls.Add(this.lifeSliderZ);
             this.liftSliderZ.Controls.Add(this.miniMapPictureBox);
-            this.liftSliderZ.Controls.Add(this.butterflyElemtnHost);
             this.liftSliderZ.Controls.Add(this.butterflySliderX);
             this.liftSliderZ.Controls.Add(this.butterflySliderY);
             this.liftSliderZ.Controls.Add(this.miniMapSliderX);
