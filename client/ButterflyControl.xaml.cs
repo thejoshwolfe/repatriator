@@ -22,6 +22,7 @@ namespace repatriator_client
 
         private bool dragging = false;
         private System.Drawing.Point lockCursorPosition;
+        private System.Drawing.Point restoreCursorPosition;
 
         private void mouseIntercepterCanvas_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -34,10 +35,18 @@ namespace repatriator_client
 
             // hide the cursor
             System.Windows.Forms.Cursor.Hide();
+
+            // remember the user's cursor position so we can restore it later
+            restoreCursorPosition = System.Windows.Forms.Cursor.Position;
+            // start with the cursor in the center
+            System.Windows.Forms.Cursor.Position = lockCursorPosition;
         }
         private void mouseIntercepterCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             dragging = false;
+
+            // restore position of cursor to where the user wanted it
+            System.Windows.Forms.Cursor.Position = restoreCursorPosition;
 
             // show the cursor
             System.Windows.Forms.Cursor.Show();
