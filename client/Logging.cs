@@ -18,7 +18,7 @@ namespace repatriator_client
             string path = "C:\\aoeu.txt";
             logFile = new StreamWriter(path, true);
             logFile.Write("\n");
-            logFile.Write("startup: " + DateTime.Now.ToString() + "\n");
+            logSomething(null, "startup");
         }
         public static void error(string message)
         {
@@ -57,9 +57,12 @@ namespace repatriator_client
         }
         private static void logSomething(string header, string message)
         {
+            DateTime time = DateTime.Now;
             lock (_lock)
             {
-                logFile.Write(header + ": ");
+                logFile.Write(time.ToString("0:MM/dd/yy H:mm:ss "));
+                if (header != null)
+                    logFile.Write(header + ": ");
                 logFile.Write(message);
                 logFile.Write("\n");
                 logFile.Flush();
