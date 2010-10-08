@@ -142,5 +142,10 @@ namespace repatriator_client
         {
             connectionManager.cancel();
         }
+
+        private void showAdminWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AdminWindow.showInstance();
+        }
     }
 }

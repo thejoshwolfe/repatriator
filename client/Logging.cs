@@ -57,10 +57,9 @@ namespace repatriator_client
         }
         private static void logSomething(string header, string message)
         {
-            DateTime time = DateTime.Now;
             lock (_lock)
             {
-                logFile.Write(time.ToString("0:MM/dd/yy H:mm:ss "));
+                logFile.Write(DateTime.Now.ToString("0:MM/dd/yyyy HH:mm:ss "));
                 if (header != null)
                     logFile.Write(header + ": ");
                 logFile.Write(message);

@@ -55,6 +55,9 @@
             this.cancelConncetionButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
             this.userNameText = new System.Windows.Forms.TextBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showAdminWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -72,6 +75,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderY)).BeginInit();
             this.panel3.SuspendLayout();
             this.setupPanel.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -142,7 +146,7 @@
             this.liveViewPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.liveViewPictureBox.Location = new System.Drawing.Point(0, 0);
             this.liveViewPictureBox.Name = "liveViewPictureBox";
-            this.liveViewPictureBox.Size = new System.Drawing.Size(427, 363);
+            this.liveViewPictureBox.Size = new System.Drawing.Size(427, 339);
             this.liveViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.liveViewPictureBox.TabIndex = 8;
             this.liveViewPictureBox.TabStop = false;
@@ -199,9 +203,9 @@
             this.liftSliderZ.Controls.Add(this.miniMapSliderX);
             this.liftSliderZ.Controls.Add(this.miniMapSliderY);
             this.liftSliderZ.Dock = System.Windows.Forms.DockStyle.Right;
-            this.liftSliderZ.Location = new System.Drawing.Point(427, 0);
+            this.liftSliderZ.Location = new System.Drawing.Point(427, 24);
             this.liftSliderZ.Name = "liftSliderZ";
-            this.liftSliderZ.Size = new System.Drawing.Size(117, 363);
+            this.liftSliderZ.Size = new System.Drawing.Size(117, 339);
             this.liftSliderZ.TabIndex = 11;
             // 
             // butterflyElemtnHost
@@ -277,9 +281,9 @@
             this.panel3.Controls.Add(this.setupPanel);
             this.panel3.Controls.Add(this.liveViewPictureBox);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 0);
+            this.panel3.Location = new System.Drawing.Point(0, 24);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(427, 363);
+            this.panel3.Size = new System.Drawing.Size(427, 339);
             this.panel3.TabIndex = 12;
             // 
             // setupPanel
@@ -298,7 +302,7 @@
             this.setupPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.setupPanel.Location = new System.Drawing.Point(0, 0);
             this.setupPanel.Name = "setupPanel";
-            this.setupPanel.Size = new System.Drawing.Size(427, 363);
+            this.setupPanel.Size = new System.Drawing.Size(427, 339);
             this.setupPanel.TabIndex = 9;
             // 
             // downloadDirectoryText
@@ -345,6 +349,31 @@
             this.userNameText.TabIndex = 8;
             this.userNameText.Text = "default_admin";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.windowToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(544, 24);
+            this.menuStrip1.TabIndex = 13;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // windowToolStripMenuItem
+            // 
+            this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showAdminWindowToolStripMenuItem});
+            this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
+            this.windowToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
+            this.windowToolStripMenuItem.Text = "&Window";
+            // 
+            // showAdminWindowToolStripMenuItem
+            // 
+            this.showAdminWindowToolStripMenuItem.Name = "showAdminWindowToolStripMenuItem";
+            this.showAdminWindowToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.showAdminWindowToolStripMenuItem.Text = "Show &Admin Window";
+            this.showAdminWindowToolStripMenuItem.Click += new System.EventHandler(this.showAdminWindowToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -353,6 +382,8 @@
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.liftSliderZ);
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainWindow";
             this.Text = "Repatriator";
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
@@ -370,7 +401,10 @@
             this.panel3.ResumeLayout(false);
             this.setupPanel.ResumeLayout(false);
             this.setupPanel.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -398,6 +432,9 @@
         private System.Windows.Forms.Button cancelConncetionButton;
         private System.Windows.Forms.TextBox passwordText;
         private System.Windows.Forms.TextBox downloadDirectoryText;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showAdminWindowToolStripMenuItem;
 
     }
 }
