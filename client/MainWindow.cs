@@ -50,10 +50,14 @@ namespace repatriator_client
         }
         private void updateStatus_safe(string message)
         {
+            updateStatus_safe(message, LogLevel.Debug);
+        }
+        private void updateStatus_safe(string message, LogLevel logLevel)
+        {
+            Logging.log(message, logLevel);
             Action action = new Action(delegate()
             {
                 statusLabel.Text = message;
-                Logging.debug(message);
             });
             if (InvokeRequired)
                 BeginInvoke(action);
@@ -81,16 +85,16 @@ namespace repatriator_client
             switch (status)
             {
                 case LoginStatus.ConnectionTrouble:
-                    updateStatus_safe("connection trouble. i give up.");
+                    updateStatus_safe("connection trouble. i give up.", LogLevel.Warning);
                     break;
                 case LoginStatus.ServerIsBogus:
-                    updateStatus_safe("bad server specified");
+                    updateStatus_safe("bad server specified", LogLevel.Warning);
                     break;
                 case LoginStatus.LoginIsInvalid:
-                    updateStatus_safe("invalid login");
+                    updateStatus_safe("invalid login", LogLevel.Warning);
                     break;
                 case LoginStatus.InsufficientPrivileges:
-                    updateStatus_safe("insufficient privileges");
+                    updateStatus_safe("insufficient privileges", LogLevel.Warning);
                     break;
                 case LoginStatus.Cancelled:
                     updateStatus_safe("cancelled");
