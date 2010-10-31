@@ -270,11 +270,46 @@ class FullUpdate(ServerMessage):
 
 __all__.append('DirectoryListingResult')
 class DirectoryListingResult(ServerMessage):
-    pass
+    def __init__(self, file_list):
+        self.file_list = file_list
+
+    def _serialize(self):
+        buf = bytearray()
+        buf.extend(struct.pack(">i", len(self.file_list)))
+        for file_path in self.file_list:
+            path, filename = os.path.split(file_path)
+            buf.extend(struct.pack(">i", len(filename)))
+            buf.extend(filename.encode('utf8'))
+
+            try:
+                thumb_size = os.path.getsize(file_path+'.thumb')
+                f = open(file_path, 'rb')
+                buf.extend(struct.pack(">q", thumb_size))
+                buf.extend(f.read())
+                f.close()
+            except (OSError, IOError):
+                buf.extend(struct.pack(">q", 0))
+                error("error accessing thumbnail for {0}".file_path)
+            
+        return buf
 
 __all__.append('FileDownloadResult')
 class FileDownloadResult(ServerMessage):
-    pass
+    def __init__(self, file_path):
+        self.file_path = file_path
+
+    def _serialize(self):
+        buf = bytearray()
+        try:
+            file_size = os.path.getsize(self.file_path)
+            f = open(self.file_path)
+            buf.extend(file_size)
+            buf.extend(f.read())
+            f.close()
+        except (OSError, IOError):
+            buf.extend(struct.pack(">q", 0))
+
+        return buf
 
 __all__.append('ErrorMessage')
 class ErrorMessage(ServerMessage):
@@ -283,6 +318,8 @@ class ErrorMessage(ServerMessage):
     FileDoesNotExist = 2
     UserAlreadyExists = 3
     UserDoesNotExist = 4
+    OverwritingOtherUser = 5
+    InvalidFilename = 6
 
     descriptions = {
         NotAuthorized: "Not authorized to perform this operation.",
@@ -290,6 +327,8 @@ class ErrorMessage(ServerMessage):
         FileDoesNotExist: "The file does not exist.",
         UserAlreadyExists: "The user you are trying to add already exists.",
         UserDoesNotExist: "The user you are trying to update does not exist.",
+        OverwritingOtherUser: "You're trying to change a username in a way that would overwrite another user.",
+        InvalidFilename: "The filename you supplied is invalid.",
     }
 
     def __init__(self, code, description=None):

@@ -23,6 +23,7 @@ from power import set_power_switch
 from messages import *
 import auth
 from auth import Privilege
+from thumbnail import make_thumbnail
 
 # python stuff
 import struct
@@ -132,6 +133,11 @@ class Server:
     def close(self):
         self.message_queue.put(DummyCloseConnection())
 
+
+def valid_filename(filename):
+    invalid_characters = r'\\/:*?"<>|'
+    return not any([c in invalid_characters for c in filename])
+
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
     global server
@@ -178,8 +184,18 @@ def must_have_privilege(privilege):
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_TakePicture(msg):
+    global camera, user
     debug("Got take picture message")
-    pass
+
+    def unique_file(path, filename):
+        n = 0
+        while True:
+            n += 1
+            candidate = os.path.exists(os.path.join(path, filename.format(n)))
+            if not os.path.exists(candidate):
+                return candidate
+
+    camera.takePicture(unique_file(user.picture_folder(), "img_{0}.jpg"))
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_MotorMovement(msg):
@@ -188,18 +204,51 @@ def handle_MotorMovement(msg):
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_DirectoryListingRequest(msg):
+    global server, user
     debug("Got directory listing message")
-    pass
+
+    files = [f for f in os.listdir(user.picture_folder()) if f.endswith('.jpg')]
+    server.send_message(DirectoryListingResult(files))
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_FileDownloadRequest(msg):
+    global server, user
     debug("Got file download message")
-    pass
+
+    if not valid_filename(msg.filename):
+        warning("filename which user supplied to download contained invalid characters: {0}".format(msg.filename))
+        server.send_message(ErrorMessage(ErrorMessage.InvalidFilename))
+        return
+
+    target_file = os.path.join(user.picture_folder(), msg.filename)
+    if not os.path.exists(target_file):
+        warning("filename which user supplied to download does not exist: {0}".format(msg.filename))
+        server.send_message(ErrorMessage(ErrorMessage.FileDoesNotExist))
+        return
+    
+    server.send_message(FileDownloadResult(target_file))
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_FileDeleteRequest(msg):
+    global server, user
     debug("Got file delete request message")
-    pass
+
+    if not valid_filename(msg.filename):
+        warning("filename which user supplied to delete contained invalid characters: {0}".format(msg.filename))
+        server.send_message(ErrorMessage(ErrorMessage.InvalidFilename))
+        return
+
+    target_path = os.path.join(user.picture_folder(), msg.filename)
+    if not os.path.exists(target_path):
+        warning("filename which user supplied to delete does not exist: {0}".format(msg.filename))
+        server.send_message(ErrorMessage(ErrorMessage.FileDoesNotExist))
+        return
+
+    debug("Removing file {0}".format(target_path))
+    try:
+        os.remove(target_path)
+    except OSError as ex:
+        error("OSError removing file: {0}".format(ex))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_AddUser(msg):
@@ -207,9 +256,11 @@ def handle_AddUser(msg):
     debug("Got add user message")
 
     try:
-        user = auth.User(msg.username, msg.password, msg.privileges)
-        user.save()
+        new_user = auth.User(msg.username, msg.password, msg.privileges)
+        new_user.save()
+        debug("created new user {0}".format(msg.username))
     except auth.UserAlreadyExists:
+        warning("user {0} already exists, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserAlreadyExists))
         return
 
@@ -218,17 +269,22 @@ def handle_UpdateUser(msg):
     global server
     debug("Got update user message")
     
-    user = auth.get_user(msg.username)
-    if user is None:
+    target_user = auth.get_user(msg.username)
+    if target_user is None:
+        warning("user {0} does not exist, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
 
-    user.attrs['username'] = msg.username
-    if len(msg.password) > 0:
-        user.attrs['password'] = msg.password
-    user.attrs['privileges'] = msg.privileges
+    if auth.get_user(msg.username) is not None:
+        warning("trying to update a user in a way that would overwrite another user")
+        server.send_message(ErrorMessage(ErrorMessage.OverwritingOtherUser))
+        return
 
-    user.save()
+    debug("updating user {0} and saving to disk".format(msg.username))
+    if len(msg.password) > 0:
+        target_user.attrs['password'] = msg.password
+    target_user.attrs['privileges'] = msg.privileges
+    target_user.save()
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_DeleteUser(msg):
@@ -237,7 +293,9 @@ def handle_DeleteUser(msg):
 
     try:
         auth.delete_user(msg.username)
+        debug("deleted {0}".format(msg.username))
     except auth.UserDoesNotExist:
+        warning("user {0} does not exist, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
 
@@ -336,6 +394,12 @@ def run_camera():
     pythoncom.CoInitializeEx(2)
     debug("edsdk: getting first camera")
     camera = edsdk.getFirstCamera()
+
+    def takePictureCallback(pic_file):
+        # create a thumbnail
+        make_thumbnail(pic_file, pic_file+".thumb", 90)
+    camera.setPictureCompleteCallback(takePictureCallback)
+
     debug("edsdk: starting live view")
     camera.startLiveView()
 

@@ -70,6 +70,8 @@ class User:
         self.attrs = {}
         self.username = username
 
+        self._picture_folder = None
+
         if username is not None or password is not None:
             if username in _auth_data:
                 raise UserAlreadyExists
@@ -77,6 +79,12 @@ class User:
                 self.attrs['salt'] = _random_string(32)
                 self.attrs['password_hash'] = _hash_password(self.attrs['salt'], password)
                 self.attrs['privileges'] = privileges
+                os.makedirs(self.picture_folder())
+    
+    def picture_folder(self):
+        if self._picture_folder is None:
+            self._picture_folder = hashlib.md5(self.username).hexdigest()
+        return self._picture_folder
 
     def grant_privilege(self, privilege):
         self.attrs['privileges'].add(privilege)
@@ -114,12 +122,13 @@ def login(username, password):
     return None
 
 def delete_user(username):
-    try:
-        del _auth_data[username]
-        _save_json()
-    except KeyError:
+    user = get_user(username)
+    if user is None:
         raise UserDoesNotExist
-    
+
+    shutil.rmtree(user.picture_folder())
+    del _auth_data[username]
+    _save_json()
 
 _auth_file = os.path.join(settings['DATA_FOLDER'], "auth.json")
 _build_path(_auth_file)
