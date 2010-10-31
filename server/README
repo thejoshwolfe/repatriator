@@ -150,7 +150,7 @@ Messages:
             int64 - position of motor Y
             int64 - position of motor Z
 
-        DirectoryListingRequest - returns all the files a user can download
+        DirectoryListingRequest - requests a DirectoryListingResult message
             int8 - identifies this message as a DirectoryListingRequest
             int64 - byte count of the entire message including this field (always 9)
 
@@ -185,7 +185,8 @@ Messages:
             int32 - length of utf8 password below. if 0, don't change password.
             <password - utf8 string>
             int32 - number of permissions granted
-            [int32 permission enum value for permission in permissions granted]
+            for each permission granted:
+                int32 permission enum value 
 
         DeleteUser - deletes a user from the system
             int8 - identifies this message as a DeleteUser

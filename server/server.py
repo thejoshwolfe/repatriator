@@ -173,7 +173,7 @@ def must_have_privilege(privilege):
             if user.has_privilege(privilege):
                 return function(msg, *args, **kwargs)
             else:
-                warning("User doesn't have privilege " + str(privilege) + ": sending authorization denied message")
+                warning("User doesn't have privilege {0}: sending authorization denied message".format(privilege))
                 return server.send_message(ErrorMessage(ErrorMessage.NotAuthorized))
         return wraps(function)(_wrapped)
     return decorated

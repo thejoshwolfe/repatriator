@@ -23,6 +23,34 @@ class ClientMessage:
     class ParseError(Exception):
         pass
 
+    def _move_pointer(self, amount):
+        self._bytes_left -= amount
+        self._offset += amount
+
+    def _parse_string(self):
+        string_len = self._parse_int32()
+        if self._bytes_left < string_len:
+            raise self.ParseError("Message is missing string at position {0}".format(self._offset))
+        offset = self._offset
+        self._move_pointer(string_len)
+        return self._raw_data[offset:offset+string_len].decode('utf8')
+
+    def _parse_int(self, byte_count, unpack_str):
+        if self._bytes_left < byte_count:
+            raise self.ParseError("Message is missing int{0} at position {1}".format(byte_count*8, self._offset))
+        n = struct.unpack_from(unpack_str, self._raw_data, self._offset)[0]
+        self._move_pointer(byte_count)
+        return n
+
+    def _parse_int32(self):
+        return self._parse_int(4, '>i')
+
+    def _parse_int64(self):
+        return self._parse_int(8, '>q')
+
+    def _parse_bool(self):
+        return bool(self._parse_int(1, '>b'))
+
     @staticmethod
     def parse(raw_data):
         """
@@ -46,99 +74,93 @@ class ClientMessage:
             warning("Client message length value is wrong")
             raise ClientMessage.ParseError("Message length value is wrong.")
 
-        msg = MessageClass(raw_data[9:])
+        debug("message identified as a " + MessageClass.__name__)
+
+        msg = MessageClass()
+        msg._raw_data = raw_data
+        msg._bytes_left = len(raw_data) - 9
+        msg._offset = len(raw_data) - msg._bytes_left
         msg.message_type = raw_data[0]
-        debug("message identified as a " + msg.__class__.__name__)
+        msg.parse()
         return msg
 
 __all__.append('MagicalRequest')
 class MagicalRequest(ClientMessage):
     magical_bytes = bytes([0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4])
 
-    def __init__(self, data):
-        if MagicalRequest.magical_bytes != data:
+    def parse(self):
+        if MagicalRequest.magical_bytes != self._raw_data[self._offset:]:
             warning("Client message magical bytes didn't match up.")
             raise ClientMessage.ParseError("Magical bytes didn't match up.")
 
 __all__.append('ConnectionRequest')
 class ConnectionRequest(ClientMessage):
-    def __init__(self, data):
-        bytes_left = len(data)
-        offset = len(data) - bytes_left
-
-        def move_pointer(amount):
-            nonlocal bytes_left, offset
-            bytes_left -= amount
-            offset += amount
-
-        #int8 - major version number of client
-        #int8 - minor version number of client
-        #int8 - revision version number of client
-        if bytes_left < 4*3:
-            raise ClientMessage.ParseError("Message is missing version data.")
-        self.version = struct.unpack_from(">iii", data, offset)
-        move_pointer(4*3)
-
-        #int32 - length of utf8 username string below
-        #<utf8 username string>
-        if bytes_left < 4:
-            raise ClientMessage.ParseError("Message is missing username data.")
-        username_len = struct.unpack_from(">i", data, offset)[0]
-        move_pointer(4)
-        if bytes_left < username_len:
-            raise ClientMessage.ParseError("Message is missing username string.")
-        self.username = data[offset:offset+username_len].decode('utf8')
-        move_pointer(username_len)
-        
-        #int32 - length of utf8 password string below
-        #<utf8 password string>
-        if bytes_left < 4:
-            raise ClientMessage.ParseError("Message is missing password data.")
-        password_len = struct.unpack_from(">i", data, offset)[0]
-        move_pointer(4)
-        if bytes_left < password_len:
-            debug("bytes_left: {0}, password_len: {1}, len(data): {2}".format(bytes_left, password_len, len(data)))
-            raise ClientMessage.ParseError("Message is missing password string.")
-        self.password = data[offset:offset+password_len].decode('utf8')
-        move_pointer(password_len)
-
-        #int8 - boolean - do you want the hardware to turn on? False if you're only doing admin.
-        if bytes_left < 1:
-            raise ClientMessage.ParseError("Message is missing admin flag.")
-        self.hardware_flag = struct.unpack_from("?", data, offset)[0]
+    def parse(self):
+        self.version = [0, 0, 0]
+        self.version[0] = self._parse_int32()
+        self.version[1] = self._parse_int32()
+        self.version[2] = self._parse_int32()
+        self.username = self._parse_string()
+        self.password = self._parse_string()
+        self.hardware_flag = self._parse_bool()
 
 __all__.append('TakePicture')
 class TakePicture(ClientMessage):
-    def __init__(self, data, size):
+    def parse(self):
+        # nothing to do
         pass
+
 __all__.append('MotorMovement')
 class MotorMovement(ClientMessage):
-    def __init__(self, data, size):
-        pass
+    def parse(self):
+        self.motor_a = self._parse_int64()
+        self.motor_b = self._parse_int64()
+        self.motor_x = self._parse_int64()
+        self.motor_y = self._parse_int64()
+        self.motor_z = self._parse_int64()
+
 __all__.append('DirectoryListingRequest')
 class DirectoryListingRequest(ClientMessage):
-    def __init__(self, data, size):
+    def parse(self):
+        # nothing to do
         pass
+
 __all__.append('FileDownloadRequest')
 class FileDownloadRequest(ClientMessage):
-    def __init__(self, data, size):
-        pass
+    def parse(self):
+        self.filename = self._parse_string()
+
 __all__.append('FileDeleteRequest')
 class FileDeleteRequest(ClientMessage):
-    def __init__(self, data, size):
-        pass
+    def parse(self):
+        self.filename = self._parse_string()
+
 __all__.append('AddUser')
 class AddUser(ClientMessage):
-    def __init__(self, data, size):
-        pass
+    def parse(self):
+        self.username = self._parse_string()
+        self.password = self._parse_string()
+
+        privilege_count = self._parse_int32()
+        self.privileges = set()
+        for _ in range(privilege_count):
+            self.privileges.add(self._parse_int32())
+
 __all__.append('UpdateUser')
 class UpdateUser(ClientMessage):
-    def __init__(self, data, size):
-        pass
+    def parse(self):
+        self.username = self._parse_string()
+        self.password = self._parse_string()
+
+        privilege_count = self._parse_int32()
+        self.privileges = set()
+        for _ in range(privilege_count):
+            self.privileges.add(self._parse_int32())
+
 __all__.append('DeleteUser')
 class DeleteUser(ClientMessage):
-    def __init__(self, data, size):
-        pass
+    def parse(self):
+        self.username = self._parse_string()
 
 __all__.append('ServerMessage')
 class ServerMessage:
