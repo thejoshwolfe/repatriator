@@ -16,7 +16,7 @@ def set_up_logging():
     logging.basicConfig(filename=log_file, level=log_level, format=log_format)
 set_up_logging()
 from logging import debug, warning, error
-debug("\n\n")
+debug("\n\nServer starting\n")
 
 # now import our stuff
 from power import set_power_switch
@@ -135,8 +135,6 @@ class Server:
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
     global server
-
-    # nothing to do
     debug("got a magical request, sending a magical response")
     server.send_message(MagicalResponse())
 
@@ -198,25 +196,50 @@ def handle_FileDownloadRequest(msg):
     debug("Got file download message")
     pass
 
-@must_have_privilege(Privilege.ManageUsers)
-def handle_AddUser(msg):
-    debug("Got add user message")
-    pass
-
-@must_have_privilege(Privilege.ManageUsers)
-def handle_UpdateUser(msg):
-    debug("Got update user message")
-    pass
-
-@must_have_privilege(Privilege.ManageUsers)
-def handle_DeleteUser(msg):
-    debug("Got delete user message")
-    pass
-
-@must_have_privilege(Privilege.ManageUsers)
+@must_have_privilege(Privilege.OperateHardware)
 def handle_FileDeleteRequest(msg):
     debug("Got file delete request message")
     pass
+
+@must_have_privilege(Privilege.ManageUsers)
+def handle_AddUser(msg):
+    global server
+    debug("Got add user message")
+
+    try:
+        user = auth.User(msg.username, msg.password, msg.privileges)
+        user.save()
+    except auth.UserAlreadyExists:
+        server.send_message(ErrorMessage(ErrorMessage.UserAlreadyExists))
+        return
+
+@must_have_privilege(Privilege.ManageUsers)
+def handle_UpdateUser(msg):
+    global server
+    debug("Got update user message")
+    
+    user = auth.get_user(msg.username)
+    if user is None:
+        server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
+        return
+
+    user.attrs['username'] = msg.username
+    if len(msg.password) > 0:
+        user.attrs['password'] = msg.password
+    user.attrs['privileges'] = msg.privileges
+
+    user.save()
+
+@must_have_privilege(Privilege.ManageUsers)
+def handle_DeleteUser(msg):
+    global server
+    debug("Got delete user message")
+
+    try:
+        auth.delete_user(msg.username)
+    except auth.UserDoesNotExist:
+        server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
+        return
 
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,

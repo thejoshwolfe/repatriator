@@ -56,8 +56,14 @@ class Privilege:
 class UserAlreadyExists(Exception):
     pass
 
+class UserDoesNotExist(Exception):
+    pass
+
 class User:
     def __init__(self, username=None, password=None, privileges=None):
+        """
+        creates a new user and returns it, or raises UserAlreadyExists.
+        """
         if privileges is None:
             privileges = set()
 
@@ -88,18 +94,32 @@ class User:
         _auth_data[self.username] = self.attrs
         _save_json()
 
+def get_user(username):
+    if username in _auth_data:
+        user = User()
+        user.username = username
+        user.attrs = _auth_data[username]
+        return user
+    
+    return None
+
 def login(username, password):
     """
     Returns the User object if the authentication succeeded, else None
     """
-    if username in _auth_data:
-        if _hash_password(_auth_data[username]['salt'], password) == _auth_data[username]['password_hash']:
-            user = User()
-            user.username = username
-            user.attrs = _auth_data[username]
-            return user
+    user = get_user(username)
+    if user is not None and _hash_password(user.attrs['salt'], password) == user.attrs['password_hash']:
+        return user
     
     return None
+
+def delete_user(username):
+    try:
+        del _auth_data[username]
+        _save_json()
+    except KeyError:
+        raise UserDoesNotExist
+    
 
 _auth_file = os.path.join(settings['DATA_FOLDER'], "auth.json")
 _build_path(_auth_file)

@@ -281,11 +281,15 @@ class ErrorMessage(ServerMessage):
     NotAuthorized = 0
     HardwareInUse = 1
     FileDoesNotExist = 2
+    UserAlreadyExists = 3
+    UserDoesNotExist = 4
 
     descriptions = {
         NotAuthorized: "Not authorized to perform this operation.",
         HardwareInUse: "The hardware is already in use - wait till someone logs off.",
         FileDoesNotExist: "The file does not exist.",
+        UserAlreadyExists: "The user you are trying to add already exists.",
+        UserDoesNotExist: "The user you are trying to update does not exist.",
     }
 
     def __init__(self, code, description=None):
