@@ -4,11 +4,10 @@ Installation:
     install pywin32-214.win32-py3.1.exe.
     copy C:\Python31\Lib\site-packages\pywin32_system32\pywintypes31.dll
         to C:\Windows\System32\
-    extract "EDSDK 2.7 Windows.zip"\EDSDK\Dll\*.dll to server\
-    install pyedsdk. a shortcut is to use:
-        wolfebin get -k pyedsdk-0.1
-        then extract the zip into C:\Python31\Lib\site-packages.
-        the long way is to follow the install instructions in pyedsdk.
+    extract "EDSDK 2.7 Windows.zip"\EDSDK\Dll\*.dll
+        to C:\Windows\System32\
+    install pyedsdk and its dependencies
+    install pysilverpak and its dependencies
 
 Configuration:
 
@@ -21,6 +20,26 @@ Configuration:
 
     Try omitting this file first, and then use it if you need to.
     
+How the server handles authentication:
+    
+    Auth data is represented as a dictionary:
+        
+        {
+            'username': {
+                'salt': '32 character random character string',
+                'password_hash': sha256(salt + password),
+                'privileges': set([one or more values from the privilege enum]),
+            },
+            ...
+        }
+
+    When it changes, it is converted to json and dumped to auth.json. This file
+    is parsed upon server load. There is a default admin account:
+
+        user: default_admin
+        pass: temp1234
+
+
 How to communicate with the server:
 
     1.  Connect.
@@ -193,23 +212,3 @@ Messages:
             int64 - byte count of the entire message including this field
             int32 - length of utf8 username below
             <username - utf8 string>
-
-How the server handles authentication:
-    
-    Auth data is represented as a dictionary:
-        
-        {
-            'username': {
-                'salt': '32 character random character string',
-                'password_hash': sha256(salt + password),
-                'privileges': set([one or more values from the privilege enum]),
-            },
-            ...
-        }
-
-    When it changes, it is converted to json and dumped to auth.json. This file
-    is parsed upon server load. There is a default admin account:
-
-        user: default_admin
-        pass: temp1234
-
