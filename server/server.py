@@ -477,7 +477,6 @@ def initialize_hardware():
         motor.velocity = 300000
         motor.acceleration = 500
         motor.maxPosition = 242000 * 2
-        motor.fake = settings['FAKE_MOTOR']
         return motor
 
     def motorB():
@@ -485,7 +484,6 @@ def initialize_hardware():
         motor.baudRate = 9600
         motor.driverAddress = 1
         motor.maxPosition = 10000
-        motor.fake = settings['FAKE_MOTOR']
         return motor
 
     def motorX():
@@ -493,7 +491,6 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 2
-        motor.fake = settings['FAKE_MOTOR']
         return motor
 
     def motorY():
@@ -501,7 +498,6 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 3
-        motor.fake = settings['FAKE_MOTOR']
         return motor
 
     def motorZ():
@@ -509,7 +505,6 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 4
-        motor.fake = settings['FAKE_MOTOR']
         return motor
 
     motor_creators = {
@@ -522,6 +517,9 @@ def initialize_hardware():
 
     global motors
     motors = {char: create_motor() for char, create_motor in motor_creators.items()}
+    if settings['FAKE_MOTOR']:
+        for motor in motors.values():
+            motor.setFake()
 
     for char, create_motor in motors.items():
         if not motor.findAndConnect():
