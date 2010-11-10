@@ -113,11 +113,12 @@ class TakePicture(ClientMessage):
 __all__.append('MotorMovement')
 class MotorMovement(ClientMessage):
     def parse(self):
-        self.motor_a = self._parse_int64()
-        self.motor_b = self._parse_int64()
-        self.motor_x = self._parse_int64()
-        self.motor_y = self._parse_int64()
-        self.motor_z = self._parse_int64()
+        self.motor_pos = {}
+        self.motor_pos['A'] = self._parse_int64()
+        self.motor_pos['B'] = self._parse_int64()
+        self.motor_pos['X'] = self._parse_int64()
+        self.motor_pos['Y'] = self._parse_int64()
+        self.motor_pos['Z'] = self._parse_int64()
 
 __all__.append('DirectoryListingRequest')
 class DirectoryListingRequest(ClientMessage):
@@ -229,15 +230,14 @@ class ConnectionResult(ServerMessage):
 
 __all__.append('FullUpdate')
 class FullUpdate(ServerMessage):
-    def __init__(self, camera, motor_a_pos=0, motor_b_pos=0, motor_x_pos=0, motor_y_pos=0, motor_z_pos=0):
+    def __init__(self, frame_buffer, motor_positions):
+        """
+        frame_buffer is a memoryview of the live view picture
+        motor_positions is a dictionary of the motor character to position.
+        """
         self.message_type = ServerMessage.FullUpdate
-        self.motor_a_pos = motor_a_pos
-        self.motor_b_pos = motor_b_pos
-        self.motor_x_pos = motor_x_pos
-        self.motor_y_pos = motor_y_pos
-        self.motor_z_pos = motor_z_pos
+        self.motor_pos = motor_positions
 
-        frame_buffer = camera.liveViewMemoryView()
         self.jpeg = bytearray()
 
         # get live view frame

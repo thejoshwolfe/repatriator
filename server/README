@@ -8,6 +8,7 @@ Installation:
         to C:\Windows\System32\
     install pyedsdk and its dependencies
     install pysilverpak and its dependencies
+    install imagemagick and put convert.exe in PATH
 
 Configuration:
 

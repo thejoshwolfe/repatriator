@@ -36,6 +36,7 @@ from functools import wraps
 # dependencies
 import pythoncom
 import edsdk
+import silverpak
 
 class Server:
     def _write_message(self, message):
@@ -199,8 +200,11 @@ def handle_TakePicture(msg):
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_MotorMovement(msg):
+    global motors
     debug("Got motor movement message")
-    pass
+    
+    for char, motor in motors.items():
+        motor.goToPosition(msg.motor_pos[char])
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_DirectoryListingRequest(msg):
@@ -412,7 +416,7 @@ def run_camera():
         # if it's time, send a live view frame
         now = time.time()
         if now > next_frame:
-            server.send_message(FullUpdate(camera))
+            server.send_message(FullUpdate(camera.liveViewMemoryView(), {char: motor.position() for char, motor in motors.items()}))
             camera.grabLiveViewFrame()
             next_frame = now + 0.20
 
@@ -444,6 +448,11 @@ def on_connection_close():
         message_queue.put(DummyCloseConnection)
         message_thread.join()
 
+    # shutdown motors
+    global motors
+    for motor in motors.values():
+        motor.dispose()
+
     set_power_switch(on=False)
 
     debug("resetting state")
@@ -459,6 +468,67 @@ def initialize_hardware():
     finished = False
     camera_thread = threading.Thread(target=run_camera, name="camera")
     camera_thread.start()
+
+    def motorA():
+        motor = silverpak.Silverpak()
+        motor.baudRate = 9600
+        motor.driverAddress = 5
+        motor.fancy = False
+        motor.velocity = 300000
+        motor.acceleration = 500
+        motor.maxPosition = 242000 * 2
+        motor.fake = settings['FAKE_MOTOR']
+        return motor
+
+    def motorB():
+        motor = silverpak.Silverpak()
+        motor.baudRate = 9600
+        motor.driverAddress = 1
+        motor.maxPosition = 10000
+        motor.fake = settings['FAKE_MOTOR']
+        return motor
+
+    def motorX():
+        # TODO: this information is wrong
+        motor = silverpak.Silverpak()
+        motor.baudRate = 9600
+        motor.driverAddress = 2
+        motor.fake = settings['FAKE_MOTOR']
+        return motor
+
+    def motorY():
+        # TODO: this information is wrong
+        motor = silverpak.Silverpak()
+        motor.baudRate = 9600
+        motor.driverAddress = 3
+        motor.fake = settings['FAKE_MOTOR']
+        return motor
+
+    def motorZ():
+        # TODO: this information is wrong
+        motor = silverpak.Silverpak()
+        motor.baudRate = 9600
+        motor.driverAddress = 4
+        motor.fake = settings['FAKE_MOTOR']
+        return motor
+
+    motor_creators = {
+        'A': motorA,
+        'B': motorB,
+        'X': motorX,
+        'Y': motorY,
+        'Z': motorZ,
+    }
+
+    global motors
+    motors = {char: create_motor() for char, create_motor in motor_creators.items()}
+
+    for char, create_motor in motors.items():
+        if not motor.findAndConnect():
+            error("Fatal: Unable to find and connect to silverpak motor '{0}'.".format(motor_char))
+            sys.exit(-1)
+
+        motor.fullInit()
 
 if __name__ == "__main__":
     start_server()
