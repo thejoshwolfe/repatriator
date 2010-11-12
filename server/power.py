@@ -3,11 +3,11 @@ from logging import debug, warning, error
 import powerusb
 import sys
 
-if powerusb.initialize():
+try:
+    powerusb.initialize():
     debug("Initialized PowerUSB")
-else
-    error("Fatal: Unable to initialize PowerUSB")
-    sys.exit(-1)
+except powerusb.error:
+    error("Unable to initialize PowerUSB")
 
 def set_power_switch(on):
     """
@@ -16,4 +16,7 @@ def set_power_switch(on):
     """
     status = {True: 'on', False: 'off'}[on]
     debug("turning {0} power strip".format(status))
-    powerusb.set_state(on, on)
+    try:
+        powerusb.set_state(on, on)
+    except powerusb.error:
+        error("Unable to set PowerUSB state.")
