@@ -188,6 +188,14 @@ Messages:
             int32 - length of utf8 string filename
             <utf8 string filename requested>
 
+        ChangePasswordRequest - changes the currently logged in user's password
+            int8 - identifies this message as a ChangePasswordRequest
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 string old password
+            <utf8 string old password>
+            int32 - length of utf8 string new password
+            <utf8 string new password>
+
         AddUser - creates a new user in the system
             int8 - identifies this message as an AddUser
             int64 - byte count of the entire message including this field

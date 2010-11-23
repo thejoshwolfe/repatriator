@@ -59,6 +59,9 @@ class UserAlreadyExists(Exception):
 class UserDoesNotExist(Exception):
     pass
 
+class BadPassword(Exception):
+    pass
+
 class User:
     def __init__(self, username=None, password=None, privileges=None):
         """
@@ -101,6 +104,12 @@ class User:
     def save(self):
         _auth_data[self.username] = self.attrs
         _save_json()
+
+    def change_password(self, old_password, new_password):
+        if _hash_password(self.attrs['salt'], old_password) != self.attrs['password_hash']:
+            raise BadPassword
+        self.attrs['salt'] = _random_string(32)
+        self.attrs['password_hash'] = _hash_password(self.attrs['salt'], new_password)
 
 def get_user(username):
     if username in _auth_data:

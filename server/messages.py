@@ -19,6 +19,7 @@ class ClientMessage:
     UpdateUser = 7
     DeleteUser = 8
     FileDeleteRequest = 9
+    ChangePasswordRequest = 10
 
     class ParseError(Exception):
         pass
@@ -135,6 +136,12 @@ __all__.append('FileDeleteRequest')
 class FileDeleteRequest(ClientMessage):
     def parse(self):
         self.filename = self._parse_string()
+
+__all__.append('ChangePasswordRequest')
+class ChangePasswordRequest(ClientMessage):
+    def parse(self):
+        self.old_password = self._parse_string()
+        self.new_password = self._parse_string()
 
 __all__.append('AddUser')
 class AddUser(ClientMessage):
@@ -320,6 +327,7 @@ class ErrorMessage(ServerMessage):
     UserDoesNotExist = 4
     OverwritingOtherUser = 5
     InvalidFilename = 6
+    BadPassword = 7
 
     descriptions = {
         NotAuthorized: "Not authorized to perform this operation.",
@@ -329,6 +337,7 @@ class ErrorMessage(ServerMessage):
         UserDoesNotExist: "The user you are trying to update does not exist.",
         OverwritingOtherUser: "You're trying to change a username in a way that would overwrite another user.",
         InvalidFilename: "The filename you supplied is invalid.",
+        BadPassword: "Invalid password.",
     }
 
     def __init__(self, code, description=None):
