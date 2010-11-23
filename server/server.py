@@ -330,13 +330,14 @@ need_camera_thread = {
 }
 
 def reset_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors
 
     # initialize variables
     finished = False
     user = None
     camera_thread = None
     message_thread = None
+    motors = None
     camera_thread_queue = queue.Queue()
     message_queue = queue.Queue()
 
@@ -450,8 +451,9 @@ def on_connection_close():
 
     # shutdown motors
     global motors
-    for motor in motors.values():
-        motor.dispose()
+    if motors is not None:
+        for motor in motors.values():
+            motor.dispose()
 
     set_power_switch(on=False)
 

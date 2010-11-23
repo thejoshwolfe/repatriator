@@ -4,7 +4,7 @@ import powerusb
 import sys
 
 try:
-    powerusb.initialize():
+    powerusb.initialize()
     debug("Initialized PowerUSB")
 except powerusb.error:
     error("Unable to initialize PowerUSB")
