@@ -11,9 +11,15 @@ namespace repatriator_client
 {
     public partial class AdminWindow : Form
     {
-        public AdminWindow()
+        private readonly ConnectionManager connectionManager;
+        public AdminWindow(ConnectionManager connectionManager)
         {
+            this.connectionManager = connectionManager;
+
             InitializeComponent();
+
+
         }
     }
 }
+

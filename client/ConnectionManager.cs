@@ -26,6 +26,7 @@ namespace repatriator_client
         public event Action directoryListUpdated;
 
         private ConnectionSettings connection;
+        private bool hardware;
         private string password;
         private string downloadDirectory;
 
@@ -40,10 +41,12 @@ namespace repatriator_client
         private Image image;
         private DirectoryItem[] directoryList = { };
 
-        public ConnectionManager(ConnectionSettings connection, string password)
+        public ConnectionManager(ConnectionSettings connection, string password, bool hardware)
         {
             this.connection = connection;
             this.password = password;
+            this.hardware = hardware;
+            createSocket();
         }
 
         private void createSocket()
@@ -60,8 +63,6 @@ namespace repatriator_client
             if (connection.url.Length == 0)
                 return false;
             if (connection.username.Length == 0)
-                return false;
-            if (!Directory.Exists(downloadDirectory))
                 return false;
             return true;
         }
@@ -147,7 +148,7 @@ namespace repatriator_client
                     if (!socketStream.readMagicalResponse())
                         return LoginStatus.ServerIsBogus;
                     // this is a real host
-                    socketStream.writeConnectionRequest(connection.username, connection.password);
+                    socketStream.writeConnectionRequest(connection.username, this.password, this.hardware);
                     ConnectionResult connectionResult = socketStream.readConnectionResult();
                     if (connectionResult.connectionStatus != ServerConnectionStatus.Success)
                     {
@@ -248,6 +249,10 @@ namespace repatriator_client
         }
         private abstract class StreamManager
         {
+            public void writeBool(bool value)
+            {
+                writeByte((byte)(value ? 1 : 0));
+            }
             public void writeByte(byte value)
             {
                 write(new byte[] { value });
@@ -294,7 +299,7 @@ namespace repatriator_client
                 writeLong(1 + 8 + magicalRequest.Length);
                 write(magicalRequest);
             }
-            public void writeConnectionRequest(string userName, string password)
+            public void writeConnectionRequest(string userName, string password, bool hardware)
             {
                 FakeStreamWriter buffer = new FakeStreamWriter();
                 buffer.writeInt(clientMajorVersion);
@@ -302,7 +307,7 @@ namespace repatriator_client
                 buffer.writeInt(clientBuildVersion);
                 buffer.writeString(userName);
                 buffer.writeString(password);
-                buffer.writeByte(1); // turn on the hardware
+                buffer.writeBool(hardware); // turn on the hardware
                 writeBufferedMessage(RequestTypes.ConnectionRequest, buffer);
             }
             public void writeTakePicture()

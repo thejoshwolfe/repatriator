@@ -108,9 +108,24 @@ namespace repatriator_client
                 return;
 
             ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
-            ConnectionStatusWindow statusWindow = new ConnectionStatusWindow();
-            statusWindow.Show(this);
-            // TODO: open connection to selected connection with the purpose of doing admin
+
+            string password = conn.password;
+            if (password == "")
+            {
+                PasswordInputWindow inputPasswordWindow = new PasswordInputWindow();
+                password = inputPasswordWindow.showGetPassword(this, password, conn.username);
+                if (password == "")
+                    return;
+            }
+            ConnectionManager connectionManager = new ConnectionManager(conn, password, false);
+
+            ConnectionStatusWindow statusWindow = new ConnectionStatusWindow(connectionManager);
+            statusWindow.ShowDialog(this);
+            if (!statusWindow.result)
+                return;
+            AdminWindow adminWindow = new AdminWindow(connectionManager);
+            adminWindow.Show();
+            Close();
         }
 
         private void adminToolStripMenuItem_Click(object sender, EventArgs e)
