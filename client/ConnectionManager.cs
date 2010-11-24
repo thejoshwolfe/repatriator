@@ -246,6 +246,9 @@ namespace repatriator_client
             public const byte AddUser = 6;
             public const byte UpdateUser = 7;
             public const byte DeleteUser = 8;
+            public const byte FileDeleteRequest = 9;
+            public const byte ChangePasswordRequest = 10;
+            public const byte ListUserRequest = 11;
         }
         private static class ResponseTypes
         {
@@ -254,6 +257,8 @@ namespace repatriator_client
             public const byte FullUpdate = 2;
             public const byte DirectoryListingResult = 3;
             public const byte FileDownloadResult = 4;
+            public const byte ErrorMessage = 5;
+            public const byte ListUserResult = 6;
         }
         private class ConnectionResult
         {
@@ -261,18 +266,13 @@ namespace repatriator_client
             public int serverMinorVersion;
             public int serverBuildVersion;
             public ServerConnectionStatus connectionStatus;
-            public HashSet<Permission> permissions = new HashSet<Permission>();
+            public HashSet<Permission> permissions;
         }
         private enum ServerConnectionStatus
         {
             InvalidLogin = 0,
             InsufficientPrivileges = 1,
             Success = 2,
-        }
-        private enum Permission
-        {
-            OperateHardware = 0,
-            ManageUsers = 1,
         }
         private abstract class StreamManager
         {
@@ -310,6 +310,12 @@ namespace repatriator_client
                 writeInt(bytes.Length);
                 write(bytes);
             }
+            private void writePermissions(HashSet<Permission> permissions)
+            {
+                writeInt(permissions.Count);
+                foreach (Permission permission in permissions)
+                    writeInt((int)permission);
+            }
             public void writeMagicalRequest()
             {
                 writeByte(RequestTypes.MagicalRequest);
@@ -325,9 +331,80 @@ namespace repatriator_client
                 buffer.writeString(userName);
                 buffer.writeString(password);
                 buffer.writeByte(1); // turn on the hardware
+                writeBufferedMessage(RequestTypes.ConnectionRequest, buffer);
+            }
+            public void writeTakePicture()
+            {
+                writeSimpleMessage(RequestTypes.TakePicture);
+            }
+            public void writeMotorMovement(long[] motorPositions)
+            {
+                if (motorPositions.Length != 5)
+                    throw null;
+                writeByte(RequestTypes.MotorMovement);
+                writeLong(1 + 8 + 5 * 8);
+                foreach (long motorPosition in motorPositions)
+                    writeLong(motorPosition);
+            }
+            public void writeDirectoryListingRequest()
+            {
+                writeSimpleMessage(RequestTypes.DirectoryListingRequest);
+            }
+            public void writeFileDownloadRequest(string filename)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(filename);
+                writeBufferedMessage(RequestTypes.FileDownloadRequest, buffer);
+            }
+            public void writeFileDeleteRequest(string filename)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(filename);
+                writeBufferedMessage(RequestTypes.FileDeleteRequest, buffer);
+            }
+            public void writeChangePasswordRequest(string oldPassword, string newPassword)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(oldPassword);
+                buffer.writeString(newPassword);
+                writeBufferedMessage(RequestTypes.ChangePasswordRequest, buffer);
+            }
+            public void writeAddUser(string username, string password, HashSet<Permission> permissions)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(username);
+                buffer.writeString(password);
+                buffer.writePermissions(permissions);
+                writeBufferedMessage(RequestTypes.AddUser, buffer);
+            }
+            public void writeUpdateUser(string username, string password, HashSet<Permission> permissions)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(username);
+                buffer.writeString(password);
+                buffer.writePermissions(permissions);
+                writeBufferedMessage(RequestTypes.UpdateUser, buffer);
+            }
+            public void writeDeleteUser(string username)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(username);
+                writeBufferedMessage(RequestTypes.DeleteUser, buffer);
+            }
+            public void writeListUserRequest()
+            {
+                writeSimpleMessage(RequestTypes.ListUserRequest);
+            }
+            private void writeSimpleMessage(byte messageCode)
+            {
+                writeByte(messageCode);
+                writeLong(1 + 8);
+            }
+            private void writeBufferedMessage(byte messageCode, FakeStreamWriter buffer)
+            {
                 byte[] bytes = buffer.toByteArray();
 
-                writeByte(RequestTypes.ConnectionRequest);
+                writeByte(messageCode);
                 writeLong(1 + 8 + bytes.Length);
                 write(bytes);
             }
@@ -373,6 +450,14 @@ namespace repatriator_client
                 long imageLength = readLong();
                 return Image.FromStream(new MemoryStream(read((int)imageLength), false));
             }
+            public HashSet<Permission> readPermissions()
+            {
+                HashSet<Permission> permissions = new HashSet<Permission>();
+                int permissionsCount = readInt();
+                for (int i = 0; i < permissionsCount; i++)
+                    permissions.Add((Permission)Enum.ToObject(typeof(Permission), readInt()));
+                return permissions;
+            }
             public bool readMagicalResponse()
             {
                 byte typeCode = readByte();
@@ -395,9 +480,7 @@ namespace repatriator_client
                 result.serverMinorVersion = reader.readInt();
                 result.serverBuildVersion = reader.readInt();
                 result.connectionStatus = (ServerConnectionStatus)Enum.ToObject(typeof(ServerConnectionStatus), reader.readInt());
-                int permissionsCount = reader.readInt();
-                for (int i = 0; i < permissionsCount; i++)
-                    result.permissions.Add((Permission)Enum.ToObject(typeof(Permission), reader.readInt()));
+                result.permissions = reader.readPermissions();
                 return result;
             }
             public EventResponse readEventResponse()
@@ -433,6 +516,26 @@ namespace repatriator_client
                         {
                             FileDownloadEventResponse response = new FileDownloadEventResponse();
                             response.image = reader.readImage();
+                            return response;
+                        }
+                    case ResponseTypes.ErrorMessage:
+                        {
+                            ErrorMessageEventResponse response = new ErrorMessageEventResponse();
+                            response.message = reader.readString();
+                            return response;
+                        }
+                    case ResponseTypes.ListUserResult:
+                        {
+                            ListUserEventResponse response = new ListUserEventResponse();
+                            int userCount = reader.readInt();
+                            response.users = new UserInfo[userCount];
+                            for (int i = 0; i < userCount; i++)
+                            {
+                                UserInfo user = new UserInfo();
+                                user.username = reader.readString();
+                                user.permissions = reader.readPermissions();
+                                response.users[i] = user;
+                            }
                             return response;
                         }
                     default:
@@ -567,6 +670,26 @@ namespace repatriator_client
     {
         public Image image;
     }
+    public class ErrorMessageEventResponse : EventResponse
+    {
+        public string message;
+    }
+    public class ListUserEventResponse : EventResponse
+    {
+        public UserInfo[] users;
+    }
+
+    public enum Permission
+    {
+        OperateHardware = 0,
+        ManageUsers = 1,
+    }
+    public class UserInfo
+    {
+        public string username;
+        public HashSet<Permission> permissions;
+    }
+
     public class DirectoryItem
     {
         public string filename;
