@@ -45,6 +45,7 @@
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.rightClickMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,6 +58,7 @@
             this.newButton.TabIndex = 4;
             this.newButton.Text = "&New";
             this.newButton.UseVisualStyleBackColor = true;
+            this.newButton.Click += new System.EventHandler(this.newButton_Click);
             // 
             // deleteButton
             // 
@@ -67,6 +69,7 @@
             this.deleteButton.TabIndex = 3;
             this.deleteButton.Text = "&Delete";
             this.deleteButton.UseVisualStyleBackColor = true;
+            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
             // editButton
             // 
@@ -77,6 +80,7 @@
             this.editButton.TabIndex = 2;
             this.editButton.Text = "&Edit";
             this.editButton.UseVisualStyleBackColor = true;
+            this.editButton.Click += new System.EventHandler(this.editButton_Click);
             // 
             // adminButton
             // 
@@ -87,6 +91,7 @@
             this.adminButton.TabIndex = 1;
             this.adminButton.Text = "&Admin";
             this.adminButton.UseVisualStyleBackColor = true;
+            this.adminButton.Click += new System.EventHandler(this.adminButton_Click);
             // 
             // loginButton
             // 
@@ -97,6 +102,7 @@
             this.loginButton.TabIndex = 5;
             this.loginButton.Text = "&Login";
             this.loginButton.UseVisualStyleBackColor = true;
+            this.loginButton.Click += new System.EventHandler(this.loginButton_Click);
             // 
             // cancelButton
             // 
@@ -108,6 +114,7 @@
             this.cancelButton.TabIndex = 6;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // connectionListView
             // 
@@ -117,11 +124,13 @@
             this.connectionListView.AutoArrange = false;
             this.connectionListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
+            this.columnHeader3,
             this.columnHeader2});
             this.connectionListView.ContextMenuStrip = this.rightClickMenu;
             this.connectionListView.FullRowSelect = true;
             this.connectionListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.connectionListView.HideSelection = false;
+            this.connectionListView.LabelWrap = false;
             this.connectionListView.Location = new System.Drawing.Point(12, 12);
             this.connectionListView.MultiSelect = false;
             this.connectionListView.Name = "connectionListView";
@@ -129,11 +138,13 @@
             this.connectionListView.TabIndex = 0;
             this.connectionListView.UseCompatibleStateImageBehavior = false;
             this.connectionListView.View = System.Windows.Forms.View.Details;
+            this.connectionListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.connectionListView_ItemSelectionChanged);
+            this.connectionListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.connectionListView_MouseDoubleClick);
             // 
             // columnHeader1
             // 
             this.columnHeader1.Text = "Server";
-            this.columnHeader1.Width = 112;
+            this.columnHeader1.Width = 129;
             // 
             // columnHeader2
             // 
@@ -156,18 +167,21 @@
             this.adminToolStripMenuItem.Name = "adminToolStripMenuItem";
             this.adminToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.adminToolStripMenuItem.Text = "&Admin";
+            this.adminToolStripMenuItem.Click += new System.EventHandler(this.adminToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.editToolStripMenuItem.Text = "&Edit";
+            this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.deleteToolStripMenuItem.Text = "&Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -179,6 +193,12 @@
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.newToolStripMenuItem.Text = "&New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Port";
+            this.columnHeader3.Width = 56;
             // 
             // ConnectionWindow
             // 
@@ -198,6 +218,7 @@
             this.MinimumSize = new System.Drawing.Size(365, 294);
             this.Name = "ConnectionWindow";
             this.Text = "Repatriator Login";
+            this.Shown += new System.EventHandler(this.ConnectionWindow_Shown);
             this.rightClickMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -220,5 +241,6 @@
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
     }
 }
