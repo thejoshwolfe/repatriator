@@ -56,8 +56,9 @@ namespace repatriator_client
             urlTextBox.Text = conn.url;
             portTextBox.Text = conn.port;
             userNameTextBox.Text = conn.username;
-            savePasswordCheckBox.Checked = conn.password.Length > 0;
-            passwordTextBox.Text = static_password;
+            bool save_password = conn.password.Length != 0;
+            savePasswordCheckBox.Checked = save_password;
+            passwordTextBox.Text = save_password ? static_password : "";
 
             enableCorrectControls();
 
@@ -96,6 +97,18 @@ namespace repatriator_client
         {
             connection = null;
             this.Close();
+        }
+
+        private void passwordTextBox_Enter(object sender, EventArgs e)
+        {
+            if (passwordTextBox.Text == static_password)
+                passwordTextBox.Text = "";
+        }
+
+        private void portTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(('0' <= e.KeyChar && e.KeyChar <= '9') || e.KeyChar == '\b'))
+                e.Handled = true;
         }
     }
 }

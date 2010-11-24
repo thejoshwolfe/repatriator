@@ -25,24 +25,43 @@ namespace repatriator_client
         {
             EditConnectionWindow editor = new EditConnectionWindow();
             Connection new_conn = editor.showNew(this);
-            if (new_conn != null)
-            {
-                Settings.connections.Add(new_conn);
-                Settings.save();
-            }
+            if (new_conn == null)
+                return;
+            Settings.connections.Add(new_conn);
+            Settings.save();
+            refreshConnections();
+
+            // select the new one
+            connectionListView.Items[connectionListView.Items.Count - 1].Selected = true;
         }
 
         private void ConnectionWindow_Shown(object sender, EventArgs e)
         {
+            refreshConnections();
+            if (connectionListView.Items.Count > 0)
+                connectionListView.Items[0].Selected = true;
+        }
+
+        private void refreshConnections()
+        {
+            // maybe perserve selection
+            int selection = -1;
+            foreach (int selectedIndex in connectionListView.SelectedIndices)
+                selection = selectedIndex; // will only happen once.
+
+            // load contents
             connectionListView.Items.Clear();
             foreach (Connection connection in Settings.connections)
+                connectionListView.Items.Add(new ListViewItem(new string[] { connection.url, connection.port, connection.username }));
+
+            // restore selection
+            if (selection != -1 && connectionListView.Items.Count != 0)
             {
-                connectionListView.Items.Add(new ListViewItem(new string[]{connection.url, connection.port, connection.username}));
+                if (selection >= connectionListView.Items.Count)
+                    selection = connectionListView.Items.Count - 1;
+                connectionListView.Items[selection].Selected = true;
             }
-            if (connectionListView.Items.Count > 0)
-            {
-                connectionListView.Items[0].Selected = true;
-            }
+
             enableCorrectControls();
         }
 
@@ -55,6 +74,7 @@ namespace repatriator_client
                 editor.showEdit(this, conn);
                 Settings.save();
             }
+            refreshConnections();
         }
 
         private void deleteButton_Click(object sender, EventArgs e)
@@ -62,7 +82,9 @@ namespace repatriator_client
             if (connectionListView.SelectedIndices.Count == 1)
             {
                 Settings.connections.RemoveAt(connectionListView.SelectedIndices[0]);
+                Settings.save();
             }
+            refreshConnections();
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)

@@ -93,6 +93,7 @@ namespace repatriator_client
             {
                 // do nothing
             }
+            reader.Close();
         }
 
         public static void save()
@@ -101,20 +102,20 @@ namespace repatriator_client
             writer.WriteLine("<connections>");
             foreach (Connection connection in connections)
             {
-                writer.WriteLine("<connection>");
-                writer.WriteLine("<url>");
-                writer.WriteLine(connection.url);
+                writer.WriteLine("    <connection>");
+                writer.Write("        <url>");
+                writer.Write(connection.url);
                 writer.WriteLine("</url>");
-                writer.WriteLine("<port>");
-                writer.WriteLine(connection.port);
+                writer.Write("        <port>");
+                writer.Write(connection.port);
                 writer.WriteLine("</port>");
-                writer.WriteLine("<user>");
-                writer.WriteLine(connection.username);
+                writer.Write("        <user>");
+                writer.Write(connection.username);
                 writer.WriteLine("</user>");
-                writer.WriteLine("<password>");
-                writer.WriteLine(connection.password);
+                writer.Write("        <password>");
+                writer.Write(connection.password);
                 writer.WriteLine("</password>");
-                writer.WriteLine("</connection>");
+                writer.WriteLine("    </connection>");
             }
             writer.WriteLine("</connections>");
             writer.Close();

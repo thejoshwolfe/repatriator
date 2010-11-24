@@ -30,7 +30,6 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.portTextBox = new System.Windows.Forms.TextBox();
             this.urlTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.userNameTextBox = new System.Windows.Forms.TextBox();
@@ -39,6 +38,7 @@
             this.passwordLabel = new System.Windows.Forms.Label();
             this.passwordTextBox = new System.Windows.Forms.TextBox();
             this.savePasswordCheckBox = new System.Windows.Forms.CheckBox();
+            this.portTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -58,13 +58,6 @@
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 2;
             this.label2.Text = "&Port:";
-            // 
-            // portTextBox
-            // 
-            this.portTextBox.Location = new System.Drawing.Point(103, 38);
-            this.portTextBox.Name = "portTextBox";
-            this.portTextBox.Size = new System.Drawing.Size(52, 20);
-            this.portTextBox.TabIndex = 3;
             // 
             // urlTextBox
             // 
@@ -128,6 +121,7 @@
             this.passwordTextBox.Size = new System.Drawing.Size(194, 20);
             this.passwordTextBox.TabIndex = 8;
             this.passwordTextBox.UseSystemPasswordChar = true;
+            this.passwordTextBox.Enter += new System.EventHandler(this.passwordTextBox_Enter);
             // 
             // savePasswordCheckBox
             // 
@@ -136,9 +130,17 @@
             this.savePasswordCheckBox.Name = "savePasswordCheckBox";
             this.savePasswordCheckBox.Size = new System.Drawing.Size(100, 17);
             this.savePasswordCheckBox.TabIndex = 6;
-            this.savePasswordCheckBox.Text = "&Save Password";
+            this.savePasswordCheckBox.Text = "Sa&ve Password";
             this.savePasswordCheckBox.UseVisualStyleBackColor = true;
             this.savePasswordCheckBox.CheckedChanged += new System.EventHandler(this.savePasswordCheckBox_CheckedChanged);
+            // 
+            // portTextBox
+            // 
+            this.portTextBox.Location = new System.Drawing.Point(103, 38);
+            this.portTextBox.Name = "portTextBox";
+            this.portTextBox.Size = new System.Drawing.Size(52, 20);
+            this.portTextBox.TabIndex = 3;
+            this.portTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.portTextBox_KeyPress);
             // 
             // EditConnectionWindow
             // 
@@ -148,6 +150,7 @@
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(313, 235);
             this.ControlBox = false;
+            this.Controls.Add(this.portTextBox);
             this.Controls.Add(this.savePasswordCheckBox);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.cancelButton);
@@ -155,7 +158,6 @@
             this.Controls.Add(this.passwordTextBox);
             this.Controls.Add(this.userNameTextBox);
             this.Controls.Add(this.passwordLabel);
-            this.Controls.Add(this.portTextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -170,7 +172,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox portTextBox;
         private System.Windows.Forms.TextBox urlTextBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox userNameTextBox;
@@ -179,5 +180,6 @@
         private System.Windows.Forms.Label passwordLabel;
         private System.Windows.Forms.TextBox passwordTextBox;
         private System.Windows.Forms.CheckBox savePasswordCheckBox;
+        private System.Windows.Forms.TextBox portTextBox;
     }
 }
