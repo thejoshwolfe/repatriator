@@ -254,6 +254,18 @@ def handle_FileDeleteRequest(msg):
     except OSError as ex:
         error("OSError removing file: {0}".format(ex))
 
+def handle_ChangePasswordRequest(msg):
+    global server
+    debug("Got change password message")
+    
+    global user
+    try:
+        user.change_password(msg.old_password, msg.new_password)
+    except auth.BadPassword:
+        warning("user {0} tried to change password with invalid old password, sending error message".format(msg.username))
+        server.send_message(ErrorMessage(ErrorMessage.BadPassword))
+        return
+
 @must_have_privilege(Privilege.ManageUsers)
 def handle_AddUser(msg):
     global server
@@ -314,19 +326,22 @@ message_handlers = {
     ClientMessage.UpdateUser: handle_UpdateUser,
     ClientMessage.DeleteUser: handle_DeleteUser,
     ClientMessage.FileDeleteRequest: handle_FileDeleteRequest,
+    ClientMessage.ChangePasswordRequest: handle_ChangePasswordRequest,
 }
 
 need_camera_thread = {
-    ClientMessage.MagicalRequest: False,
-    ClientMessage.ConnectionRequest: False,
     ClientMessage.TakePicture: True,
     ClientMessage.MotorMovement: True,
+
+    ClientMessage.MagicalRequest: False,
+    ClientMessage.ConnectionRequest: False,
     ClientMessage.DirectoryListingRequest: False,
     ClientMessage.FileDownloadRequest: False,
     ClientMessage.AddUser: False,
     ClientMessage.UpdateUser: False,
     ClientMessage.DeleteUser: False,
     ClientMessage.FileDeleteRequest: False,
+    ClientMessage.ChangePasswordRequest: False,
 }
 
 def reset_state():
