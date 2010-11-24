@@ -28,117 +28,196 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.Label label4;
-            System.Windows.Forms.Label label3;
-            System.Windows.Forms.Label label2;
-            this.passwordText = new System.Windows.Forms.TextBox();
-            this.userNameText = new System.Windows.Forms.TextBox();
-            this.serverText = new System.Windows.Forms.TextBox();
-            this.cancelConncetionButton = new System.Windows.Forms.Button();
-            this.connectButton = new System.Windows.Forms.Button();
-            label4 = new System.Windows.Forms.Label();
-            label3 = new System.Windows.Forms.Label();
-            label2 = new System.Windows.Forms.Label();
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AdminWindow));
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.adminToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.newToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.usersListBox = new System.Windows.Forms.ListBox();
+            this.newButton = new System.Windows.Forms.Button();
+            this.deleteButton = new System.Windows.Forms.Button();
+            this.editButton = new System.Windows.Forms.Button();
+            this.adminCheckbox = new System.Windows.Forms.CheckBox();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.okButton = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.contextMenuStrip1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // label4
+            // contextMenuStrip1
             // 
-            label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(16, 67);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(55, 13);
-            label4.TabIndex = 20;
-            label4.Text = "password:";
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.adminToolStripMenuItem,
+            this.editToolStripMenuItem,
+            this.newToolStripMenuItem,
+            this.newToolStripMenuItem1,
+            this.newToolStripMenuItem2});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(111, 98);
             // 
-            // passwordText
+            // adminToolStripMenuItem
             // 
-            this.passwordText.Location = new System.Drawing.Point(77, 64);
-            this.passwordText.Name = "passwordText";
-            this.passwordText.Size = new System.Drawing.Size(157, 20);
-            this.passwordText.TabIndex = 19;
-            this.passwordText.Text = "temp1234";
-            this.passwordText.UseSystemPasswordChar = true;
+            this.adminToolStripMenuItem.Name = "adminToolStripMenuItem";
+            this.adminToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.adminToolStripMenuItem.Text = "&Admin";
             // 
-            // label3
+            // editToolStripMenuItem
             // 
-            label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(12, 41);
-            label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(59, 13);
-            label3.TabIndex = 18;
-            label3.Text = "user name:";
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.editToolStripMenuItem.Text = "&Edit";
             // 
-            // label2
+            // newToolStripMenuItem
             // 
-            label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(32, 15);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(39, 13);
-            label2.TabIndex = 17;
-            label2.Text = "server:";
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.newToolStripMenuItem.Text = "&Delete";
             // 
-            // userNameText
+            // newToolStripMenuItem1
             // 
-            this.userNameText.Location = new System.Drawing.Point(77, 38);
-            this.userNameText.Name = "userNameText";
-            this.userNameText.Size = new System.Drawing.Size(157, 20);
-            this.userNameText.TabIndex = 16;
-            this.userNameText.Text = "default_admin";
+            this.newToolStripMenuItem1.Name = "newToolStripMenuItem1";
+            this.newToolStripMenuItem1.Size = new System.Drawing.Size(107, 6);
             // 
-            // serverText
+            // newToolStripMenuItem2
             // 
-            this.serverText.Location = new System.Drawing.Point(77, 12);
-            this.serverText.Name = "serverText";
-            this.serverText.Size = new System.Drawing.Size(157, 20);
-            this.serverText.TabIndex = 15;
-            this.serverText.Text = "localhost:57051";
+            this.newToolStripMenuItem2.Name = "newToolStripMenuItem2";
+            this.newToolStripMenuItem2.Size = new System.Drawing.Size(110, 22);
+            this.newToolStripMenuItem2.Text = "&New";
             // 
-            // cancelConncetionButton
+            // usersListBox
             // 
-            this.cancelConncetionButton.Location = new System.Drawing.Point(159, 90);
-            this.cancelConncetionButton.Name = "cancelConncetionButton";
-            this.cancelConncetionButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelConncetionButton.TabIndex = 22;
-            this.cancelConncetionButton.Text = "Cancel";
-            this.cancelConncetionButton.UseVisualStyleBackColor = true;
+            this.usersListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.usersListBox.FormattingEnabled = true;
+            this.usersListBox.IntegralHeight = false;
+            this.usersListBox.Location = new System.Drawing.Point(6, 19);
+            this.usersListBox.Name = "usersListBox";
+            this.usersListBox.Size = new System.Drawing.Size(224, 230);
+            this.usersListBox.TabIndex = 1;
             // 
-            // connectButton
+            // newButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(77, 90);
-            this.connectButton.Name = "connectButton";
-            this.connectButton.Size = new System.Drawing.Size(76, 23);
-            this.connectButton.TabIndex = 21;
-            this.connectButton.Text = "Connect";
-            this.connectButton.UseVisualStyleBackColor = true;
-            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
+            this.newButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.newButton.AutoSize = true;
+            this.newButton.Location = new System.Drawing.Point(236, 118);
+            this.newButton.Name = "newButton";
+            this.newButton.Size = new System.Drawing.Size(103, 23);
+            this.newButton.TabIndex = 13;
+            this.newButton.Text = "&New";
+            this.newButton.UseVisualStyleBackColor = true;
+            // 
+            // deleteButton
+            // 
+            this.deleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.deleteButton.AutoSize = true;
+            this.deleteButton.Location = new System.Drawing.Point(236, 48);
+            this.deleteButton.Name = "deleteButton";
+            this.deleteButton.Size = new System.Drawing.Size(103, 23);
+            this.deleteButton.TabIndex = 14;
+            this.deleteButton.Text = "&Delete";
+            this.deleteButton.UseVisualStyleBackColor = true;
+            // 
+            // editButton
+            // 
+            this.editButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.editButton.Location = new System.Drawing.Point(236, 19);
+            this.editButton.Name = "editButton";
+            this.editButton.Size = new System.Drawing.Size(103, 23);
+            this.editButton.TabIndex = 15;
+            this.editButton.Text = "&Change Password";
+            this.editButton.UseVisualStyleBackColor = true;
+            // 
+            // adminCheckbox
+            // 
+            this.adminCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.adminCheckbox.AutoSize = true;
+            this.adminCheckbox.Location = new System.Drawing.Point(236, 77);
+            this.adminCheckbox.Name = "adminCheckbox";
+            this.adminCheckbox.Size = new System.Drawing.Size(103, 17);
+            this.adminCheckbox.TabIndex = 16;
+            this.adminCheckbox.Text = "&Admin Privileges";
+            this.adminCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // cancelButton
+            // 
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.cancelButton.Location = new System.Drawing.Point(282, 273);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.TabIndex = 17;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            // 
+            // okButton
+            // 
+            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.okButton.Location = new System.Drawing.Point(201, 273);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(75, 23);
+            this.okButton.TabIndex = 18;
+            this.okButton.Text = "&OK";
+            this.okButton.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.usersListBox);
+            this.groupBox1.Controls.Add(this.editButton);
+            this.groupBox1.Controls.Add(this.deleteButton);
+            this.groupBox1.Controls.Add(this.newButton);
+            this.groupBox1.Controls.Add(this.adminCheckbox);
+            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(345, 255);
+            this.groupBox1.TabIndex = 19;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Users";
             // 
             // AdminWindow
             // 
+            this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.cancelConncetionButton);
-            this.Controls.Add(this.connectButton);
-            this.Controls.Add(label4);
-            this.Controls.Add(this.passwordText);
-            this.Controls.Add(label3);
-            this.Controls.Add(label2);
-            this.Controls.Add(this.userNameText);
-            this.Controls.Add(this.serverText);
+            this.CancelButton = this.cancelButton;
+            this.ClientSize = new System.Drawing.Size(369, 308);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.okButton);
+            this.Controls.Add(this.cancelButton);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(313, 287);
             this.Name = "AdminWindow";
             this.Text = "Repatriator Admin";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AdminWindow_FormClosed);
+            this.contextMenuStrip1.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TextBox passwordText;
-        private System.Windows.Forms.TextBox userNameText;
-        private System.Windows.Forms.TextBox serverText;
-        private System.Windows.Forms.Button cancelConncetionButton;
-        private System.Windows.Forms.Button connectButton;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem adminToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator newToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem2;
+        private System.Windows.Forms.ListBox usersListBox;
+        private System.Windows.Forms.Button newButton;
+        private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.Button editButton;
+        private System.Windows.Forms.CheckBox adminCheckbox;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button okButton;
+        private System.Windows.Forms.GroupBox groupBox1;
+
     }
 }

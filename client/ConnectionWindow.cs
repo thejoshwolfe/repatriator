@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace repatriator_client
 {
-    public partial class AdminWindow : Form
+    public partial class ConnectionWindow : Form
     {
-        public AdminWindow()
+        public ConnectionWindow()
         {
             InitializeComponent();
         }

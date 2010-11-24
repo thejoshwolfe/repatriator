@@ -29,12 +29,6 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.Label label1;
-            System.Windows.Forms.Label label2;
-            System.Windows.Forms.Label label3;
-            System.Windows.Forms.Label label4;
-            System.Windows.Forms.Label label5;
-            this.connectButton = new System.Windows.Forms.Button();
-            this.serverText = new System.Windows.Forms.TextBox();
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -49,20 +43,7 @@
             this.miniMapSliderX = new System.Windows.Forms.TrackBar();
             this.miniMapSliderY = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.setupPanel = new System.Windows.Forms.Panel();
-            this.downloadDirectoryText = new System.Windows.Forms.TextBox();
-            this.passwordText = new System.Windows.Forms.TextBox();
-            this.cancelConncetionButton = new System.Windows.Forms.Button();
-            this.statusLabel = new System.Windows.Forms.Label();
-            this.userNameText = new System.Windows.Forms.TextBox();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showAdminWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             label1 = new System.Windows.Forms.Label();
-            label2 = new System.Windows.Forms.Label();
-            label3 = new System.Windows.Forms.Label();
-            label4 = new System.Windows.Forms.Label();
-            label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -74,8 +55,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderY)).BeginInit();
             this.panel3.SuspendLayout();
-            this.setupPanel.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -87,66 +66,12 @@
             label1.TabIndex = 0;
             label1.Text = "label1";
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(40, 79);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(39, 13);
-            label2.TabIndex = 9;
-            label2.Text = "server:";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(20, 105);
-            label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(59, 13);
-            label3.TabIndex = 10;
-            label3.Text = "user name:";
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(24, 131);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(55, 13);
-            label4.TabIndex = 14;
-            label4.Text = "password:";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(9, 157);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(70, 13);
-            label5.TabIndex = 16;
-            label5.Text = "download dir:";
-            // 
-            // connectButton
-            // 
-            this.connectButton.Location = new System.Drawing.Point(85, 201);
-            this.connectButton.Name = "connectButton";
-            this.connectButton.Size = new System.Drawing.Size(76, 23);
-            this.connectButton.TabIndex = 2;
-            this.connectButton.Text = "Connect";
-            this.connectButton.UseVisualStyleBackColor = true;
-            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
-            // 
-            // serverText
-            // 
-            this.serverText.Location = new System.Drawing.Point(85, 76);
-            this.serverText.Name = "serverText";
-            this.serverText.Size = new System.Drawing.Size(157, 20);
-            this.serverText.TabIndex = 3;
-            this.serverText.Text = "localhost:57051";
-            // 
             // liveViewPictureBox
             // 
             this.liveViewPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.liveViewPictureBox.Location = new System.Drawing.Point(0, 0);
             this.liveViewPictureBox.Name = "liveViewPictureBox";
-            this.liveViewPictureBox.Size = new System.Drawing.Size(427, 339);
+            this.liveViewPictureBox.Size = new System.Drawing.Size(427, 363);
             this.liveViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.liveViewPictureBox.TabIndex = 8;
             this.liveViewPictureBox.TabStop = false;
@@ -203,9 +128,9 @@
             this.liftSliderZ.Controls.Add(this.miniMapSliderX);
             this.liftSliderZ.Controls.Add(this.miniMapSliderY);
             this.liftSliderZ.Dock = System.Windows.Forms.DockStyle.Right;
-            this.liftSliderZ.Location = new System.Drawing.Point(427, 24);
+            this.liftSliderZ.Location = new System.Drawing.Point(427, 0);
             this.liftSliderZ.Name = "liftSliderZ";
-            this.liftSliderZ.Size = new System.Drawing.Size(117, 339);
+            this.liftSliderZ.Size = new System.Drawing.Size(117, 363);
             this.liftSliderZ.TabIndex = 11;
             // 
             // butterflyElemtnHost
@@ -278,101 +203,12 @@
             // 
             // panel3
             // 
-            this.panel3.Controls.Add(this.setupPanel);
             this.panel3.Controls.Add(this.liveViewPictureBox);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 24);
+            this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(427, 339);
+            this.panel3.Size = new System.Drawing.Size(427, 363);
             this.panel3.TabIndex = 12;
-            // 
-            // setupPanel
-            // 
-            this.setupPanel.Controls.Add(label5);
-            this.setupPanel.Controls.Add(this.downloadDirectoryText);
-            this.setupPanel.Controls.Add(label4);
-            this.setupPanel.Controls.Add(this.passwordText);
-            this.setupPanel.Controls.Add(this.cancelConncetionButton);
-            this.setupPanel.Controls.Add(this.statusLabel);
-            this.setupPanel.Controls.Add(label3);
-            this.setupPanel.Controls.Add(label2);
-            this.setupPanel.Controls.Add(this.userNameText);
-            this.setupPanel.Controls.Add(this.serverText);
-            this.setupPanel.Controls.Add(this.connectButton);
-            this.setupPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.setupPanel.Location = new System.Drawing.Point(0, 0);
-            this.setupPanel.Name = "setupPanel";
-            this.setupPanel.Size = new System.Drawing.Size(427, 339);
-            this.setupPanel.TabIndex = 9;
-            // 
-            // downloadDirectoryText
-            // 
-            this.downloadDirectoryText.Location = new System.Drawing.Point(85, 154);
-            this.downloadDirectoryText.Name = "downloadDirectoryText";
-            this.downloadDirectoryText.Size = new System.Drawing.Size(157, 20);
-            this.downloadDirectoryText.TabIndex = 15;
-            this.downloadDirectoryText.Text = "C:\\TEMP";
-            // 
-            // passwordText
-            // 
-            this.passwordText.Location = new System.Drawing.Point(85, 128);
-            this.passwordText.Name = "passwordText";
-            this.passwordText.Size = new System.Drawing.Size(157, 20);
-            this.passwordText.TabIndex = 13;
-            this.passwordText.Text = "temp1234";
-            this.passwordText.UseSystemPasswordChar = true;
-            // 
-            // cancelConncetionButton
-            // 
-            this.cancelConncetionButton.Location = new System.Drawing.Point(167, 201);
-            this.cancelConncetionButton.Name = "cancelConncetionButton";
-            this.cancelConncetionButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelConncetionButton.TabIndex = 12;
-            this.cancelConncetionButton.Text = "Cancel";
-            this.cancelConncetionButton.UseVisualStyleBackColor = true;
-            this.cancelConncetionButton.Click += new System.EventHandler(this.cancelConncetionButton_Click);
-            // 
-            // statusLabel
-            // 
-            this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(19, 245);
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(60, 13);
-            this.statusLabel.TabIndex = 11;
-            this.statusLabel.Text = "status label";
-            // 
-            // userNameText
-            // 
-            this.userNameText.Location = new System.Drawing.Point(85, 102);
-            this.userNameText.Name = "userNameText";
-            this.userNameText.Size = new System.Drawing.Size(157, 20);
-            this.userNameText.TabIndex = 8;
-            this.userNameText.Text = "default_admin";
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.windowToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(544, 24);
-            this.menuStrip1.TabIndex = 13;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // windowToolStripMenuItem
-            // 
-            this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showAdminWindowToolStripMenuItem});
-            this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
-            this.windowToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
-            this.windowToolStripMenuItem.Text = "&Window";
-            // 
-            // showAdminWindowToolStripMenuItem
-            // 
-            this.showAdminWindowToolStripMenuItem.Name = "showAdminWindowToolStripMenuItem";
-            this.showAdminWindowToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
-            this.showAdminWindowToolStripMenuItem.Text = "Show &Admin Window";
-            this.showAdminWindowToolStripMenuItem.Click += new System.EventHandler(this.showAdminWindowToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -382,8 +218,6 @@
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.liftSliderZ);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainWindow";
             this.Text = "Repatriator";
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
@@ -399,19 +233,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderY)).EndInit();
             this.panel3.ResumeLayout(false);
-            this.setupPanel.ResumeLayout(false);
-            this.setupPanel.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button connectButton;
-        private System.Windows.Forms.TextBox serverText;
         private System.Windows.Forms.PictureBox liveViewPictureBox;
         private System.Windows.Forms.Button takePictureButton;
         private System.Windows.Forms.Panel panel1;
@@ -426,15 +253,6 @@
         private System.Windows.Forms.PictureBox miniMapPictureBox;
         private System.Windows.Forms.TrackBar lifeSliderZ;
         private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Panel setupPanel;
-        private System.Windows.Forms.TextBox userNameText;
-        private System.Windows.Forms.Label statusLabel;
-        private System.Windows.Forms.Button cancelConncetionButton;
-        private System.Windows.Forms.TextBox passwordText;
-        private System.Windows.Forms.TextBox downloadDirectoryText;
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem showAdminWindowToolStripMenuItem;
 
     }
 }

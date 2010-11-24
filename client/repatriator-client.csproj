@@ -61,6 +61,12 @@
       <DependentUpon>ButterflyControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConnectionManager.cs" />
+    <Compile Include="ConnectionWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConnectionWindow.Designer.cs">
+      <DependentUpon>ConnectionWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Logging.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
@@ -73,6 +79,9 @@
     <Compile Include="Utils.cs" />
     <EmbeddedResource Include="AdminWindow.resx">
       <DependentUpon>AdminWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConnectionWindow.resx">
+      <DependentUpon>ConnectionWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
