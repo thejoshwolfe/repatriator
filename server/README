@@ -133,11 +133,22 @@ Messages:
             <file binary data as requested by FileDownloadRequest>
 
         ErrorMessage
-            int 8 - identifies this message as an ErrorMessage
+            int8 - identifies this message as an ErrorMessage
             int64 - byte count of the entire message including this field
             int32 - error number
             int32 - length of utf8 description of error below
             <utf8 error message string>
+
+        ListUserResult
+            int8 - identifies this message as a ListUserResult
+            int64 - byte count of the entire message including this field
+            int32 - number of users on the system
+            for each user:
+                int32 - length of utf8 string username
+                <utf8 username string>
+                int32 - number of permissions granted
+                for each permission granted:
+                    int32 permission enum value 
 
 
     From the client to the server:
@@ -223,3 +234,8 @@ Messages:
             int64 - byte count of the entire message including this field
             int32 - length of utf8 username below
             <username - utf8 string>
+
+        ListUserRequest - requests a list of users on the system
+            int8 - identifies this message as a ListUserRequest
+            int64 - byte count of the entire message including this field
+            
