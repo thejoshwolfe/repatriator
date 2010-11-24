@@ -20,6 +20,7 @@ class ClientMessage:
     DeleteUser = 8
     FileDeleteRequest = 9
     ChangePasswordRequest = 10
+    ListUserRequest = 11
 
     class ParseError(Exception):
         pass
@@ -170,6 +171,12 @@ class DeleteUser(ClientMessage):
     def parse(self):
         self.username = self._parse_string()
 
+__all__.append('ListUserRequest')
+class ListUserRequest(ClientMessage):
+    def parse(self):
+        # nothing to do
+        pass
+
 __all__.append('ServerMessage')
 class ServerMessage:
     DummyCloseConnection = -1
@@ -179,6 +186,7 @@ class ServerMessage:
     DirectoryListingResult = 3
     FileDownloadResult = 4
     ErrorMessage = 5
+    ListUserResult = 6
 
     def serialize(self):
         """
@@ -354,6 +362,22 @@ class ErrorMessage(ServerMessage):
         buf.extend(self.description.encode('utf8'))
         return buf
 
+__all__.append('ListUserResult')
+class ListUserResult(ServerMessage):
+    def __init__(self, user_list):
+        self.user_list = user_list
+
+    def _serialize(self):
+        buf = bytearray()
+        buf.extend(struct.pack(">i", len(user_list)))
+        for username, data in user_list.items():
+            buf.extend(struct.pack(">i", len(username)))
+            buf.extend(username.encode('utf8'))
+
+            buf.extend(struct.pack(">i", len(data['privileges'])))
+            for perm in data['privileges']:
+                buf.extend(">i", perm)
+        return buf
 
 ClientMessage.TypeForId = {
     ClientMessage.MagicalRequest: MagicalRequest,

@@ -315,6 +315,11 @@ def handle_DeleteUser(msg):
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
 
+def handle_ListUserRequest(msg):
+    global server
+    debug("Got list user request message")
+    server.send_message(ListUserResult(auth.list_users()))
+
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,
     ClientMessage.ConnectionRequest: handle_ConnectionRequest,
@@ -327,6 +332,7 @@ message_handlers = {
     ClientMessage.DeleteUser: handle_DeleteUser,
     ClientMessage.FileDeleteRequest: handle_FileDeleteRequest,
     ClientMessage.ChangePasswordRequest: handle_ChangePasswordRequest,
+    ClientMessage.ListUserRequest: handle_ListUserRequest,
 }
 
 need_camera_thread = {
@@ -342,6 +348,7 @@ need_camera_thread = {
     ClientMessage.DeleteUser: False,
     ClientMessage.FileDeleteRequest: False,
     ClientMessage.ChangePasswordRequest: False,
+    ClientMessage.ListUserRequest: False,
 }
 
 def reset_state():

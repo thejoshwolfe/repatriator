@@ -139,6 +139,9 @@ def delete_user(username):
     del _auth_data[username]
     _save_json()
 
+def list_users():
+    return _auth_data
+
 _auth_file = os.path.join(settings['DATA_FOLDER'], "auth.json")
 _build_path(_auth_file)
 _lock = threading.Lock()
