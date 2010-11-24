@@ -25,9 +25,7 @@ namespace repatriator_client
         public event Action fullUpdated;
         public event Action directoryListUpdated;
 
-        private string serverHostName;
-        private int serverPortNumber;
-        private string userName;
+        private ConnectionSettings connection;
         private string password;
         private string downloadDirectory;
 
@@ -42,9 +40,10 @@ namespace repatriator_client
         private Image image;
         private DirectoryItem[] directoryList = { };
 
-        private ConnectionManager()
+        public ConnectionManager(ConnectionSettings connection, string password)
         {
-            createSocket();
+            this.connection = connection;
+            this.password = password;
         }
 
         private void createSocket()
@@ -56,23 +55,15 @@ namespace repatriator_client
 
         public bool hasValidSettings()
         {
-            if (!(1 <= serverPortNumber && serverPortNumber <= 65535))
+            if (!(1 <= connection.port && connection.port <= 65535))
                 return false;
-            if (serverHostName.Length == 0)
+            if (connection.url.Length == 0)
                 return false;
-            if (userName.Length == 0)
+            if (connection.username.Length == 0)
                 return false;
             if (!Directory.Exists(downloadDirectory))
                 return false;
             return true;
-        }
-        public void setEverything(string serverHostName, int serverPortNumber, string userName, string password, string downloadDirectory)
-        {
-            this.serverHostName = serverHostName;
-            this.serverPortNumber = serverPortNumber;
-            this.userName = userName;
-            this.password = password;
-            this.downloadDirectory = downloadDirectory;
         }
 
         private void receive_run()
@@ -139,7 +130,7 @@ namespace repatriator_client
             const int connectionRetryCount = 5;
             for (int i = 0; i < connectionRetryCount; i++)
             {
-                try { socket.Connect(serverHostName, serverPortNumber); }
+                try { socket.Connect(connection.url, connection.port); }
                 catch (SocketException) { }
                 if (!socket.Connected)
                 {
@@ -156,7 +147,7 @@ namespace repatriator_client
                     if (!socketStream.readMagicalResponse())
                         return LoginStatus.ServerIsBogus;
                     // this is a real host
-                    socketStream.writeConnectionRequest(userName, password);
+                    socketStream.writeConnectionRequest(connection.username, connection.password);
                     ConnectionResult connectionResult = socketStream.readConnectionResult();
                     if (connectionResult.connectionStatus != ServerConnectionStatus.Success)
                     {
@@ -211,25 +202,6 @@ namespace repatriator_client
                 return;
             connectionState = ConnectionState.Cancelling;
             socket.Close();
-        }
-
-        public static ConnectionManager load()
-        {
-            string serverHostName = "";
-            int serverPortNumer = -1;
-            string userName = "";
-            string password = "";
-            string settingsPath = Path.Combine(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]), "settings.txt");
-            string downloadDirectory = "";
-
-            if (File.Exists(settingsPath))
-            {
-                // TODO: read the settings file
-            }
-
-            ConnectionManager connectionManager = new ConnectionManager();
-            connectionManager.setEverything(serverHostName, serverPortNumer, userName, password, downloadDirectory);
-            return connectionManager;
         }
         private enum ConnectionState
         {

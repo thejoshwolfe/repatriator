@@ -149,7 +149,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(313, 235);
-            this.ControlBox = false;
             this.Controls.Add(this.portTextBox);
             this.Controls.Add(this.savePasswordCheckBox);
             this.Controls.Add(this.okButton);
@@ -161,7 +160,11 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "EditConnectionWindow";
+            this.ShowInTaskbar = false;
             this.Text = "Edit Connection";
             this.ResumeLayout(false);
             this.PerformLayout();

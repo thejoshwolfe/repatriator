@@ -19,7 +19,7 @@ namespace repatriator_client
 
         private Mode mode;
 
-        private Connection connection;
+        private ConnectionSettings connection;
 
         private const string static_password = "12345678";
            
@@ -28,7 +28,7 @@ namespace repatriator_client
             InitializeComponent();
         }
 
-        public Connection showNew(IWin32Window owner)
+        public ConnectionSettings showNew(IWin32Window owner)
         {
             this.Text = "New Connection - Repatriator";
             mode = Mode.NewMode;
@@ -42,12 +42,12 @@ namespace repatriator_client
 
             enableCorrectControls();
 
-            connection = new Connection();
+            connection = new ConnectionSettings();
             this.ShowDialog(owner);
             return connection;
         }
 
-        public Connection showEdit(IWin32Window owner, Connection conn)
+        public ConnectionSettings showEdit(IWin32Window owner, ConnectionSettings conn)
         {
             this.Text = "Edit Connection - Repatriator";
             mode = Mode.EditMode;

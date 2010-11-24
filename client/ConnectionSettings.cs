@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace repatriator_client
 {
-    public class Connection
+    public class ConnectionSettings
     {
         public string url;
         public int port;

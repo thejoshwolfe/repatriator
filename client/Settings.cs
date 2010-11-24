@@ -9,7 +9,7 @@ namespace repatriator_client
 {
     class Settings
     {
-        public static List<Connection> connections = new List<Connection>();
+        public static List<ConnectionSettings> connections = new List<ConnectionSettings>();
 
         private const string settings_file = "repatriator.xml";
 
@@ -19,7 +19,7 @@ namespace repatriator_client
 
             int state = 0;
             connections.Clear();
-            Connection connection = new Connection();
+            ConnectionSettings connection = new ConnectionSettings();
             try
             {
                 while (reader.Read())
@@ -70,7 +70,7 @@ namespace repatriator_client
                                 case "connection":
                                     state = 0;
                                     connections.Add(connection);
-                                    connection = new Connection();
+                                    connection = new ConnectionSettings();
                                     break;
                                 case "url":
                                     state = 1;
@@ -101,7 +101,7 @@ namespace repatriator_client
         {
             StreamWriter writer = new StreamWriter(settings_file);
             writer.WriteLine("<connections>");
-            foreach (Connection connection in connections)
+            foreach (ConnectionSettings connection in connections)
             {
                 writer.WriteLine("    <connection>");
                 writer.Write("        <url>");

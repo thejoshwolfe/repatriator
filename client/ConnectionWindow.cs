@@ -24,7 +24,7 @@ namespace repatriator_client
         private void newButton_Click(object sender, EventArgs e)
         {
             EditConnectionWindow editor = new EditConnectionWindow();
-            Connection new_conn = editor.showNew(this);
+            ConnectionSettings new_conn = editor.showNew(this);
             if (new_conn == null)
                 return;
             Settings.connections.Add(new_conn);
@@ -51,7 +51,7 @@ namespace repatriator_client
 
             // load contents
             connectionListView.Items.Clear();
-            foreach (Connection connection in Settings.connections)
+            foreach (ConnectionSettings connection in Settings.connections)
                 connectionListView.Items.Add(new ListViewItem(new string[] { connection.url, connection.port.ToString(), connection.username }));
 
             // restore selection
@@ -69,7 +69,7 @@ namespace repatriator_client
         {
             if (connectionListView.SelectedIndices.Count == 1)
             {
-                Connection conn = Settings.connections[connectionListView.SelectedIndices[0]];
+                ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
                 EditConnectionWindow editor = new EditConnectionWindow();
                 editor.showEdit(this, conn);
                 Settings.save();
@@ -104,11 +104,13 @@ namespace repatriator_client
 
         private void adminButton_Click(object sender, EventArgs e)
         {
-            if (connectionListView.SelectedIndices.Count == 1)
-            {
-                Connection conn = Settings.connections[connectionListView.SelectedIndices[0]];
-                // TODO: open connection to selected connection with the purpose of doing admin
-            }
+            if (connectionListView.SelectedIndices.Count != 1)
+                return;
+
+            ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
+            ConnectionStatusWindow statusWindow = new ConnectionStatusWindow();
+            statusWindow.Show(this);
+            // TODO: open connection to selected connection with the purpose of doing admin
         }
 
         private void adminToolStripMenuItem_Click(object sender, EventArgs e)
@@ -125,7 +127,7 @@ namespace repatriator_client
         {
             if (connectionListView.SelectedIndices.Count == 1)
             {
-                Connection conn = Settings.connections[connectionListView.SelectedIndices[0]];
+                ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
                 // TODO: open connection to selected connection with the purpose of using hardware
             }
         }
