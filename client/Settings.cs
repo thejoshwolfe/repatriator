@@ -53,7 +53,8 @@ namespace repatriator_client
                                     connection.url = reader.Value.Trim();
                                     break;
                                 case 3:
-                                    connection.port = reader.Value.Trim();
+                                    connection.port = 0;
+                                    int.TryParse(reader.Value.Trim(), out connection.port);
                                     break;
                                 case 4:
                                     connection.username = reader.Value.Trim();

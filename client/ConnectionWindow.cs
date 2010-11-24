@@ -52,7 +52,7 @@ namespace repatriator_client
             // load contents
             connectionListView.Items.Clear();
             foreach (Connection connection in Settings.connections)
-                connectionListView.Items.Add(new ListViewItem(new string[] { connection.url, connection.port, connection.username }));
+                connectionListView.Items.Add(new ListViewItem(new string[] { connection.url, connection.port.ToString(), connection.username }));
 
             // restore selection
             if (selection != -1 && connectionListView.Items.Count != 0)

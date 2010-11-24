@@ -54,7 +54,7 @@ namespace repatriator_client
 
             // load values from connection
             urlTextBox.Text = conn.url;
-            portTextBox.Text = conn.port;
+            portTextBox.Text = conn.port.ToString();
             userNameTextBox.Text = conn.username;
             bool save_password = conn.password.Length != 0;
             savePasswordCheckBox.Checked = save_password;
@@ -71,7 +71,8 @@ namespace repatriator_client
         private void updateConnectionWithControls()
         {
             connection.url = urlTextBox.Text;
-            connection.port = portTextBox.Text;
+            connection.port = 0;
+            int.TryParse(portTextBox.Text, out connection.port);
             connection.username = userNameTextBox.Text;
             connection.password = (savePasswordCheckBox.Checked && passwordTextBox.Text != static_password) ? passwordTextBox.Text : "";
         }
