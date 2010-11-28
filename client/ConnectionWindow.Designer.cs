@@ -38,6 +38,7 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.connectionListView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.rightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.adminToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,7 +46,6 @@
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.rightClickMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -146,6 +146,11 @@
             this.columnHeader1.Text = "Server";
             this.columnHeader1.Width = 129;
             // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Port";
+            this.columnHeader3.Width = 56;
+            // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "User";
@@ -195,11 +200,6 @@
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Port";
-            this.columnHeader3.Width = 56;
-            // 
             // ConnectionWindow
             // 
             this.AcceptButton = this.loginButton;
@@ -218,6 +218,7 @@
             this.MinimumSize = new System.Drawing.Size(365, 294);
             this.Name = "ConnectionWindow";
             this.Text = "Repatriator Login";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ConnectionWindow_FormClosed);
             this.Shown += new System.EventHandler(this.ConnectionWindow_Shown);
             this.rightClickMenu.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -14,7 +14,8 @@ namespace repatriator_client
             Application.SetCompatibleTextRenderingDefault(false);
 
             Settings.load();
-            Application.Run(new ConnectionWindow());
+            new ConnectionWindow().Show();
+            Application.Run();
         }
     }
 }

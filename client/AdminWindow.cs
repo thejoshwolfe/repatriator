@@ -17,8 +17,11 @@ namespace repatriator_client
             this.connectionManager = connectionManager;
 
             InitializeComponent();
+        }
 
-
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

@@ -164,6 +164,7 @@ namespace repatriator_client
                     }
                     // login suceeded
                     connectionState = ConnectionState.GoodConnection;
+                    socket.ReceiveTimeout = 0;
                     receiveThread = new Thread(receive_run);
                     receiveThread.IsBackground = true;
                     receiveThread.Start();

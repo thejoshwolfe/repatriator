@@ -16,11 +16,6 @@ namespace repatriator_client
             InitializeComponent();
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
         private void newButton_Click(object sender, EventArgs e)
         {
             EditConnectionWindow editor = new EditConnectionWindow();
@@ -124,8 +119,9 @@ namespace repatriator_client
             if (!statusWindow.result)
                 return;
             AdminWindow adminWindow = new AdminWindow(connectionManager);
-            adminWindow.Show();
-            Close();
+            Hide();
+            adminWindow.ShowDialog();
+            Show();
         }
 
         private void adminToolStripMenuItem_Click(object sender, EventArgs e)
@@ -155,6 +151,15 @@ namespace repatriator_client
         private void connectionListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             enableCorrectControls();
+        }
+
+        private void ConnectionWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
