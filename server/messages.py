@@ -286,6 +286,7 @@ class FullUpdate(ServerMessage):
 __all__.append('DirectoryListingResult')
 class DirectoryListingResult(ServerMessage):
     def __init__(self, file_list):
+        self.message_type = ServerMessage.DirectoryListingResult
         self.file_list = file_list
 
     def _serialize(self):
@@ -311,6 +312,7 @@ class DirectoryListingResult(ServerMessage):
 __all__.append('FileDownloadResult')
 class FileDownloadResult(ServerMessage):
     def __init__(self, file_path):
+        self.message_type = ServerMessage.FileDownloadResult
         self.file_path = file_path
 
     def _serialize(self):
@@ -349,6 +351,7 @@ class ErrorMessage(ServerMessage):
     }
 
     def __init__(self, code, description=None):
+        self.message_type = ServerMessage.ErrorMessage
         self.code = code
         if description is None:
             self.description = self.descriptions[code]
@@ -365,18 +368,19 @@ class ErrorMessage(ServerMessage):
 __all__.append('ListUserResult')
 class ListUserResult(ServerMessage):
     def __init__(self, user_list):
+        self.message_type = ServerMessage.ListUserResult
         self.user_list = user_list
 
     def _serialize(self):
         buf = bytearray()
-        buf.extend(struct.pack(">i", len(user_list)))
-        for username, data in user_list.items():
+        buf.extend(struct.pack(">i", len(self.user_list)))
+        for username, data in self.user_list.items():
             buf.extend(struct.pack(">i", len(username)))
             buf.extend(username.encode('utf8'))
 
             buf.extend(struct.pack(">i", len(data['privileges'])))
             for perm in data['privileges']:
-                buf.extend(">i", perm)
+                buf.extend(struct.pack(">i", perm))
         return buf
 
 ClientMessage.TypeForId = {
@@ -390,5 +394,7 @@ ClientMessage.TypeForId = {
     ClientMessage.UpdateUser: UpdateUser,
     ClientMessage.DeleteUser: DeleteUser,
     ClientMessage.FileDeleteRequest: FileDeleteRequest,
+    ClientMessage.ChangePasswordRequest: ChangePasswordRequest,
+    ClientMessage.ListUserRequest: ListUserRequest,
 }
 
