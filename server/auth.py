@@ -86,7 +86,7 @@ class User:
     
     def picture_folder(self):
         if self._picture_folder is None:
-            self._picture_folder = hashlib.md5(self.username).hexdigest()
+            self._picture_folder = hashlib.md5(self.username.encode('utf8')).hexdigest()
         return self._picture_folder
 
     def grant_privilege(self, privilege):

@@ -91,6 +91,7 @@ class Server:
                 data = self._read_message()
             except socket.error:
                 debug("socket.error when reading message, exiting thread")
+                self.message_queue.put(DummyCloseConnection())
                 return
 
             message = None
