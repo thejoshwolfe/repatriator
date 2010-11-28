@@ -689,6 +689,17 @@ namespace repatriator_client
         public string username;
         public HashSet<Permission> permissions;
     }
+    public class DetailedUserInfo : UserInfo
+    {
+        public string password = "";
+        public bool changed = false;
+        public DetailedUserInfo() { }
+        public DetailedUserInfo(UserInfo source)
+        {
+            base.username = source.username;
+            base.permissions = source.permissions;
+        }
+    }
 
     public class DirectoryItem
     {

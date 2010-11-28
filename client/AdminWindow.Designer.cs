@@ -114,6 +114,7 @@
             this.newButton.TabIndex = 13;
             this.newButton.Text = "&New";
             this.newButton.UseVisualStyleBackColor = true;
+            this.newButton.Click += new System.EventHandler(this.newButton_Click);
             // 
             // deleteButton
             // 

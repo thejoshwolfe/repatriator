@@ -12,7 +12,7 @@ namespace repatriator_client
     public partial class AdminWindow : Form
     {
         private readonly ConnectionManager connectionManager;
-        private Dictionary<string, UserInfo> users = new Dictionary<string, UserInfo>();
+        private Dictionary<string, DetailedUserInfo> users = new Dictionary<string, DetailedUserInfo>();
         public AdminWindow(ConnectionManager connectionManager)
         {
             this.connectionManager = connectionManager;
@@ -33,7 +33,7 @@ namespace repatriator_client
                 foreach (UserInfo user in connectionManager.users)
                 {
                     usersListBox.Items.Add(user.username);
-                    users.Add(user.username, user);
+                    users.Add(user.username, new DetailedUserInfo(user));
                 }
                 usersListBox.Enabled = true;
             }));
@@ -64,7 +64,7 @@ namespace repatriator_client
             if (userIsSelected)
             {
                 // user is selected
-                UserInfo user = users[username];
+                DetailedUserInfo user = users[username];
                 adminCheckbox.Checked = user.permissions.Contains(Permission.ManageUsers);
             }
             else
@@ -77,6 +77,13 @@ namespace repatriator_client
         private void AdminWindow_Shown(object sender, EventArgs e)
         {
             connectionManager.refreshUserList();
+        }
+
+        private void newButton_Click(object sender, EventArgs e)
+        {
+            DetailedUserInfo user = new DetailedUserInfo();
+            
+            users.Add("newguy", user);
         }
     }
 }
