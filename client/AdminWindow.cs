@@ -44,13 +44,39 @@ namespace repatriator_client
             usersListBox.Items.Clear();
             usersListBox.Items.Add("updating...");
             usersListBox.Enabled = false;
-
-            connectionManager.refreshUserList();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void usersListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string username = (string)usersListBox.SelectedItem;
+
+            bool userIsSelected = username != null;
+            changePasswordButton.Enabled = userIsSelected;
+            deleteButton.Enabled = userIsSelected;
+            adminCheckbox.Enabled = userIsSelected;
+            newButton.Enabled = true;
+
+            if (userIsSelected)
+            {
+                // user is selected
+                UserInfo user = users[username];
+                adminCheckbox.Checked = user.permissions.Contains(Permission.ManageUsers);
+            }
+            else
+            {
+                // no selection
+                adminCheckbox.Checked = false;
+            }
+        }
+
+        private void AdminWindow_Shown(object sender, EventArgs e)
+        {
+            connectionManager.refreshUserList();
         }
     }
 }

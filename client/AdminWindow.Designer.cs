@@ -39,7 +39,7 @@
             this.usersListBox = new System.Windows.Forms.ListBox();
             this.newButton = new System.Windows.Forms.Button();
             this.deleteButton = new System.Windows.Forms.Button();
-            this.editButton = new System.Windows.Forms.Button();
+            this.changePasswordButton = new System.Windows.Forms.Button();
             this.adminCheckbox = new System.Windows.Forms.CheckBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.okButton = new System.Windows.Forms.Button();
@@ -101,11 +101,13 @@
             this.usersListBox.Name = "usersListBox";
             this.usersListBox.Size = new System.Drawing.Size(224, 230);
             this.usersListBox.TabIndex = 1;
+            this.usersListBox.SelectedIndexChanged += new System.EventHandler(this.usersListBox_SelectedIndexChanged);
             // 
             // newButton
             // 
             this.newButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.newButton.AutoSize = true;
+            this.newButton.Enabled = false;
             this.newButton.Location = new System.Drawing.Point(236, 118);
             this.newButton.Name = "newButton";
             this.newButton.Size = new System.Drawing.Size(103, 23);
@@ -117,6 +119,7 @@
             // 
             this.deleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.deleteButton.AutoSize = true;
+            this.deleteButton.Enabled = false;
             this.deleteButton.Location = new System.Drawing.Point(236, 48);
             this.deleteButton.Name = "deleteButton";
             this.deleteButton.Size = new System.Drawing.Size(103, 23);
@@ -124,20 +127,22 @@
             this.deleteButton.Text = "&Delete";
             this.deleteButton.UseVisualStyleBackColor = true;
             // 
-            // editButton
+            // changePasswordButton
             // 
-            this.editButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.editButton.Location = new System.Drawing.Point(236, 19);
-            this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(103, 23);
-            this.editButton.TabIndex = 15;
-            this.editButton.Text = "&Change Password";
-            this.editButton.UseVisualStyleBackColor = true;
+            this.changePasswordButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.changePasswordButton.Enabled = false;
+            this.changePasswordButton.Location = new System.Drawing.Point(236, 19);
+            this.changePasswordButton.Name = "changePasswordButton";
+            this.changePasswordButton.Size = new System.Drawing.Size(103, 23);
+            this.changePasswordButton.TabIndex = 15;
+            this.changePasswordButton.Text = "&Change Password";
+            this.changePasswordButton.UseVisualStyleBackColor = true;
             // 
             // adminCheckbox
             // 
             this.adminCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.adminCheckbox.AutoSize = true;
+            this.adminCheckbox.Enabled = false;
             this.adminCheckbox.Location = new System.Drawing.Point(236, 77);
             this.adminCheckbox.Name = "adminCheckbox";
             this.adminCheckbox.Size = new System.Drawing.Size(103, 17);
@@ -173,7 +178,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.usersListBox);
-            this.groupBox1.Controls.Add(this.editButton);
+            this.groupBox1.Controls.Add(this.changePasswordButton);
             this.groupBox1.Controls.Add(this.deleteButton);
             this.groupBox1.Controls.Add(this.newButton);
             this.groupBox1.Controls.Add(this.adminCheckbox);
@@ -198,6 +203,7 @@
             this.MinimumSize = new System.Drawing.Size(313, 287);
             this.Name = "AdminWindow";
             this.Text = "Repatriator Admin";
+            this.Shown += new System.EventHandler(this.AdminWindow_Shown);
             this.rightClickMenu.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -216,7 +222,7 @@
         private System.Windows.Forms.ListBox usersListBox;
         private System.Windows.Forms.Button newButton;
         private System.Windows.Forms.Button deleteButton;
-        private System.Windows.Forms.Button editButton;
+        private System.Windows.Forms.Button changePasswordButton;
         private System.Windows.Forms.CheckBox adminCheckbox;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button okButton;
