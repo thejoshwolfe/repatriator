@@ -24,6 +24,7 @@ namespace repatriator_client
         public event Action<LoginStatus> loginFinished;
         public event Action fullUpdated;
         public event Action directoryListUpdated;
+        public event Action usersUpdated;
 
         private ConnectionSettings connection;
         private bool hardware;
@@ -40,6 +41,8 @@ namespace repatriator_client
         private long a, b, x, y, z;
         private Image image;
         private DirectoryItem[] directoryList = { };
+        private UserInfo[] _users = { };
+        public UserInfo[] users { get { return _users; } }
 
         public ConnectionManager(ConnectionSettings connection, string password, bool hardware)
         {
@@ -83,8 +86,23 @@ namespace repatriator_client
                 updateDirectoryList((DirectoryListingEventResponse)eventResponse);
             else if (eventResponse is FileDownloadEventResponse)
                 handleFileDownloaded((FileDownloadEventResponse)eventResponse);
+            else if (eventResponse is ListUserEventResponse)
+                handleListUserEventResponse((ListUserEventResponse)eventResponse);
+            else if (eventResponse is ErrorMessageEventResponse)
+                handleErrorMessageEventResponse((ErrorMessageEventResponse)eventResponse);
             else
                 throw null;
+        }
+
+        private void handleListUserEventResponse(ListUserEventResponse listUserEventResponse)
+        {
+            _users = listUserEventResponse.users;
+            usersUpdated();
+        }
+
+        private void handleErrorMessageEventResponse(ErrorMessageEventResponse errorMessageEventResponse)
+        {
+            throw new NotImplementedException();
         }
 
         private void fullUpdate(FullUpdateEventResponse response)
@@ -204,6 +222,10 @@ namespace repatriator_client
                 return;
             connectionState = ConnectionState.Cancelling;
             socket.Close();
+        }
+        public void refreshUserList()
+        {
+            socketStream.writeListUserRequest();
         }
         private enum ConnectionState
         {
