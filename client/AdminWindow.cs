@@ -21,7 +21,7 @@ namespace repatriator_client
 
             connectionManager.usersUpdated += new Action(connectionManager_usersUpdated);
 
-            refreshList();
+            usersListBox.Items.Add("updating...");
         }
 
         private void connectionManager_usersUpdated()
@@ -36,14 +36,8 @@ namespace repatriator_client
                     users.Add(user.username, new DetailedUserInfo(user));
                 }
                 usersListBox.Enabled = true;
+                newButton.Enabled = true;
             }));
-        }
-
-        private void refreshList()
-        {
-            usersListBox.Items.Clear();
-            usersListBox.Items.Add("updating...");
-            usersListBox.Enabled = false;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -59,7 +53,6 @@ namespace repatriator_client
             changePasswordButton.Enabled = userIsSelected;
             deleteButton.Enabled = userIsSelected;
             adminCheckbox.Enabled = userIsSelected;
-            newButton.Enabled = true;
 
             if (userIsSelected)
             {
@@ -81,9 +74,17 @@ namespace repatriator_client
 
         private void newButton_Click(object sender, EventArgs e)
         {
+            // TODO get this from a form:
             DetailedUserInfo user = new DetailedUserInfo();
-            
-            users.Add("newguy", user);
+            user.username = "newguy";
+            user.password = "abcdefg";
+            user.permissions = new HashSet<Permission>();
+            user.permissions.Add(Permission.OperateHardware);
+            user.changed = true;
+
+            users.Add(user.username, user);
+            usersListBox.Items.Add(user.username);
+            usersListBox.SelectedIndex = usersListBox.Items.Count - 1;
         }
     }
 }

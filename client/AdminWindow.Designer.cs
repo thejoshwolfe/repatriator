@@ -95,6 +95,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.usersListBox.ContextMenuStrip = this.rightClickMenu;
+            this.usersListBox.Enabled = false;
             this.usersListBox.FormattingEnabled = true;
             this.usersListBox.IntegralHeight = false;
             this.usersListBox.Location = new System.Drawing.Point(6, 19);
