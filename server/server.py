@@ -259,6 +259,7 @@ def handle_ChangePasswordRequest(msg):
     global user
     try:
         user.change_password(msg.old_password, msg.new_password)
+        user.save()
     except auth.BadPassword:
         warning("user {0} tried to change password with invalid old password, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.BadPassword))
