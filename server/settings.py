@@ -14,6 +14,7 @@ settings = {
     'LOG_LEVEL': 'ERROR',
     # set to true to not actually use the hardware
     'FAKE_MOTOR': False,
+    # set to a jpeg image path to turn on fake camera
     'FAKE_CAMERA_IMAGE_PATH': None,
 }
 try:

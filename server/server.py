@@ -421,13 +421,13 @@ def run_camera():
     pythoncom.CoInitializeEx(2)
 
     # try for 15 seconds to get the camera
-    tries = 0
     fakeCameraImagePath = settings['FAKE_CAMERA_IMAGE_PATH']
     if fakeCameraImagePath != None:
         debug("edsdk: using fake camera")
         camera = edsdk.getFakeCamera(fakeCameraImagePath)
     else:
         debug("edsdk: getting first camera")
+        tries = 0
         while tries < 15:
             tries += 1
             try:
@@ -563,12 +563,31 @@ def initialize_hardware():
         for motor in motors.values():
             motor.setFake()
 
-    for char, motor in motors.items():
-        if not motor.findAndConnect():
-            error("Fatal: Unable to find and connect to silverpak motor '{0}'.".format(char))
-            sys.exit(-1)
-
-        motor.fullInit()
+    found = {
+        'A': False,
+        'B': False,
+        'X': False,
+        'Y': False,
+        'Z': False,
+    }
+    all_found = False
+    tries = 0
+    while not all_found and tries < 15:
+        all_found = True
+        tries += 1
+        for char, motor in motors.items():
+            if found[char]:
+                continue
+            found[char] = motor.findAndConnect()
+            if not found[char]
+                warning("Unable to find and connect to silverpak motor '{0}', waiting a sec and trying again".format(char))
+                all_found = False
+            else:
+                motor.fullInit()
+        if not all_found:
+            time.sleep(1)
+    if not all_found:
+        error("Unable to find and connect to all motors.")
 
 if __name__ == "__main__":
     start_server()
