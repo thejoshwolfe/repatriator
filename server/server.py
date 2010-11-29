@@ -292,11 +292,6 @@ def handle_UpdateUser(msg):
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
 
-    if auth.get_user(msg.username) is not None:
-        warning("trying to update a user in a way that would overwrite another user")
-        server.send_message(ErrorMessage(ErrorMessage.OverwritingOtherUser))
-        return
-
     debug("updating user {0} and saving to disk".format(msg.username))
     if len(msg.password) > 0:
         target_user.attrs['password'] = msg.password
