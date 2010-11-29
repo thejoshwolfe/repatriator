@@ -72,6 +72,22 @@ namespace repatriator_client
             connectionManager.refreshUserList();
         }
 
+        private void changePasswordButton_Click(object sender, EventArgs e)
+        {
+            string username = (string)usersListBox.SelectedItem;
+            if (username == null)
+                return;
+            DetailedUserInfo user = users[username];
+
+            PasswordInputWindow window = new PasswordInputWindow();
+            string newPassword = window.showGetPassword(this, "", user.username);
+            if (newPassword == "")
+                return;
+
+            user.password = newPassword;
+            user.changedStatus = DetailedUserInfo.ChangedStatus.Updated;
+        }
+
         private void deleteButton_Click(object sender, EventArgs e)
         {
             string username = (string)usersListBox.SelectedItem;

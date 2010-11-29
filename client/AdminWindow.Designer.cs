@@ -140,6 +140,7 @@
             this.changePasswordButton.TabIndex = 15;
             this.changePasswordButton.Text = "&Change Password";
             this.changePasswordButton.UseVisualStyleBackColor = true;
+            this.changePasswordButton.Click += new System.EventHandler(this.changePasswordButton_Click);
             // 
             // adminCheckbox
             // 
