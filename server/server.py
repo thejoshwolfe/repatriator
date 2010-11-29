@@ -563,9 +563,9 @@ def initialize_hardware():
         for motor in motors.values():
             motor.setFake()
 
-    for char, create_motor in motors.items():
+    for char, motor in motors.items():
         if not motor.findAndConnect():
-            error("Fatal: Unable to find and connect to silverpak motor '{0}'.".format(motor_char))
+            error("Fatal: Unable to find and connect to silverpak motor '{0}'.".format(char))
             sys.exit(-1)
 
         motor.fullInit()
