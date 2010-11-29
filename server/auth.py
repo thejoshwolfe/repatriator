@@ -136,7 +136,8 @@ def delete_user(username):
     if user is None:
         raise UserDoesNotExist
 
-    shutil.rmtree(user.picture_folder())
+    if os.path.exists(user.picture_folder()):
+        shutil.rmtree(user.picture_folder())
     del _auth_data[username]
     _save_json()
 

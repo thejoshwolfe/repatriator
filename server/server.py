@@ -190,7 +190,7 @@ def handle_TakePicture(msg):
         n = 0
         while True:
             n += 1
-            candidate = os.path.exists(os.path.join(path, filename.format(n)))
+            candidate = os.path.join(path, filename.format(n))
             if not os.path.exists(candidate):
                 return candidate
 
