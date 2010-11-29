@@ -208,7 +208,7 @@
             this.MinimumSize = new System.Drawing.Size(313, 287);
             this.Name = "AdminWindow";
             this.Text = "Repatriator Admin";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AdminWindow_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AdminWindow_FormClosed);
             this.Shown += new System.EventHandler(this.AdminWindow_Shown);
             this.rightClickMenu.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);

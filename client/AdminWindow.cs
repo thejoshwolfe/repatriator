@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace repatriator_client
 {
@@ -157,8 +158,11 @@ namespace repatriator_client
             Close();
         }
 
-        private void AdminWindow_FormClosing(object sender, FormClosingEventArgs e)
+        private void AdminWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
+            // oh no. we have to sleep a bit to make sure closing the connection doesn't
+            // truncate some of the buffered out-bound data.
+            Thread.Sleep(200);
             connectionManager.close();
         }
     }
