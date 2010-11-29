@@ -48,5 +48,11 @@ namespace repatriator_client
                     break;
             }
         }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            connectionManager.cancel();
+            Close();
+        }
     }
 }
