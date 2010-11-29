@@ -79,7 +79,7 @@ namespace repatriator_client
                 return;
             DetailedUserInfo user = users[username];
 
-            PasswordInputWindow window = new PasswordInputWindow();
+            PasswordInputWindow window = new PasswordInputWindow("Change Password", "&OK");
             string newPassword = window.showGetPassword(this, "", user.username);
             if (newPassword == "")
                 return;

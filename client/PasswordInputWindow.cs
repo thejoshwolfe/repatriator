@@ -13,9 +13,11 @@ namespace repatriator_client
     {
         private string returnPassword;
 
-        public PasswordInputWindow()
+        public PasswordInputWindow(string title, string okButtonText)
         {
             InitializeComponent();
+            this.Text = title;
+            loginButton.Text = okButtonText;
         }
 
         public string showGetPassword(IWin32Window owner, string password, string username)

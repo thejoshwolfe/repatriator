@@ -29,7 +29,8 @@ namespace repatriator_client
 
         private ConnectionSettings connection;
         private bool hardware;
-        private string password;
+        private string _password;
+        public string password { set { _password = value; } }
         private string downloadDirectory;
 
         private Socket socket;
@@ -51,7 +52,7 @@ namespace repatriator_client
         public ConnectionManager(ConnectionSettings connection, string password, bool hardware)
         {
             this.connection = connection;
-            this.password = password;
+            this._password = password;
             this.hardware = hardware;
 
             errorMessageReceived += new Action<string>(delegate(string message)
@@ -181,7 +182,7 @@ namespace repatriator_client
                     if (!socketStream.readMagicalResponse())
                         return LoginStatus.ServerIsBogus;
                     // this is a real host
-                    socketStream.writeConnectionRequest(connection.username, this.password, this.hardware);
+                    socketStream.writeConnectionRequest(connection.username, this._password, this.hardware);
                     ConnectionResult connectionResult = socketStream.readConnectionResult();
                     if (connectionResult.connectionStatus != ServerConnectionStatus.Success)
                     {

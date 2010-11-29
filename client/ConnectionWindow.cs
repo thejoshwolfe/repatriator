@@ -117,14 +117,14 @@ namespace repatriator_client
             string password = conn.password;
             if (password == "")
             {
-                PasswordInputWindow inputPasswordWindow = new PasswordInputWindow();
+                PasswordInputWindow inputPasswordWindow = new PasswordInputWindow("Authentication Required", "&Login");
                 password = inputPasswordWindow.showGetPassword(this, password, conn.username);
                 if (password == "")
                     return null;
             }
             ConnectionManager connectionManager = new ConnectionManager(conn, password, hardware);
 
-            ConnectionStatusWindow statusWindow = new ConnectionStatusWindow(connectionManager);
+            ConnectionStatusWindow statusWindow = new ConnectionStatusWindow(connectionManager, conn.username, hardware);
             statusWindow.ShowDialog(this);
             if (!statusWindow.result)
                 return null;
