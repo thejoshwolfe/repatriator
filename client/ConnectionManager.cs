@@ -127,7 +127,8 @@ namespace repatriator_client
         {
             _motorPositions = response.motorPositions;
             _image = response.image;
-            fullUpdated();
+            if (fullUpdated != null)
+                fullUpdated();
         }
         private void updateDirectoryList(DirectoryListingEventResponse directoryListingEventResponse)
         {
@@ -474,6 +475,8 @@ namespace repatriator_client
             public Image readImage()
             {
                 long imageLength = readLong();
+                if (imageLength == 0)
+                    return null;
                 return Image.FromStream(new MemoryStream(read((int)imageLength), false));
             }
             public HashSet<Permission> readPermissions()

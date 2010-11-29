@@ -44,10 +44,7 @@ class Server:
         actually writes the message to the open connection
         """
         raw_data = message.serialize()
-        debug("outgoing message (" + message.__class__.__name__ + ")")
-        debug("--------------------------------")
-        debug(raw_data)
-        debug("--------------------------------")
+        debug("writing outgoing message of type " + message.__class__.__name__)
         self.request.sendall(raw_data)
 
     def _read_amt(self, byte_count):

@@ -257,28 +257,29 @@ class FullUpdate(ServerMessage):
 
         # get live view frame
         if frame_buffer[0] != b'\xff' or frame_buffer[1] != b'\xd8':
-            raise IOError("bad image data: invalid header")
-
-        ff_flag = False
-        for b in frame_buffer:
-            self.jpeg.append(ord(b))
-            if b == b'\xff':
-                ff_flag = True
-            elif b == b'\xd9' and ff_flag:
-                break
-            else:
-                ff_flag = False
-        else:
+            warning("bad image data: invalid header")
             self.jpeg = bytearray()
-            raise IOError("bad image data: could not find ff flag")
+        else:
+            ff_flag = False
+            for b in frame_buffer:
+                self.jpeg.append(ord(b))
+                if b == b'\xff':
+                    ff_flag = True
+                elif b == b'\xd9' and ff_flag:
+                    break
+                else:
+                    ff_flag = False
+            else:
+                warning("bad image data: could not find ff flag")
+                self.jpeg = bytearray()
 
     def _serialize(self):
         buf = bytearray()
-        buf.extend(struct.pack(">q", self.motor_a_pos))
-        buf.extend(struct.pack(">q", self.motor_b_pos))
-        buf.extend(struct.pack(">q", self.motor_x_pos))
-        buf.extend(struct.pack(">q", self.motor_y_pos))
-        buf.extend(struct.pack(">q", self.motor_z_pos))
+        buf.extend(struct.pack(">q", self.motor_pos['A']))
+        buf.extend(struct.pack(">q", self.motor_pos['B']))
+        buf.extend(struct.pack(">q", self.motor_pos['X']))
+        buf.extend(struct.pack(">q", self.motor_pos['Y']))
+        buf.extend(struct.pack(">q", self.motor_pos['Z']))
         buf.extend(struct.pack(">q", len(self.jpeg)))
         buf.extend(self.jpeg)
         return buf
