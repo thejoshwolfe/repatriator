@@ -422,6 +422,7 @@ def run_camera():
 
     # try for 15 seconds to get the camera
     fakeCameraImagePath = settings['FAKE_CAMERA_IMAGE_PATH']
+    global finished
     if fakeCameraImagePath != None:
         debug("edsdk: using fake camera")
         camera = edsdk.getFakeCamera(fakeCameraImagePath)
@@ -436,6 +437,8 @@ def run_camera():
             except edsdk.CppCamera.error:
                 debug("unable to get camera, waiting a second and trying again")
                 time.sleep(1)
+                if finished:
+                    return
         else:
             error("Unable to get camera.")
             return
@@ -572,6 +575,7 @@ def initialize_hardware():
     }
     all_found = False
     tries = 0
+    global finished
     while not all_found and tries < 15:
         all_found = True
         tries += 1
@@ -586,6 +590,8 @@ def initialize_hardware():
                 motor.fullInit()
         if not all_found:
             time.sleep(1)
+            if finished:
+                return
     if not all_found:
         error("Unable to find and connect to all motors.")
 
