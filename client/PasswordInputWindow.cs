@@ -31,11 +31,13 @@ namespace repatriator_client
         private void loginButton_Click(object sender, EventArgs e)
         {
             returnPassword = passwordTextBox.Text;
+            Close();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
             returnPassword = "";
+            Close();
         }
     }
 }
