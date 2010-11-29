@@ -28,11 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.Label label1;
+            this.components = new System.ComponentModel.Container();
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.downlaodAllButton = new System.Windows.Forms.Button();
             this.liftSliderZ = new System.Windows.Forms.Panel();
             this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
@@ -43,10 +42,10 @@
             this.miniMapSliderX = new System.Windows.Forms.TrackBar();
             this.miniMapSliderY = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
-            label1 = new System.Windows.Forms.Label();
+            this.directoryListView = new System.Windows.Forms.ListView();
+            this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.liftSliderZ.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lifeSliderZ)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.miniMapPictureBox)).BeginInit();
@@ -56,15 +55,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.miniMapSliderY)).BeginInit();
             this.panel3.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(406, 33);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(35, 13);
-            label1.TabIndex = 0;
-            label1.Text = "label1";
             // 
             // liveViewPictureBox
             // 
@@ -87,24 +77,13 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.panel2);
+            this.panel1.Controls.Add(this.directoryListView);
             this.panel1.Controls.Add(this.downlaodAllButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 363);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(544, 100);
             this.panel1.TabIndex = 10;
-            // 
-            // panel2
-            // 
-            this.panel2.AutoScroll = true;
-            this.panel2.BackColor = System.Drawing.Color.Maroon;
-            this.panel2.Controls.Add(label1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(427, 100);
-            this.panel2.TabIndex = 1;
             // 
             // downlaodAllButton
             // 
@@ -210,6 +189,22 @@
             this.panel3.Size = new System.Drawing.Size(427, 363);
             this.panel3.TabIndex = 12;
             // 
+            // directoryListView
+            // 
+            this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.directoryListView.LargeImageList = this.directoryImageList;
+            this.directoryListView.Location = new System.Drawing.Point(0, 0);
+            this.directoryListView.Name = "directoryListView";
+            this.directoryListView.Size = new System.Drawing.Size(427, 100);
+            this.directoryListView.TabIndex = 1;
+            this.directoryListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // directoryImageList
+            // 
+            this.directoryImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.directoryImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.directoryImageList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -223,8 +218,6 @@
             this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
             this.panel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.liftSliderZ.ResumeLayout(false);
             this.liftSliderZ.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lifeSliderZ)).EndInit();
@@ -243,7 +236,6 @@
         private System.Windows.Forms.PictureBox liveViewPictureBox;
         private System.Windows.Forms.Button takePictureButton;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button downlaodAllButton;
         private System.Windows.Forms.Panel liftSliderZ;
         private System.Windows.Forms.TrackBar miniMapSliderY;
@@ -254,6 +246,8 @@
         private System.Windows.Forms.PictureBox miniMapPictureBox;
         private System.Windows.Forms.TrackBar lifeSliderZ;
         private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.ListView directoryListView;
+        private System.Windows.Forms.ImageList directoryImageList;
 
     }
 }

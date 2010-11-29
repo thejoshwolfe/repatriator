@@ -31,6 +31,19 @@ namespace repatriator_client
 
         private void connectionManager_directoryListUpdated()
         {
+            BeginInvoke(new Action(updateDirectory));
+        }
+
+        private void updateDirectory()
+        {
+            directoryListView.Items.Clear();
+            directoryImageList.Images.Clear();
+            for (int i = 0; i < connectionManager.directoryList.Length; i++)
+            {
+                DirectoryItem directoryItem = connectionManager.directoryList[i];
+                directoryImageList.Images.Add(directoryItem.thumbNail);
+                directoryListView.Items.Add(directoryItem.filename, i);
+            }
         }
         private void connectionManager_fullUpdated()
         {
@@ -51,3 +64,4 @@ namespace repatriator_client
         }
     }
 }
+
