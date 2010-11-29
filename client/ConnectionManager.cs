@@ -254,6 +254,11 @@ namespace repatriator_client
         {
             socketStream.writeDeleteUser(username);
         }
+        public void takePicture()
+        {
+            socketStream.writeTakePicture();
+        }
+
         private enum ConnectionState
         {
             Inactive, Trying, Cancelling, GoodConnection,

@@ -62,6 +62,11 @@ namespace repatriator_client
             // invert the Y. maybe we shouldn't do this.
             butterflySliderY.Value = butterflySliderY.Maximum - butterflyControl.AngleY;
         }
+
+        private void takePictureButton_Click(object sender, EventArgs e)
+        {
+            connectionManager.takePicture();
+        }
     }
 }
 

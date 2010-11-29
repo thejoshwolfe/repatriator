@@ -33,6 +33,8 @@
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.directoryListView = new System.Windows.Forms.ListView();
+            this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
             this.downlaodAllButton = new System.Windows.Forms.Button();
             this.liftSliderZ = new System.Windows.Forms.Panel();
             this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
@@ -43,8 +45,6 @@
             this.miniMapSliderX = new System.Windows.Forms.TrackBar();
             this.miniMapSliderY = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.directoryListView = new System.Windows.Forms.ListView();
-            this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.liftSliderZ.SuspendLayout();
@@ -63,7 +63,7 @@
             this.liveViewPictureBox.Location = new System.Drawing.Point(0, 0);
             this.liveViewPictureBox.Name = "liveViewPictureBox";
             this.liveViewPictureBox.Size = new System.Drawing.Size(427, 362);
-            this.liveViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.liveViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.liveViewPictureBox.TabIndex = 8;
             this.liveViewPictureBox.TabStop = false;
             // 
@@ -75,6 +75,7 @@
             this.takePictureButton.TabIndex = 9;
             this.takePictureButton.Text = "Take Picture";
             this.takePictureButton.UseVisualStyleBackColor = true;
+            this.takePictureButton.Click += new System.EventHandler(this.takePictureButton_Click);
             // 
             // panel1
             // 
@@ -85,6 +86,22 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(544, 100);
             this.panel1.TabIndex = 10;
+            // 
+            // directoryListView
+            // 
+            this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.directoryListView.LargeImageList = this.directoryImageList;
+            this.directoryListView.Location = new System.Drawing.Point(0, 0);
+            this.directoryListView.Name = "directoryListView";
+            this.directoryListView.Size = new System.Drawing.Size(427, 100);
+            this.directoryListView.TabIndex = 1;
+            this.directoryListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // directoryImageList
+            // 
+            this.directoryImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.directoryImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.directoryImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // downlaodAllButton
             // 
@@ -189,22 +206,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(427, 362);
             this.panel3.TabIndex = 12;
-            // 
-            // directoryListView
-            // 
-            this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.directoryListView.LargeImageList = this.directoryImageList;
-            this.directoryListView.Location = new System.Drawing.Point(0, 0);
-            this.directoryListView.Name = "directoryListView";
-            this.directoryListView.Size = new System.Drawing.Size(427, 100);
-            this.directoryListView.TabIndex = 1;
-            this.directoryListView.UseCompatibleStateImageBehavior = false;
-            // 
-            // directoryImageList
-            // 
-            this.directoryImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.directoryImageList.ImageSize = new System.Drawing.Size(16, 16);
-            this.directoryImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // MainWindow
             // 
