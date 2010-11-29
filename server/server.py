@@ -44,10 +44,7 @@ class Server:
         actually writes the message to the open connection
         """
         raw_data = message.serialize()
-        debug("outgoing message (" + message.__class__.__name__ + ")")
-        debug("--------------------------------")
-        debug(raw_data)
-        debug("--------------------------------")
+        debug("writing outgoing message of type " + message.__class__.__name__)
         self.request.sendall(raw_data)
 
     def _read_amt(self, byte_count):
@@ -415,8 +412,21 @@ def run_camera():
     debug("running camera")
 
     pythoncom.CoInitializeEx(2)
+
+    # try for 15 seconds to get the camera
+    tries = 0
     debug("edsdk: getting first camera")
-    camera = edsdk.getFirstCamera()
+    camera = None
+    while tries < 15:
+        tries += 1
+        try:
+            camera = edsdk.getFirstCamera()
+        except edsdk.CppCamera.error:
+            debug("unable to get camera, waiting a second and trying again")
+            time.sleep(1)
+    if camera is None:
+        error("Unable to get camera.")
+        return
 
     def takePictureCallback(pic_file):
         # create a thumbnail

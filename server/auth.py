@@ -83,10 +83,7 @@ class User:
                 self.attrs['salt'] = _random_string(32)
                 self.attrs['password_hash'] = _hash_password(self.attrs['salt'], password)
                 self.attrs['privileges'] = privileges
-                try:
-                    os.makedirs(self.picture_folder())
-                except WindowsError:
-                    pass
+                _build_path(os.path.join(settings['DATA_FOLDER'], self.picture_folder())
     
     def picture_folder(self):
         if self._picture_folder is None:

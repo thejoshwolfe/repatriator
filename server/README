@@ -113,7 +113,7 @@ Messages:
             int64 - position of motor X
             int64 - position of motor Y
             int64 - position of motor Z
-            int64 - byte count for following JPEG image
+            int64 - byte count for following JPEG image. if it's 0, then server is unable to provide a frame.
             <jpeg format image>
 
         DirectoryListingResult
