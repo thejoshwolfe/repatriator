@@ -74,12 +74,16 @@ namespace repatriator_client
 
         private void newButton_Click(object sender, EventArgs e)
         {
-            // TODO get this from a form:
+            EditUserAccountWindow.UserAccount new_account = (new EditUserAccountWindow()).showGetNewUser(this);
+            if (new_account == null)
+                return;
             DetailedUserInfo user = new DetailedUserInfo();
-            user.username = "newguy";
-            user.password = "abcdefg";
+            user.username = new_account.username;
+            user.password = new_account.password;
             user.permissions = new HashSet<Permission>();
             user.permissions.Add(Permission.OperateHardware);
+            if (new_account.is_admin)
+                user.permissions.Add(Permission.ManageUsers);
             user.changed = true;
 
             users.Add(user.username, user);
