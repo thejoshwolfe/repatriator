@@ -140,7 +140,6 @@
             this.portTextBox.Name = "portTextBox";
             this.portTextBox.Size = new System.Drawing.Size(52, 20);
             this.portTextBox.TabIndex = 3;
-            this.portTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.portTextBox_KeyPress);
             // 
             // EditConnectionWindow
             // 

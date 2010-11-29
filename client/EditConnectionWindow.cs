@@ -105,11 +105,5 @@ namespace repatriator_client
             if (passwordTextBox.Text == static_password)
                 passwordTextBox.Text = "";
         }
-
-        private void portTextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!(('0' <= e.KeyChar && e.KeyChar <= '9') || e.KeyChar == '\b'))
-                e.Handled = true;
-        }
     }
 }

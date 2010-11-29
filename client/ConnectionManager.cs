@@ -53,6 +53,12 @@ namespace repatriator_client
             this.connection = connection;
             this.password = password;
             this.hardware = hardware;
+
+            errorMessageReceived += new Action<string>(delegate(string message)
+            {
+                Logging.error(message);
+            });
+
             createSocket();
         }
 

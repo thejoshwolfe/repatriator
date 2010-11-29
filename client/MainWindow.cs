@@ -10,9 +10,12 @@ namespace repatriator_client
     public partial class MainWindow : Form
     {
         private ButterflyControl butterflyControl;
+        private ConnectionManager connectionManager;
 
-        public MainWindow()
+        public MainWindow(ConnectionManager connectionManager)
         {
+            this.connectionManager = connectionManager;
+
             InitializeComponent();
 
             butterflyControl = new ButterflyControl();

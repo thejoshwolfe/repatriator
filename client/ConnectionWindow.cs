@@ -103,25 +103,33 @@ namespace repatriator_client
                 return;
 
             ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
+            ConnectionManager connectionManager = establishConnection(conn, false);
+            if (connectionManager == null)
+                return;
 
+            AdminWindow adminWindow = new AdminWindow(connectionManager);
+            Hide();
+            adminWindow.ShowDialog();
+            Show();
+        }
+        private ConnectionManager establishConnection(ConnectionSettings conn, bool hardware)
+        {
             string password = conn.password;
             if (password == "")
             {
                 PasswordInputWindow inputPasswordWindow = new PasswordInputWindow();
                 password = inputPasswordWindow.showGetPassword(this, password, conn.username);
                 if (password == "")
-                    return;
+                    return null;
             }
-            ConnectionManager connectionManager = new ConnectionManager(conn, password, false);
+            ConnectionManager connectionManager = new ConnectionManager(conn, password, hardware);
 
             ConnectionStatusWindow statusWindow = new ConnectionStatusWindow(connectionManager);
             statusWindow.ShowDialog(this);
             if (!statusWindow.result)
-                return;
-            AdminWindow adminWindow = new AdminWindow(connectionManager);
-            Hide();
-            adminWindow.ShowDialog();
-            Show();
+                return null;
+
+            return connectionManager;
         }
 
         private void adminToolStripMenuItem_Click(object sender, EventArgs e)
@@ -136,11 +144,17 @@ namespace repatriator_client
 
         private void loginButton_Click(object sender, EventArgs e)
         {
-            if (connectionListView.SelectedIndices.Count == 1)
-            {
-                ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
-                // TODO: open connection to selected connection with the purpose of using hardware
-            }
+            if (connectionListView.SelectedIndices.Count != 1)
+                return;
+            ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
+            ConnectionManager connectionManager = establishConnection(conn, true);
+            if (connectionManager == null)
+                return;
+
+            MainWindow mainWindow = new MainWindow(connectionManager);
+            Hide();
+            mainWindow.ShowDialog();
+            Close();
         }
 
         private void enableCorrectControls()
