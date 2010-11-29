@@ -575,7 +575,6 @@ def initialize_hardware():
     }
     all_found = False
     tries = 0
-    global finished
     while not all_found and tries < 15:
         all_found = True
         tries += 1
