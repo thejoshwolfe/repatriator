@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -61,7 +62,7 @@
             this.liveViewPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.liveViewPictureBox.Location = new System.Drawing.Point(0, 0);
             this.liveViewPictureBox.Name = "liveViewPictureBox";
-            this.liveViewPictureBox.Size = new System.Drawing.Size(427, 363);
+            this.liveViewPictureBox.Size = new System.Drawing.Size(427, 362);
             this.liveViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.liveViewPictureBox.TabIndex = 8;
             this.liveViewPictureBox.TabStop = false;
@@ -80,7 +81,7 @@
             this.panel1.Controls.Add(this.directoryListView);
             this.panel1.Controls.Add(this.downlaodAllButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 363);
+            this.panel1.Location = new System.Drawing.Point(0, 362);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(544, 100);
             this.panel1.TabIndex = 10;
@@ -109,7 +110,7 @@
             this.liftSliderZ.Dock = System.Windows.Forms.DockStyle.Right;
             this.liftSliderZ.Location = new System.Drawing.Point(427, 0);
             this.liftSliderZ.Name = "liftSliderZ";
-            this.liftSliderZ.Size = new System.Drawing.Size(117, 363);
+            this.liftSliderZ.Size = new System.Drawing.Size(117, 362);
             this.liftSliderZ.TabIndex = 11;
             // 
             // butterflyElemtnHost
@@ -186,7 +187,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(427, 363);
+            this.panel3.Size = new System.Drawing.Size(427, 362);
             this.panel3.TabIndex = 12;
             // 
             // directoryListView
@@ -209,10 +210,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(544, 463);
+            this.ClientSize = new System.Drawing.Size(544, 462);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.liftSliderZ);
             this.Controls.Add(this.panel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(560, 500);
             this.Name = "MainWindow";
             this.Text = "Repatriator";
             this.Load += new System.EventHandler(this.MainWindow_Load);
