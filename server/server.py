@@ -162,6 +162,11 @@ def handle_ConnectionRequest(msg):
         server.send_message(ConnectionResult(ConnectionResult.InsufficientPrivileges, user.privileges()))
         server.close()
         return
+    elif not msg.hardware_flag and not user.has_privilege(Privilege.ManageUsers):
+        warning(msg.username + " tried to manage users but doesn't have permission")
+        server.send_message(ConnectionResult(ConnectionResult.InsufficientPrivileges, user.privileges()))
+        server.close()
+        return
         
     debug("Successful login for user " + msg.username)
     server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges()))
@@ -309,6 +314,7 @@ def handle_DeleteUser(msg):
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
 
+@must_have_privilege(Privilege.ManageUsers)
 def handle_ListUserRequest(msg):
     global server
     debug("Got list user request message")
