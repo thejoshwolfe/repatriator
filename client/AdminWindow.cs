@@ -72,6 +72,25 @@ namespace repatriator_client
             connectionManager.refreshUserList();
         }
 
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
+            string username = (string)usersListBox.SelectedItem;
+            if (username == null)
+                return;
+            DetailedUserInfo user = users[username];
+            if (user.changedStatus == DetailedUserInfo.ChangedStatus.New)
+            {
+                // i changed my mind about creating this user
+                users.Remove(username);
+            }
+            else
+            {
+                // we need to be sure to delete this guy
+                user.changedStatus = DetailedUserInfo.ChangedStatus.Deleted;
+            }
+            usersListBox.Items.Remove(username);
+        }
+
         private void newButton_Click(object sender, EventArgs e)
         {
             EditUserAccountWindow.UserAccount new_account = (new EditUserAccountWindow()).showGetNewUser(this);
@@ -84,9 +103,19 @@ namespace repatriator_client
             user.permissions.Add(Permission.OperateHardware);
             if (new_account.is_admin)
                 user.permissions.Add(Permission.ManageUsers);
-            user.changedStatus = DetailedUserInfo.ChangedStatus.New;
+            if (users.ContainsKey(user.username))
+            {
+                // previously deleted. turn this into an update.
+                user.changedStatus = DetailedUserInfo.ChangedStatus.Updated;
+                users[user.username] = user;
+            }
+            else
+            {
+                // actually new
+                user.changedStatus = DetailedUserInfo.ChangedStatus.New;
+                users.Add(user.username, user);
+            }
 
-            users.Add(user.username, user);
             usersListBox.Items.Add(user.username);
             usersListBox.SelectedIndex = usersListBox.Items.Count - 1;
         }
