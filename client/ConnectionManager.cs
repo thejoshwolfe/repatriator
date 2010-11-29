@@ -25,6 +25,7 @@ namespace repatriator_client
         public event Action fullUpdated;
         public event Action directoryListUpdated;
         public event Action usersUpdated;
+        public event Action<string> errorMessageReceived;
 
         private ConnectionSettings connection;
         private bool hardware;
@@ -38,9 +39,12 @@ namespace repatriator_client
 
         private ConnectionState connectionState = ConnectionState.Inactive;
 
-        private long a, b, x, y, z;
-        private Image image;
-        private DirectoryItem[] directoryList = { };
+        private long[] _motorPositions = new long[5];
+        public long[] motorPositions { get { return _motorPositions; } }
+        private Image _image = null;
+        public Image image { get { return _image; } }
+        private DirectoryItem[] _directoryList = { };
+        public DirectoryItem[] directoryList { get { return _directoryList; } }
         private UserInfo[] _users = { };
         public UserInfo[] users { get { return _users; } }
 
@@ -102,22 +106,18 @@ namespace repatriator_client
 
         private void handleErrorMessageEventResponse(ErrorMessageEventResponse errorMessageEventResponse)
         {
-            throw new NotImplementedException();
+            errorMessageReceived(errorMessageEventResponse.message);
         }
 
         private void fullUpdate(FullUpdateEventResponse response)
         {
-            a = response.a;
-            b = response.b;
-            x = response.x;
-            y = response.y;
-            z = response.z;
-            image = response.image;
+            _motorPositions = response.motorPositions;
+            _image = response.image;
             fullUpdated();
         }
         private void updateDirectoryList(DirectoryListingEventResponse directoryListingEventResponse)
         {
-            directoryList = directoryListingEventResponse.directoryList;
+            _directoryList = directoryListingEventResponse.directoryList;
             directoryListUpdated();
         }
         private void handleFileDownloaded(FileDownloadEventResponse fileDownloadEventResponse)
@@ -492,11 +492,9 @@ namespace repatriator_client
                     case ResponseTypes.FullUpdate:
                         {
                             FullUpdateEventResponse response = new FullUpdateEventResponse();
-                            response.a = reader.readLong();
-                            response.b = reader.readLong();
-                            response.x = reader.readLong();
-                            response.y = reader.readLong();
-                            response.z = reader.readLong();
+                            response.motorPositions = new long[5];
+                            for (int i = 0; i < response.motorPositions.Length; i++)
+                                response.motorPositions[i] = reader.readLong();
                             response.image = reader.readImage();
                             return response;
                         }
@@ -659,7 +657,7 @@ namespace repatriator_client
     }
     public class FullUpdateEventResponse : EventResponse
     {
-        public long a, b, x, y, z;
+        public long[] motorPositions;
         public Image image;
     }
     public class DirectoryListingEventResponse : EventResponse
