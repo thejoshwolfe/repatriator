@@ -84,11 +84,37 @@ namespace repatriator_client
             user.permissions.Add(Permission.OperateHardware);
             if (new_account.is_admin)
                 user.permissions.Add(Permission.ManageUsers);
-            user.changed = true;
+            user.changedStatus = DetailedUserInfo.ChangedStatus.New;
 
             users.Add(user.username, user);
             usersListBox.Items.Add(user.username);
             usersListBox.SelectedIndex = usersListBox.Items.Count - 1;
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            // TODO don't do this on the GUI thread
+            foreach (DetailedUserInfo user in users.Values)
+            {
+                switch (user.changedStatus)
+                {
+                    case DetailedUserInfo.ChangedStatus.New:
+                        connectionManager.addUser(user.username, user.password, user.permissions);
+                        break;
+                    case DetailedUserInfo.ChangedStatus.Updated:
+                        connectionManager.updateUser(user.username, user.password, user.permissions);
+                        break;
+                    case DetailedUserInfo.ChangedStatus.Deleted:
+                        connectionManager.deleteUser(user.username);
+                        break;
+                }
+            }
+            Close();
+        }
+
+        private void AdminWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            connectionManager.cancel();
         }
     }
 }

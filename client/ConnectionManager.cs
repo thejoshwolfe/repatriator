@@ -215,6 +215,11 @@ namespace repatriator_client
             establishConnectionThread.IsBackground = true;
             establishConnectionThread.Start();
         }
+        public void close()
+        {
+            socket.Close();
+            connectionState = ConnectionState.Inactive;
+        }
         public void cancel()
         {
             // TODO thread-safe this
@@ -226,6 +231,18 @@ namespace repatriator_client
         public void refreshUserList()
         {
             socketStream.writeListUserRequest();
+        }
+        public void addUser(string username, string password, HashSet<Permission> permissions)
+        {
+            socketStream.writeAddUser(username, password, permissions);
+        }
+        public void updateUser(string username, string password, HashSet<Permission> permissions)
+        {
+            socketStream.writeUpdateUser(username, password, permissions);
+        }
+        public void deleteUser(string username)
+        {
+            socketStream.writeDeleteUser(username);
         }
         private enum ConnectionState
         {
@@ -519,6 +536,7 @@ namespace repatriator_client
                     case ResponseTypes.ErrorMessage:
                         {
                             ErrorMessageEventResponse response = new ErrorMessageEventResponse();
+                            response.number = reader.readInt();
                             response.message = reader.readString();
                             return response;
                         }
@@ -671,6 +689,7 @@ namespace repatriator_client
     public class ErrorMessageEventResponse : EventResponse
     {
         public string message;
+        public int number;
     }
     public class ListUserEventResponse : EventResponse
     {
@@ -690,12 +709,19 @@ namespace repatriator_client
     public class DetailedUserInfo : UserInfo
     {
         public string password = "";
-        public bool changed = false;
+        public ChangedStatus changedStatus = ChangedStatus.Unchanged;
         public DetailedUserInfo() { }
         public DetailedUserInfo(UserInfo source)
         {
             base.username = source.username;
             base.permissions = source.permissions;
+        }
+        public enum ChangedStatus
+        {
+            Unchanged,
+            New,
+            Updated,
+            Deleted,
         }
     }
 

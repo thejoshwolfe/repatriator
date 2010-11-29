@@ -173,6 +173,7 @@
             this.okButton.TabIndex = 18;
             this.okButton.Text = "&OK";
             this.okButton.UseVisualStyleBackColor = true;
+            this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
             // groupBox1
             // 
@@ -205,6 +206,7 @@
             this.MinimumSize = new System.Drawing.Size(313, 287);
             this.Name = "AdminWindow";
             this.Text = "Repatriator Admin";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AdminWindow_FormClosing);
             this.Shown += new System.EventHandler(this.AdminWindow_Shown);
             this.rightClickMenu.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
