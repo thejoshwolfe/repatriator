@@ -3,6 +3,7 @@ import string
 import random
 import hashlib
 import threading
+import shutil
 from settings import settings
 import os, sys
 from logging import debug, warning, error
@@ -82,7 +83,10 @@ class User:
                 self.attrs['salt'] = _random_string(32)
                 self.attrs['password_hash'] = _hash_password(self.attrs['salt'], password)
                 self.attrs['privileges'] = privileges
-                os.makedirs(self.picture_folder())
+                try:
+                    os.makedirs(self.picture_folder())
+                except WindowsError:
+                    pass
     
     def picture_folder(self):
         if self._picture_folder is None:

@@ -12,6 +12,9 @@ settings = {
     'DATA_FOLDER': os.path.join(os.path.dirname(__file__), 'data'),
     # log level: 'DEBUG', 'WARNING', 'ERROR'
     'LOG_LEVEL': 'ERROR',
+    # set to true to not actually use the hardware
+    'FAKE_MOTOR': False,
+    'FAKE_CAMERA': False,
 }
 try:
     import config
