@@ -220,6 +220,7 @@
             this.Controls.Add(this.panel1);
             this.Name = "MainWindow";
             this.Text = "Repatriator";
+            this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
