@@ -579,7 +579,7 @@ def initialize_hardware():
             if found[char]:
                 continue
             found[char] = motor.findAndConnect()
-            if not found[char]
+            if not found[char]:
                 warning("Unable to find and connect to silverpak motor '{0}', waiting a sec and trying again".format(char))
                 all_found = False
             else:
