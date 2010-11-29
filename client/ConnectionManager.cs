@@ -78,7 +78,15 @@ namespace repatriator_client
         {
             while (true)
             {
-                readAndDispatchEvent();
+                try
+                {
+                    readAndDispatchEvent();
+                }
+                catch (SocketException)
+                {
+                    if (!socket.Connected)
+                        return;
+                }
             }
         }
         private void readAndDispatchEvent()
@@ -141,7 +149,7 @@ namespace repatriator_client
         {
             LoginStatus result = establishConnection();
             if (result != LoginStatus.Success)
-                terminateConnection();
+                close();
             loginFinished(result);
         }
         private LoginStatus establishConnection()
@@ -199,7 +207,7 @@ namespace repatriator_client
             }
             return LoginStatus.ConnectionTrouble;
         }
-        private void terminateConnection()
+        public void close()
         {
             socket.Close();
             createSocket();
@@ -214,11 +222,6 @@ namespace repatriator_client
             establishConnectionThread = new Thread(establishConnection_run);
             establishConnectionThread.IsBackground = true;
             establishConnectionThread.Start();
-        }
-        public void close()
-        {
-            socket.Close();
-            connectionState = ConnectionState.Inactive;
         }
         public void cancel()
         {

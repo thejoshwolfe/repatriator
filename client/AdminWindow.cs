@@ -114,7 +114,7 @@ namespace repatriator_client
 
         private void AdminWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            connectionManager.cancel();
+            connectionManager.close();
         }
     }
 }
