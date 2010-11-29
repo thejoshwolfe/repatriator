@@ -22,10 +22,9 @@ def _hash_password(salt, password):
     encoded = (salt + password).encode('utf8')
     return hashlib.sha256(encoded).hexdigest()
 
-def _build_path(filename):
-    path, name = os.path.split(filename)
+def _build_path(dirname):
     try:
-        os.makedirs(path)
+        os.makedirs(dirname)
     except WindowsError as ex:
         pass
 
@@ -83,11 +82,14 @@ class User:
                 self.attrs['salt'] = _random_string(32)
                 self.attrs['password_hash'] = _hash_password(self.attrs['salt'], password)
                 self.attrs['privileges'] = privileges
-                _build_path(os.path.join(settings['DATA_FOLDER'], self.picture_folder()))
+                _build_path(self.picture_folder())
     
     def picture_folder(self):
         if self._picture_folder is None:
-            self._picture_folder = hashlib.md5(self.username.encode('utf8')).hexdigest()
+            self._picture_folder = os.path.join(
+                settings['DATA_FOLDER'],
+                hashlib.md5(self.username.encode('utf8')).hexdigest()
+            )
         return self._picture_folder
 
     def grant_privilege(self, privilege):
@@ -145,7 +147,7 @@ def list_users():
     return _auth_data
 
 _auth_file = os.path.join(settings['DATA_FOLDER'], "auth.json")
-_build_path(_auth_file)
+_build_path(settings['DATA_FOLDER'])
 _lock = threading.Lock()
 
 try:
