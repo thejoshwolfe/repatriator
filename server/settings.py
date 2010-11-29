@@ -14,7 +14,7 @@ settings = {
     'LOG_LEVEL': 'ERROR',
     # set to true to not actually use the hardware
     'FAKE_MOTOR': False,
-    'FAKE_CAMERA': False,
+    'FAKE_CAMERA_IMAGE_PATH': None,
 }
 try:
     import config

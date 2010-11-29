@@ -416,18 +416,23 @@ def run_camera():
 
     # try for 15 seconds to get the camera
     tries = 0
-    debug("edsdk: getting first camera")
-    camera = None
-    while tries < 15:
-        tries += 1
-        try:
-            camera = edsdk.getFirstCamera()
-        except edsdk.CppCamera.error:
-            debug("unable to get camera, waiting a second and trying again")
-            time.sleep(1)
-    if camera is None:
-        error("Unable to get camera.")
-        return
+    fakeCameraImagePath = settings['FAKE_CAMERA_IMAGE_PATH']
+    if fakeCameraImagePath != None:
+        debug("edsdk: using fake camera")
+        camera = edsdk.getFakeCamera(fakeCameraImagePath)
+    else:
+        debug("edsdk: getting first camera")
+        while tries < 15:
+            tries += 1
+            try:
+                camera = edsdk.getFirstCamera()
+                break
+            except edsdk.CppCamera.error:
+                debug("unable to get camera, waiting a second and trying again")
+                time.sleep(1)
+        else:
+            error("Unable to get camera.")
+            return
 
     def takePictureCallback(pic_file):
         # create a thumbnail
