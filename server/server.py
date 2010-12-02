@@ -214,7 +214,7 @@ def handle_DirectoryListingRequest(msg):
     global server, user
     debug("Got directory listing message")
 
-    files = [f for f in os.listdir(user.picture_folder()) if f.endswith('.jpg')]
+    files = [os.path.join(user.picture_folder(), f) for f in os.listdir(user.picture_folder()) if f.endswith('.jpg')]
     server.send_message(DirectoryListingResult(files))
 
 @must_have_privilege(Privilege.OperateHardware)
