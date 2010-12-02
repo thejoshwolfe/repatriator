@@ -127,7 +127,8 @@ namespace repatriator_client
         private void fullUpdate(FullUpdateEventResponse response)
         {
             _motorPositions = response.motorPositions;
-            _image = response.image;
+            if (response.image != null)
+                _image = response.image;
             if (fullUpdated != null)
                 fullUpdated();
         }
@@ -545,7 +546,7 @@ namespace repatriator_client
                             {
                                 response.directoryList[i] = new DirectoryItem();
                                 response.directoryList[i].filename = reader.readString();
-                                response.directoryList[i].thumbNail = reader.readImage();
+                                response.directoryList[i].thumbnail = reader.readImage();
                             }
                             return response;
                         }
@@ -751,6 +752,6 @@ namespace repatriator_client
     public class DirectoryItem
     {
         public string filename;
-        public Image thumbNail;
+        public Image thumbnail;
     }
 }

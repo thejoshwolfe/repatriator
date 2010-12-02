@@ -44,7 +44,10 @@ namespace repatriator_client
             for (int i = 0; i < connectionManager.directoryList.Length; i++)
             {
                 DirectoryItem directoryItem = connectionManager.directoryList[i];
-                directoryImageList.Images.Add(directoryItem.thumbNail);
+                Image thumbnail = directoryItem.thumbnail;
+                if (thumbnail == null)
+                    thumbnail = this.Icon.ToBitmap();
+                directoryImageList.Images.Add(thumbnail);
                 directoryListView.Items.Add(directoryItem.filename, i);
             }
         }

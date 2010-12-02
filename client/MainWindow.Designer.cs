@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("asdf", 0);
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("fdsa", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
@@ -90,6 +92,9 @@
             // directoryListView
             // 
             this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.directoryListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1,
+            listViewItem2});
             this.directoryListView.LargeImageList = this.directoryImageList;
             this.directoryListView.Location = new System.Drawing.Point(0, 0);
             this.directoryListView.Name = "directoryListView";
@@ -99,9 +104,9 @@
             // 
             // directoryImageList
             // 
-            this.directoryImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.directoryImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.directoryImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("directoryImageList.ImageStream")));
             this.directoryImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.directoryImageList.Images.SetKeyName(0, "mnwla.jpg");
             // 
             // downlaodAllButton
             // 
