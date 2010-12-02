@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Drawing;
+
+namespace repatriator_client
+{
+    public class LagSlider : Control
+    {
+        public int ShadowPosition { get; set; }
+        public int Position { get; set; }
+        public int MaxPosition { get; set; }
+        public Orientation Orientation { get; set; }
+
+        public LagSlider()
+        {
+            ShadowPosition = 20;
+            Position = 80;
+            MaxPosition = 100;
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            const int endMargin = 3;
+            const int trackWidth = 4;
+            const int thumbBreadth = 15;
+            const int thumbSpan = 8;
+
+            base.OnPaint(e);
+            var g = e.Graphics;
+
+
+            if (Orientation == System.Windows.Forms.Orientation.Vertical)
+            {
+                int centerX = this.Width / 2;
+                int trackHeight = this.Height - endMargin * 2;
+                // track
+                g.FillRectangle(Brushes.LightGray, centerX - trackWidth / 2, endMargin, trackWidth, trackHeight);
+
+                float scale = trackHeight / (float)MaxPosition;
+                // shadow
+                int shadowCenterY = (int)(ShadowPosition * scale + endMargin);
+                g.FillRectangle(Brushes.DarkGray, centerX - thumbBreadth / 2, shadowCenterY - thumbSpan / 2, thumbBreadth, thumbSpan);
+
+                // thumb
+                int thumbCenterY = (int)(Position * scale + endMargin);
+                g.FillRectangle(Brushes.Black, centerX - thumbBreadth / 2, thumbCenterY - thumbSpan / 2, thumbBreadth, thumbSpan);
+            }
+            else
+            {
+            }
+        }
+    }
+}

@@ -101,7 +101,8 @@ namespace repatriator_client
         {
             angleX = Utils.wrapOverflow(angleX + angleDeltaX, 360);
             angleY = Utils.wrapOverflow(angleY + angleDeltaY, 360);
-            AnglesMoved();
+            if (AnglesMoved != null)
+                AnglesMoved();
         }
         private void stopDragging()
         {

@@ -19,7 +19,6 @@ namespace repatriator_client
             InitializeComponent();
 
             butterflyControl = new ButterflyControl();
-            butterflyControl.AnglesMoved += new Action(butterflyControl_AnglesMoved);
             butterflyElemtnHost.Child = butterflyControl;
         }
         private void MainWindow_Load(object sender, EventArgs e)
@@ -28,7 +27,9 @@ namespace repatriator_client
             connectionManager.fullUpdated += new Action(connectionManager_fullUpdated);
             connectionManager.directoryListUpdated += new Action(connectionManager_directoryListUpdated);
 
-            // TODO: not the gui thread
+            // delete dummy images
+            directoryImageList.Images.Clear();
+
             connectionManager.refreshDirectoryList();
         }
 
@@ -60,13 +61,6 @@ namespace repatriator_client
                 if (previousImage != null)
                     previousImage.Dispose();
             }));
-        }
-
-        private void butterflyControl_AnglesMoved()
-        {
-            butterflySliderX.Value = butterflyControl.AngleX;
-            // invert the Y. maybe we shouldn't do this.
-            butterflySliderY.Value = butterflySliderY.Maximum - butterflyControl.AngleY;
         }
 
         private void takePictureButton_Click(object sender, EventArgs e)
