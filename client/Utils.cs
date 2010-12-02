@@ -48,5 +48,27 @@ namespace repatriator_client
             else
                 return value - maxValue * (value / maxValue);
         }
+        public static int indexOf(this byte[] array, byte[] subsequence)
+        {
+            if (subsequence.Length == 0)
+                return 0;
+            int compareCursor = 0;
+            for (int offset = 0; offset < array.Length - subsequence.Length; offset++)
+            {
+                if (array[offset + compareCursor] != subsequence[compareCursor])
+                    continue;
+                int compareFinish = compareCursor;
+                compareCursor = (compareCursor + 1) % subsequence.Length;
+                while (true)
+                {
+                    if (compareCursor == compareFinish)
+                        return offset; // match
+                    if (array[offset + compareCursor] != subsequence[compareCursor])
+                        break; // not a match
+                    compareCursor = (compareCursor + 1) % subsequence.Length;
+                }
+            }
+            return -1;
+        }
     }
 }

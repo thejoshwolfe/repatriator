@@ -15,7 +15,7 @@ namespace repatriator_client
         {
             if (currentLogLevel == LogLevel.None)
                 return;
-            string path = "C:\\aoeu.txt";
+            string path = "client.log";
             logFile = new StreamWriter(path, true);
             logFile.Write("\n");
             logSomething(null, "startup");
@@ -69,9 +69,22 @@ namespace repatriator_client
         }
         public static string bytesToString(byte[] bytes)
         {
-            StringBuilder stringBuidler = new StringBuilder(bytes.Length * 3);
-            for (int i = 0; i < bytes.Length; i++)
-                stringBuidler.Append(bytes[i].ToString("x2")).Append(' ');
+            int jpegStart = bytes.indexOf(new byte[] { 0xff, 0xd8 });
+            if (jpegStart != -1)
+            {
+                // omit the jpeg
+                return bytesToString(bytes, 0, jpegStart + 5) + " ... jpeg ... " + bytesToString(bytes, bytes.Length - 5, 5);
+            }
+            return bytesToString(bytes, 0, bytes.Length);
+        }
+        private static string bytesToString(byte[] bytes, int start, int length)
+        {
+            if (length == 0)
+                return "";
+            StringBuilder stringBuidler = new StringBuilder(length * 3 - 1);
+            stringBuidler.Append(bytes[start].ToString("x2"));
+            for (int i = start + 1; i < start + length; i++)
+                stringBuidler.Append(' ').Append(bytes[i].ToString("x2"));
             return stringBuidler.ToString();
         }
     }
