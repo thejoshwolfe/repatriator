@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace repatriator_client
 {
-    public class LagSlider : Control
+    public class ShadowSlider : Control
     {
         private int shadowPosition = 20;
         public int ShadowPosition
@@ -56,7 +56,7 @@ namespace repatriator_client
             }
         }
 
-        public LagSlider()
+        public ShadowSlider()
         {
             ShadowPosition = 20;
             Position = 80;

@@ -29,29 +29,29 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("asdf", 0);
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("fdsa", 0);
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("asdf", 0);
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("fdsa", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.directoryListView = new System.Windows.Forms.ListView();
+            this.directoryContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.downloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.discardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
             this.downlaodAllButton = new System.Windows.Forms.Button();
             this.liftSliderZ = new System.Windows.Forms.Panel();
             this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
             this.lifeSliderZ = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.directoryContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.downloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.discardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lagSlider1 = new repatriator_client.LagSlider();
+            this.shadowSlider1 = new repatriator_client.ShadowSlider();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
+            this.directoryContextMenu.SuspendLayout();
             this.liftSliderZ.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lifeSliderZ)).BeginInit();
             this.panel3.SuspendLayout();
-            this.directoryContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // liveViewPictureBox
@@ -89,8 +89,8 @@
             this.directoryListView.ContextMenuStrip = this.directoryContextMenu;
             this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.directoryListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
+            listViewItem3,
+            listViewItem4});
             this.directoryListView.LargeImageList = this.directoryImageList;
             this.directoryListView.Location = new System.Drawing.Point(0, 0);
             this.directoryListView.Name = "directoryListView";
@@ -98,6 +98,26 @@
             this.directoryListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.directoryListView.TabIndex = 1;
             this.directoryListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // directoryContextMenu
+            // 
+            this.directoryContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.downloadToolStripMenuItem,
+            this.discardToolStripMenuItem});
+            this.directoryContextMenu.Name = "directoryContextMenu";
+            this.directoryContextMenu.Size = new System.Drawing.Size(129, 48);
+            // 
+            // downloadToolStripMenuItem
+            // 
+            this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
+            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.downloadToolStripMenuItem.Text = "Do&wnload";
+            // 
+            // discardToolStripMenuItem
+            // 
+            this.discardToolStripMenuItem.Name = "discardToolStripMenuItem";
+            this.discardToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.discardToolStripMenuItem.Text = "&Discard";
             // 
             // directoryImageList
             // 
@@ -118,7 +138,7 @@
             // liftSliderZ
             // 
             this.liftSliderZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.liftSliderZ.Controls.Add(this.lagSlider1);
+            this.liftSliderZ.Controls.Add(this.shadowSlider1);
             this.liftSliderZ.Controls.Add(this.butterflyElemtnHost);
             this.liftSliderZ.Controls.Add(this.takePictureButton);
             this.liftSliderZ.Controls.Add(this.lifeSliderZ);
@@ -155,37 +175,17 @@
             this.panel3.Size = new System.Drawing.Size(427, 362);
             this.panel3.TabIndex = 12;
             // 
-            // directoryContextMenu
+            // shadowSlider1
             // 
-            this.directoryContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.downloadToolStripMenuItem,
-            this.discardToolStripMenuItem});
-            this.directoryContextMenu.Name = "directoryContextMenu";
-            this.directoryContextMenu.Size = new System.Drawing.Size(129, 48);
-            // 
-            // downloadToolStripMenuItem
-            // 
-            this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
-            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.downloadToolStripMenuItem.Text = "Do&wnload";
-            // 
-            // discardToolStripMenuItem
-            // 
-            this.discardToolStripMenuItem.Name = "discardToolStripMenuItem";
-            this.discardToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.discardToolStripMenuItem.Text = "&Discard";
-            // 
-            // lagSlider1
-            // 
-            this.lagSlider1.Location = new System.Drawing.Point(6, 127);
-            this.lagSlider1.MaxPosition = 100;
-            this.lagSlider1.Name = "lagSlider1";
-            this.lagSlider1.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.lagSlider1.Position = 80;
-            this.lagSlider1.ShadowPosition = 20;
-            this.lagSlider1.Size = new System.Drawing.Size(14, 68);
-            this.lagSlider1.TabIndex = 12;
-            this.lagSlider1.Text = "lagSlider1";
+            this.shadowSlider1.Location = new System.Drawing.Point(3, 127);
+            this.shadowSlider1.MaxPosition = 100;
+            this.shadowSlider1.Name = "shadowSlider1";
+            this.shadowSlider1.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.shadowSlider1.Position = 80;
+            this.shadowSlider1.ShadowPosition = 20;
+            this.shadowSlider1.Size = new System.Drawing.Size(17, 68);
+            this.shadowSlider1.TabIndex = 10;
+            this.shadowSlider1.Text = "shadowSlider1";
             // 
             // MainWindow
             // 
@@ -203,11 +203,11 @@
             this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
             this.panel1.ResumeLayout(false);
+            this.directoryContextMenu.ResumeLayout(false);
             this.liftSliderZ.ResumeLayout(false);
             this.liftSliderZ.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lifeSliderZ)).EndInit();
             this.panel3.ResumeLayout(false);
-            this.directoryContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -227,7 +227,7 @@
         private System.Windows.Forms.ContextMenuStrip directoryContextMenu;
         private System.Windows.Forms.ToolStripMenuItem downloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem discardToolStripMenuItem;
-        private LagSlider lagSlider1;
+        private ShadowSlider shadowSlider1;
 
     }
 }

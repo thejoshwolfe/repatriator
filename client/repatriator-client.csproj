@@ -86,7 +86,7 @@
     <Compile Include="EditUserAccountWindow.Designer.cs">
       <DependentUpon>EditUserAccountWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="LagSlider.cs">
+    <Compile Include="ShadowSlider.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Logging.cs" />
