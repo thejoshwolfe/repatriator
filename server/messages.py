@@ -299,11 +299,11 @@ class DirectoryListingResult(ServerMessage):
             buf.extend(filename.encode('utf8'))
 
             try:
-                thumb_size = os.path.getsize(file_path+'.thumb')
-                f = open(file_path, 'rb')
-                buf.extend(struct.pack(">q", thumb_size))
-                buf.extend(f.read())
-                f.close()
+                thumb_path = file_path + ".thumb"
+                thumb_size = os.path.getsize(thumb_path)
+                with open(thumb_path, "rb") as f:
+                    buf.extend(struct.pack(">q", thumb_size))
+                    buf.extend(f.read())
             except (OSError, IOError):
                 buf.extend(struct.pack(">q", 0))
                 error("error accessing thumbnail for {0}".format(file_path))
@@ -320,10 +320,9 @@ class FileDownloadResult(ServerMessage):
         buf = bytearray()
         try:
             file_size = os.path.getsize(self.file_path)
-            f = open(self.file_path)
-            buf.extend(file_size)
-            buf.extend(f.read())
-            f.close()
+            with open(self.file_path) as f:
+                buf.extend(file_size)
+                buf.extend(f.read())
         except (OSError, IOError):
             buf.extend(struct.pack(">q", 0))
 

@@ -42,9 +42,8 @@ def _save_json():
     _lock.acquire()
     _sets_to_lists()
 
-    _out = open(_auth_file, "w")
-    _out.write(json.dumps(_auth_data))
-    _out.close()
+    with open(_auth_file, "w") as out:
+        out.write(json.dumps(_auth_data))
 
     _lists_to_sets()
     _lock.release()
@@ -151,17 +150,16 @@ _build_path(settings['DATA_FOLDER'])
 _lock = threading.Lock()
 
 try:
-    _in = open(_auth_file, "r")
-    try:
-        _auth_data = json.loads(_in.read())
-        # need to convert the lists in json to sets
-        _lists_to_sets()
-    except ValueError as ex:
-        error("Corrupt auth data, resetting auth database.")
-        _in.close()
-        raise IOError
-    _in.close()
+    with open(_auth_file, "r") as f:
+        try:
+            _auth_data = json.loads(f.read())
+            # need to convert the lists in json to sets
+            _lists_to_sets()
+        except ValueError as ex:
+            error("Corrupt auth data, resetting auth database.")
+            raise IOError
 except IOError as ex:
     _auth_data = {}
     default_user = User(username="default_admin", password="temp1234", privileges={Privilege.ManageUsers})
     default_user.save()
+
