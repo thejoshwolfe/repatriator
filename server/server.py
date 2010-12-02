@@ -213,9 +213,12 @@ def handle_MotorMovement(msg):
 def handle_DirectoryListingRequest(msg):
     global server, user
     debug("Got directory listing message")
+    send_directory_list()
 
+def send_directory_list():
     files = [os.path.join(user.picture_folder(), f) for f in os.listdir(user.picture_folder()) if f.endswith('.jpg')]
     server.send_message(DirectoryListingResult(files))
+
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_FileDownloadRequest(msg):
@@ -256,6 +259,9 @@ def handle_FileDeleteRequest(msg):
         os.remove(target_path)
     except OSError as ex:
         error("OSError removing file: {0}".format(ex))
+
+    # notify change
+    send_directory_list()
 
 def handle_ChangePasswordRequest(msg):
     global server
@@ -400,7 +406,7 @@ def run_message_loop():
     debug("entering message loop")
     while not finished:
         msg = message_queue.get(block=True)
-        
+
         # check for message indicating thread is done
         if msg.message_type == ClientMessage.DummyCloseConnection:
             return
@@ -446,6 +452,8 @@ def run_camera():
     def takePictureCallback(pic_file):
         # create a thumbnail
         make_thumbnail(pic_file, pic_file+".thumb", 90)
+        # notify change
+        send_directory_list()
     camera.setPictureCompleteCallback(takePictureCallback)
 
     debug("edsdk: starting live view")
