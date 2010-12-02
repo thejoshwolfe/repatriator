@@ -9,10 +9,52 @@ namespace repatriator_client
 {
     public class LagSlider : Control
     {
-        public int ShadowPosition { get; set; }
-        public int Position { get; set; }
-        public int MaxPosition { get; set; }
-        public Orientation Orientation { get; set; }
+        private int shadowPosition = 20;
+        public int ShadowPosition
+        {
+            get { return shadowPosition; }
+            set
+            {
+                if (!(0 <= value && value <= maxPosition))
+                    return;
+                shadowPosition = value;
+                this.Refresh();
+            }
+        }
+        private int position = 80;
+        public int Position
+        {
+            get { return position; }
+            set
+            {
+                if (!(0 <= value && value <= maxPosition))
+                    return;
+                position = value;
+                this.Refresh();
+            }
+        }
+        private int maxPosition = 100;
+        public int MaxPosition
+        {
+            get { return maxPosition; }
+            set
+            {
+                if (value <= 0)
+                    return;
+                maxPosition = value;
+                this.Refresh();
+            }
+        }
+        private System.Windows.Forms.Orientation orientation;
+        public Orientation Orientation
+        {
+            get { return orientation; }
+            set
+            {
+                orientation = value;
+                this.Refresh();
+            }
+        }
 
         public LagSlider()
         {
@@ -50,6 +92,7 @@ namespace repatriator_client
             }
             else
             {
+                // TODO
             }
         }
     }
