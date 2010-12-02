@@ -73,6 +73,11 @@ namespace repatriator_client
         {
             connectionManager.takePicture();
         }
+
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            connectionManager.close();
+        }
     }
 }
 

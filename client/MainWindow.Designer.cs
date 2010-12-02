@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("asdf", 0);
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("fdsa", 0);
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("asdf", 0);
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("fdsa", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
@@ -93,12 +93,13 @@
             // 
             this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.directoryListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
+            listViewItem3,
+            listViewItem4});
             this.directoryListView.LargeImageList = this.directoryImageList;
             this.directoryListView.Location = new System.Drawing.Point(0, 0);
             this.directoryListView.Name = "directoryListView";
             this.directoryListView.Size = new System.Drawing.Size(427, 100);
+            this.directoryListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.directoryListView.TabIndex = 1;
             this.directoryListView.UseCompatibleStateImageBehavior = false;
             // 
@@ -224,6 +225,7 @@
             this.MinimumSize = new System.Drawing.Size(560, 500);
             this.Name = "MainWindow";
             this.Text = "Repatriator";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
             this.panel1.ResumeLayout(false);
