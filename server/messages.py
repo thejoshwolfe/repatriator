@@ -1,6 +1,6 @@
 from version import version
 import struct
-import sys
+import os, sys
 import logging
 from logging import debug, warning, error
 
@@ -306,7 +306,7 @@ class DirectoryListingResult(ServerMessage):
                 f.close()
             except (OSError, IOError):
                 buf.extend(struct.pack(">q", 0))
-                error("error accessing thumbnail for {0}".file_path)
+                error("error accessing thumbnail for {0}".format(file_path))
             
         return buf
 

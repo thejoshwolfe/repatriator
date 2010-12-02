@@ -243,6 +243,10 @@ namespace repatriator_client
         {
             socketStream.writeListUserRequest();
         }
+        public void refreshDirectoryList()
+        {
+            socketStream.writeDirectoryListingRequest();
+        }
         public void addUser(string username, string password, HashSet<Permission> permissions)
         {
             socketStream.writeAddUser(username, password, permissions);
@@ -679,6 +683,7 @@ namespace repatriator_client
                 return new FakeStreamReader(buffer);
             }
         }
+
     }
     public enum ConnectionStatus
     {

@@ -27,6 +27,9 @@ namespace repatriator_client
             // attach handlers after the gui has initialized
             connectionManager.fullUpdated += new Action(connectionManager_fullUpdated);
             connectionManager.directoryListUpdated += new Action(connectionManager_directoryListUpdated);
+
+            // TODO: not the gui thread
+            connectionManager.refreshDirectoryList();
         }
 
         private void connectionManager_directoryListUpdated()
