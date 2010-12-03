@@ -263,6 +263,7 @@ def handle_FileDeleteRequest(msg):
     debug("Removing file {0}".format(target_path))
     try:
         os.remove(target_path)
+        os.remove(target_path+".thumb")
     except OSError as ex:
         error("OSError removing file: {0}".format(ex))
 
