@@ -38,14 +38,14 @@
             this.downloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.discardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
-            this.downlaodAllButton = new System.Windows.Forms.Button();
+            this.downloadAllButton = new System.Windows.Forms.Button();
             this.tinkyWinky = new System.Windows.Forms.Panel();
-            this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
-            this.panel3 = new System.Windows.Forms.Panel();
             this.orbitSliderB = new repatriator_client.ShadowSlider();
             this.shadowMinimap = new repatriator_client.ShadowMinimap();
             this.liftSliderZ = new repatriator_client.ShadowSlider();
             this.orbitSliderA = new repatriator_client.ShadowSlider();
+            this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
+            this.panel3 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.directoryContextMenu.SuspendLayout();
@@ -78,7 +78,7 @@
             // panel1
             // 
             this.panel1.Controls.Add(this.directoryListView);
-            this.panel1.Controls.Add(this.downlaodAllButton);
+            this.panel1.Controls.Add(this.downloadAllButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 362);
             this.panel1.Name = "panel1";
@@ -126,15 +126,16 @@
             this.directoryImageList.TransparentColor = System.Drawing.Color.Transparent;
             this.directoryImageList.Images.SetKeyName(0, "mnwla.jpg");
             // 
-            // downlaodAllButton
+            // downloadAllButton
             // 
-            this.downlaodAllButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.downlaodAllButton.Location = new System.Drawing.Point(427, 0);
-            this.downlaodAllButton.Name = "downlaodAllButton";
-            this.downlaodAllButton.Size = new System.Drawing.Size(117, 100);
-            this.downlaodAllButton.TabIndex = 0;
-            this.downlaodAllButton.Text = "Download All";
-            this.downlaodAllButton.UseVisualStyleBackColor = true;
+            this.downloadAllButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.downloadAllButton.Location = new System.Drawing.Point(427, 0);
+            this.downloadAllButton.Name = "downloadAllButton";
+            this.downloadAllButton.Size = new System.Drawing.Size(117, 100);
+            this.downloadAllButton.TabIndex = 0;
+            this.downloadAllButton.Text = "Download All";
+            this.downloadAllButton.UseVisualStyleBackColor = true;
+            this.downloadAllButton.Click += new System.EventHandler(this.downloadAllButton_Click);
             // 
             // tinkyWinky
             // 
@@ -150,24 +151,6 @@
             this.tinkyWinky.Name = "tinkyWinky";
             this.tinkyWinky.Size = new System.Drawing.Size(117, 362);
             this.tinkyWinky.TabIndex = 11;
-            // 
-            // butterflyElemtnHost
-            // 
-            this.butterflyElemtnHost.Location = new System.Drawing.Point(26, 288);
-            this.butterflyElemtnHost.Name = "butterflyElemtnHost";
-            this.butterflyElemtnHost.Size = new System.Drawing.Size(79, 68);
-            this.butterflyElemtnHost.TabIndex = 3;
-            this.butterflyElemtnHost.Text = "elementHost1";
-            this.butterflyElemtnHost.Child = null;
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.liveViewPictureBox);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 0);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(427, 362);
-            this.panel3.TabIndex = 12;
             // 
             // orbitSliderB
             // 
@@ -218,6 +201,24 @@
             this.orbitSliderA.Text = "shadowSlider1";
             this.orbitSliderA.positionChosen += new System.Action(this.orbitSliderA_positionChosen);
             // 
+            // butterflyElemtnHost
+            // 
+            this.butterflyElemtnHost.Location = new System.Drawing.Point(26, 288);
+            this.butterflyElemtnHost.Name = "butterflyElemtnHost";
+            this.butterflyElemtnHost.Size = new System.Drawing.Size(79, 68);
+            this.butterflyElemtnHost.TabIndex = 3;
+            this.butterflyElemtnHost.Text = "elementHost1";
+            this.butterflyElemtnHost.Child = null;
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.liveViewPictureBox);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel3.Location = new System.Drawing.Point(0, 0);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(427, 362);
+            this.panel3.TabIndex = 12;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -246,7 +247,7 @@
         private System.Windows.Forms.PictureBox liveViewPictureBox;
         private System.Windows.Forms.Button takePictureButton;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button downlaodAllButton;
+        private System.Windows.Forms.Button downloadAllButton;
         private System.Windows.Forms.Panel tinkyWinky;
         private System.Windows.Forms.Integration.ElementHost butterflyElemtnHost;
         private System.Windows.Forms.Panel panel3;
