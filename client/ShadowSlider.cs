@@ -82,16 +82,18 @@ namespace repatriator_client
             if (!mouseIsDown)
                 return;
 
+            int positionDelta;
             if (orientation == System.Windows.Forms.Orientation.Vertical)
             {
                 int pixelDelta = e.Y - mouseOrign.Y;
-                int positionDelta = (int)(pixelDelta / pixelsPerPositionY);
-                Position = positionOrigin + positionDelta;
+                positionDelta = (int)(pixelDelta / pixelsPerPositionY);
             }
             else
             {
-                // TODO
+                int pixelDelta = e.X - mouseOrign.X;
+                positionDelta = (int)(pixelDelta / pixelsPerPositionX);
             }
+            Position = positionOrigin + positionDelta;
         }
         protected override void OnMouseUp(MouseEventArgs e)
         {
@@ -106,27 +108,27 @@ namespace repatriator_client
         }
 
         private const int endMargin = 3;
+        private int trackWidth { get { return this.Width - endMargin * 2; } }
         private int trackHeight { get { return this.Height - endMargin * 2; } }
+        private float pixelsPerPositionX { get { return trackWidth / (float)maxPosition; } }
         private float pixelsPerPositionY { get { return trackHeight / (float)maxPosition; } }
-        private int valueToY(int value)
-        {
-            return (int)(value * pixelsPerPositionY + endMargin);
-        }
+        private int valueToX(int value) { return (int)(value * pixelsPerPositionX + endMargin); }
+        private int valueToY(int value) { return (int)(value * pixelsPerPositionY + endMargin); }
         protected override void OnPaint(PaintEventArgs e)
         {
-            const int trackWidth = 4;
+            const int trackBreadth = 4;
             const int thumbBreadth = 15;
             const int thumbSpan = 8;
 
             base.OnPaint(e);
-            var g = e.Graphics;
+            Graphics g = e.Graphics;
 
 
             if (Orientation == System.Windows.Forms.Orientation.Vertical)
             {
                 int centerX = this.Width / 2;
                 // track
-                g.FillRectangle(Brushes.LightGray, centerX - trackWidth / 2, endMargin, trackWidth, trackHeight);
+                g.FillRectangle(Brushes.LightGray, centerX - trackBreadth / 2, endMargin, trackBreadth, trackHeight);
 
                 // shadow
                 int shadowCenterY = valueToY(ShadowPosition);
@@ -138,7 +140,17 @@ namespace repatriator_client
             }
             else
             {
-                // TODO
+                int centerY = this.Height / 2;
+                // track
+                g.FillRectangle(Brushes.LightGray, endMargin, centerY - trackBreadth / 2, trackWidth, trackBreadth);
+
+                // shadow
+                int shadowCenterX = valueToX(ShadowPosition);
+                g.FillRectangle(Brushes.DarkGray, shadowCenterX - thumbSpan / 2, centerY - thumbBreadth / 2, thumbSpan, thumbBreadth);
+
+                // thumb
+                int thumbCenterX = valueToX(Position);
+                g.FillRectangle(Brushes.Black, thumbCenterX - thumbSpan / 2, centerY - thumbBreadth / 2, thumbSpan, thumbBreadth);
             }
         }
     }
