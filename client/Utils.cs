@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.IO;
 
 namespace repatriator_client
 {
@@ -77,6 +78,15 @@ namespace repatriator_client
             Point result = a;
             a.Offset(b);
             return a;
+        }
+
+        public static void writeFile(string filename, byte[][] blob)
+        {
+            using (FileStream file = new FileStream(filename, FileMode.Create))
+            {
+                foreach (byte[] chunk in blob)
+                    file.Write(chunk, 0, chunk.Length);
+            }
         }
     }
 }

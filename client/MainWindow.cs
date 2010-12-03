@@ -29,6 +29,7 @@ namespace repatriator_client
             // attach handlers after the gui has initialized
             connectionManager.fullUpdated += new Action(connectionManager_fullUpdated);
             connectionManager.directoryListUpdated += new Action(connectionManager_directoryListUpdated);
+            connectionManager.downloadProgressed += new Action<float>(connectionManager_downloadProgressed);
 
             // delete dummy images
             directoryImageList.Images.Clear();
@@ -36,6 +37,14 @@ namespace repatriator_client
             connectionManager.refreshDirectoryList();
 
             enableCorrectControls();
+        }
+
+        private void connectionManager_downloadProgressed(float obj)
+        {
+            BeginInvoke(new Action(delegate()
+            {
+                downlaodAllButton.Text = obj.ToString();
+            }));
         }
 
         private void connectionManager_directoryListUpdated()

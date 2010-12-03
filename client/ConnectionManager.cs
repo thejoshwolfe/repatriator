@@ -27,6 +27,7 @@ namespace repatriator_client
         public event Action directoryListUpdated;
         public event Action usersUpdated;
         public event Action<string> errorMessageReceived;
+        public event Action<float> downloadProgressed;
 
         private ConnectionSettings connection;
         private bool hardware;
@@ -68,6 +69,11 @@ namespace repatriator_client
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.ReceiveTimeout = 5000;
             socketStream = new SocketStreamManager(socket);
+            socketStream.downloadProgressed += new Action<float>(delegate(float value)
+            {
+                if (downloadProgressed != null)
+                    downloadProgressed(value);
+            });
         }
 
         public bool hasValidSettings()
@@ -140,7 +146,7 @@ namespace repatriator_client
         private void handleFileDownloaded(FileDownloadEventResponse fileDownloadEventResponse)
         {
             string filename = getNextDownloadFilename();
-            fileDownloadEventResponse.image.Save(filename);
+            Utils.writeFile(filename, fileDownloadEventResponse.blob);
         }
         private int nextDownloadNumber = 0;
         private string getNextDownloadFilename()
@@ -321,6 +327,7 @@ namespace repatriator_client
         }
         private abstract class StreamManager
         {
+            public event Action<float> downloadProgressed;
             public void writeBool(bool value)
             {
                 writeByte((byte)(value ? 1 : 0));
@@ -506,6 +513,24 @@ namespace repatriator_client
                     return null;
                 return Image.FromStream(new MemoryStream(read((int)imageLength), false));
             }
+            public byte[][] readLargeBlob()
+            {
+                const int chunkSize = 0x10000;
+                long totalSize = readLong();
+                if (totalSize == 0)
+                    return new byte[0][];
+                int chunkCount = (int)((totalSize - 1) / chunkSize + 1);
+                int lastChunkSize = (int)((totalSize - 1) % chunkSize + 1);
+                byte[][] result = new byte[chunkCount][];
+                for (int i = 0; i < chunkCount - 1; i++)
+                {
+                    result[i] = read(chunkSize);
+                    downloadProgressed(i / (float)chunkCount);
+                }
+                result[result.Length - 1] = read(lastChunkSize);
+                downloadProgressed(1);
+                return result;
+            }
             public HashSet<Permission> readPermissions()
             {
                 HashSet<Permission> permissions = new HashSet<Permission>();
@@ -541,9 +566,18 @@ namespace repatriator_client
             }
             public EventResponse readEventResponse()
             {
-                RawResponse rawResponse = readRawResponse();
-                FakeStreamReader reader = rawResponse.getReader();
-                switch (rawResponse.typeCode)
+                byte typeCode = readByte();
+                long length = readLong();
+                if (typeCode == ResponseTypes.FileDownloadResult)
+                {
+                    FileDownloadEventResponse response = new FileDownloadEventResponse();
+                    response.blob = readLargeBlob();
+                    return response;
+                }
+
+                byte[] buffer = read((int)(length - 9));
+                FakeStreamReader reader = new FakeStreamReader(buffer);
+                switch (typeCode)
                 {
                     case ResponseTypes.FullUpdate:
                         {
@@ -564,12 +598,6 @@ namespace repatriator_client
                                 response.directoryList[i].filename = reader.readString();
                                 response.directoryList[i].thumbnail = reader.readImage();
                             }
-                            return response;
-                        }
-                    case ResponseTypes.FileDownloadResult:
-                        {
-                            FileDownloadEventResponse response = new FileDownloadEventResponse();
-                            response.image = reader.readImage();
                             return response;
                         }
                     case ResponseTypes.ErrorMessage:
@@ -724,7 +752,7 @@ namespace repatriator_client
     }
     public class FileDownloadEventResponse : EventResponse
     {
-        public Image image;
+        public byte[][] blob;
     }
     public class ErrorMessageEventResponse : EventResponse
     {
