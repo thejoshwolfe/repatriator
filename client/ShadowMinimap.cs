@@ -83,11 +83,8 @@ namespace repatriator_client
             if (!mouseIsDown)
                 return;
 
-            Point positionDelta = new Point();
-            int pixelDeltaX = e.X - mouseOrign.X;
-            positionDelta.X = (int)(pixelDeltaX / pixelsPerPositionX);
-            int pixelDeltaY = e.Y - mouseOrign.Y;
-            positionDelta.Y = (int)(pixelDeltaY / pixelsPerPositionY);
+            Point pixelDelta = new Point(e.X - mouseOrign.X, e.Y - mouseOrign.Y);
+            Point positionDelta = new Point((int)(pixelDelta.X / pixelsPerPositionX), (int)(pixelDelta.Y / pixelsPerPositionY));
             Position = Utils.add(positionOrigin, positionDelta);
         }
         protected override void OnMouseUp(MouseEventArgs e)
@@ -111,13 +108,13 @@ namespace repatriator_client
         private Point valueToPoint(Point value) { return new Point((int)(value.X * pixelsPerPositionX + margin.X), (int)(value.Y * pixelsPerPositionY + margin.Y)); }
         protected override void OnPaint(PaintEventArgs e)
         {
-            const int borderWidth = 2;
+            const int borderWidth = 4;
 
             base.OnPaint(e);
             Graphics g = e.Graphics;
 
             // border
-            g.DrawRectangle(new Pen(Color.LightGray, borderWidth), borderWidth / 2, borderWidth / 2, this.Width - borderWidth / 2, this.Height - borderWidth / 2);
+            g.DrawRectangle(new Pen(Color.LightGray, borderWidth), borderWidth / 2, borderWidth / 2, this.Width - borderWidth, this.Height - borderWidth);
 
             // shadow
             Point shadowCenter = valueToPoint(shadowPosition);
