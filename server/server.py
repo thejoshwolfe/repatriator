@@ -31,6 +31,7 @@ import socket, socketserver
 import queue
 import threading
 import time
+import traceback
 from functools import wraps
 
 # dependencies
@@ -90,12 +91,17 @@ class Server:
                 debug("socket.error when reading message, exiting thread")
                 self.message_queue.put(DummyCloseConnection())
                 return
+            except:
+                error("something bad happened when reading from socket: {0}".format(traceback.format_exc()))
+                self.message_queue.put(DummyCloseConnection())
+                return
 
             message = None
             try:
                 message = ClientMessage.parse(data)
             except ClientMessage.ParseError as ex:
                 error("when parsing client message: " + str(ex))
+                message = None
 
             if message is not None and self.on_message is not None:
                 self.on_message(message)
