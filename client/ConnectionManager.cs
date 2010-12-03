@@ -6,6 +6,7 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Text;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace repatriator_client
 {
@@ -271,6 +272,10 @@ namespace repatriator_client
         {
             socketStream.writeFileDownloadRequest(filename);
         }
+        public void moveMotors(long[] motorPositions)
+        {
+            socketStream.writeMotorMovement(motorPositions);
+        }
         private enum ConnectionState
         {
             Inactive, Trying, Cancelling, GoodConnection,
@@ -383,12 +388,11 @@ namespace repatriator_client
             }
             public void writeMotorMovement(long[] motorPositions)
             {
-                if (motorPositions.Length != 5)
-                    throw null;
-                writeByte(RequestTypes.MotorMovement);
-                writeLong(1 + 8 + 5 * 8);
+                Debug.Assert(motorPositions.Length == 5);
+                FakeStreamWriter buffer = new FakeStreamWriter();
                 foreach (long motorPosition in motorPositions)
-                    writeLong(motorPosition);
+                    buffer.writeLong(motorPosition);
+                writeBufferedMessage(RequestTypes.MotorMovement, buffer);
             }
             public void writeDirectoryListingRequest()
             {

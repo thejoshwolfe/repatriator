@@ -65,6 +65,10 @@ namespace repatriator_client
                 liveViewPictureBox.Image = connectionManager.image;
                 if (previousImage != null)
                     previousImage.Dispose();
+                orbitSliderA.ShadowPosition = (int)connectionManager.motorPositions[0];
+                orbitSliderB.ShadowPosition = (int)connectionManager.motorPositions[1];
+                shadowMinimap.ShadowPosition = new Point((int)connectionManager.motorPositions[2], (int)connectionManager.motorPositions[3]);
+                liftSliderZ.ShadowPosition = (int)connectionManager.motorPositions[4];
             }));
         }
 
@@ -118,6 +122,31 @@ namespace repatriator_client
         private void directoryListView_SelectedIndexChanged(object sender, EventArgs e)
         {
             enableCorrectControls();
+        }
+
+        private void shadowMinimap_positionChosen()
+        {
+            sendIntendedMotorPositions();
+        }
+
+        private void sendIntendedMotorPositions()
+        {
+            connectionManager.moveMotors(new long[] { orbitSliderA.Position, orbitSliderB.Position, shadowMinimap.Position.X, shadowMinimap.Position.Y, liftSliderZ.Position });
+        }
+
+        private void liftSliderZ_positionChosen()
+        {
+            sendIntendedMotorPositions();
+        }
+
+        private void orbitSliderA_positionChosen()
+        {
+            sendIntendedMotorPositions();
+        }
+
+        private void orbitSliderB_positionChosen()
+        {
+            sendIntendedMotorPositions();
         }
     }
 }

@@ -39,18 +39,17 @@
             this.discardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
             this.downlaodAllButton = new System.Windows.Forms.Button();
-            this.liftSliderZ = new System.Windows.Forms.Panel();
+            this.tinkyWinky = new System.Windows.Forms.Panel();
             this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
-            this.lifeSliderZ = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.shadowSlider2 = new repatriator_client.ShadowSlider();
-            this.shadowMinimap1 = new repatriator_client.ShadowMinimap();
-            this.shadowSlider1 = new repatriator_client.ShadowSlider();
+            this.orbitSliderB = new repatriator_client.ShadowSlider();
+            this.shadowMinimap = new repatriator_client.ShadowMinimap();
+            this.liftSliderZ = new repatriator_client.ShadowSlider();
+            this.orbitSliderA = new repatriator_client.ShadowSlider();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.directoryContextMenu.SuspendLayout();
-            this.liftSliderZ.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.lifeSliderZ)).BeginInit();
+            this.tinkyWinky.SuspendLayout();
             this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -137,20 +136,20 @@
             this.downlaodAllButton.Text = "Download All";
             this.downlaodAllButton.UseVisualStyleBackColor = true;
             // 
-            // liftSliderZ
+            // tinkyWinky
             // 
-            this.liftSliderZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.liftSliderZ.Controls.Add(this.shadowSlider2);
-            this.liftSliderZ.Controls.Add(this.shadowMinimap1);
-            this.liftSliderZ.Controls.Add(this.shadowSlider1);
-            this.liftSliderZ.Controls.Add(this.butterflyElemtnHost);
-            this.liftSliderZ.Controls.Add(this.takePictureButton);
-            this.liftSliderZ.Controls.Add(this.lifeSliderZ);
-            this.liftSliderZ.Dock = System.Windows.Forms.DockStyle.Right;
-            this.liftSliderZ.Location = new System.Drawing.Point(427, 0);
-            this.liftSliderZ.Name = "liftSliderZ";
-            this.liftSliderZ.Size = new System.Drawing.Size(117, 362);
-            this.liftSliderZ.TabIndex = 11;
+            this.tinkyWinky.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.tinkyWinky.Controls.Add(this.orbitSliderB);
+            this.tinkyWinky.Controls.Add(this.shadowMinimap);
+            this.tinkyWinky.Controls.Add(this.liftSliderZ);
+            this.tinkyWinky.Controls.Add(this.orbitSliderA);
+            this.tinkyWinky.Controls.Add(this.butterflyElemtnHost);
+            this.tinkyWinky.Controls.Add(this.takePictureButton);
+            this.tinkyWinky.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tinkyWinky.Location = new System.Drawing.Point(427, 0);
+            this.tinkyWinky.Name = "tinkyWinky";
+            this.tinkyWinky.Size = new System.Drawing.Size(117, 362);
+            this.tinkyWinky.TabIndex = 11;
             // 
             // butterflyElemtnHost
             // 
@@ -161,15 +160,6 @@
             this.butterflyElemtnHost.Text = "elementHost1";
             this.butterflyElemtnHost.Child = null;
             // 
-            // lifeSliderZ
-            // 
-            this.lifeSliderZ.LargeChange = 0;
-            this.lifeSliderZ.Location = new System.Drawing.Point(72, 86);
-            this.lifeSliderZ.Name = "lifeSliderZ";
-            this.lifeSliderZ.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.lifeSliderZ.Size = new System.Drawing.Size(45, 156);
-            this.lifeSliderZ.TabIndex = 7;
-            // 
             // panel3
             // 
             this.panel3.Controls.Add(this.liveViewPictureBox);
@@ -179,40 +169,54 @@
             this.panel3.Size = new System.Drawing.Size(427, 362);
             this.panel3.TabIndex = 12;
             // 
-            // shadowSlider2
+            // orbitSliderB
             // 
-            this.shadowSlider2.Location = new System.Drawing.Point(26, 265);
-            this.shadowSlider2.MaxPosition = 100;
-            this.shadowSlider2.Name = "shadowSlider2";
-            this.shadowSlider2.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.shadowSlider2.Position = 80;
-            this.shadowSlider2.ShadowPosition = 20;
-            this.shadowSlider2.Size = new System.Drawing.Size(79, 17);
-            this.shadowSlider2.TabIndex = 12;
-            this.shadowSlider2.Text = "shadowSlider2";
+            this.orbitSliderB.Location = new System.Drawing.Point(26, 265);
+            this.orbitSliderB.MaxPosition = 10000;
+            this.orbitSliderB.Name = "orbitSliderB";
+            this.orbitSliderB.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.orbitSliderB.Position = 80;
+            this.orbitSliderB.ShadowPosition = 20;
+            this.orbitSliderB.Size = new System.Drawing.Size(79, 17);
+            this.orbitSliderB.TabIndex = 12;
+            this.orbitSliderB.Text = "shadowSlider2";
+            this.orbitSliderB.positionChosen += new System.Action(this.orbitSliderB_positionChosen);
             // 
-            // shadowMinimap1
+            // shadowMinimap
             // 
-            this.shadowMinimap1.Location = new System.Drawing.Point(6, 12);
-            this.shadowMinimap1.MaxPosition = new System.Drawing.Point(100, 100);
-            this.shadowMinimap1.Name = "shadowMinimap1";
-            this.shadowMinimap1.Position = new System.Drawing.Point(80, 80);
-            this.shadowMinimap1.ShadowPosition = new System.Drawing.Point(20, 20);
-            this.shadowMinimap1.Size = new System.Drawing.Size(99, 68);
-            this.shadowMinimap1.TabIndex = 11;
-            this.shadowMinimap1.Text = "shadowMinimap1";
+            this.shadowMinimap.Location = new System.Drawing.Point(6, 12);
+            this.shadowMinimap.MaxPosition = new System.Drawing.Point(100, 100);
+            this.shadowMinimap.Name = "shadowMinimap";
+            this.shadowMinimap.Position = new System.Drawing.Point(80, 80);
+            this.shadowMinimap.ShadowPosition = new System.Drawing.Point(20, 20);
+            this.shadowMinimap.Size = new System.Drawing.Size(99, 68);
+            this.shadowMinimap.TabIndex = 11;
+            this.shadowMinimap.positionChosen += new System.Action(this.shadowMinimap_positionChosen);
             // 
-            // shadowSlider1
+            // liftSliderZ
             // 
-            this.shadowSlider1.Location = new System.Drawing.Point(3, 288);
-            this.shadowSlider1.MaxPosition = 100;
-            this.shadowSlider1.Name = "shadowSlider1";
-            this.shadowSlider1.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.shadowSlider1.Position = 80;
-            this.shadowSlider1.ShadowPosition = 20;
-            this.shadowSlider1.Size = new System.Drawing.Size(17, 68);
-            this.shadowSlider1.TabIndex = 10;
-            this.shadowSlider1.Text = "shadowSlider1";
+            this.liftSliderZ.Location = new System.Drawing.Point(88, 86);
+            this.liftSliderZ.MaxPosition = 500000;
+            this.liftSliderZ.Name = "liftSliderZ";
+            this.liftSliderZ.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.liftSliderZ.Position = 80;
+            this.liftSliderZ.ShadowPosition = 20;
+            this.liftSliderZ.Size = new System.Drawing.Size(17, 173);
+            this.liftSliderZ.TabIndex = 10;
+            this.liftSliderZ.positionChosen += new System.Action(this.liftSliderZ_positionChosen);
+            // 
+            // orbitSliderA
+            // 
+            this.orbitSliderA.Location = new System.Drawing.Point(3, 288);
+            this.orbitSliderA.MaxPosition = 484000;
+            this.orbitSliderA.Name = "orbitSliderA";
+            this.orbitSliderA.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.orbitSliderA.Position = 80;
+            this.orbitSliderA.ShadowPosition = 20;
+            this.orbitSliderA.Size = new System.Drawing.Size(17, 68);
+            this.orbitSliderA.TabIndex = 10;
+            this.orbitSliderA.Text = "shadowSlider1";
+            this.orbitSliderA.positionChosen += new System.Action(this.orbitSliderA_positionChosen);
             // 
             // MainWindow
             // 
@@ -220,7 +224,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(544, 462);
             this.Controls.Add(this.panel3);
-            this.Controls.Add(this.liftSliderZ);
+            this.Controls.Add(this.tinkyWinky);
             this.Controls.Add(this.panel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(560, 500);
@@ -231,9 +235,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).EndInit();
             this.panel1.ResumeLayout(false);
             this.directoryContextMenu.ResumeLayout(false);
-            this.liftSliderZ.ResumeLayout(false);
-            this.liftSliderZ.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.lifeSliderZ)).EndInit();
+            this.tinkyWinky.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -245,18 +247,18 @@
         private System.Windows.Forms.Button takePictureButton;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button downlaodAllButton;
-        private System.Windows.Forms.Panel liftSliderZ;
+        private System.Windows.Forms.Panel tinkyWinky;
         private System.Windows.Forms.Integration.ElementHost butterflyElemtnHost;
-        private System.Windows.Forms.TrackBar lifeSliderZ;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.ListView directoryListView;
         private System.Windows.Forms.ImageList directoryImageList;
         private System.Windows.Forms.ContextMenuStrip directoryContextMenu;
         private System.Windows.Forms.ToolStripMenuItem downloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem discardToolStripMenuItem;
-        private ShadowSlider shadowSlider1;
-        private ShadowSlider shadowSlider2;
-        private ShadowMinimap shadowMinimap1;
+        private ShadowSlider orbitSliderA;
+        private ShadowSlider orbitSliderB;
+        private ShadowMinimap shadowMinimap;
+        private ShadowSlider liftSliderZ;
 
     }
 }

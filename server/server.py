@@ -560,6 +560,7 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 4
+        motor.maxPosition = 5000000
         motor.setFake()
         return motor
 
