@@ -544,6 +544,7 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 2
+        motor.setFake()
         return motor
 
     def motorY():
@@ -551,6 +552,7 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 3
+        motor.setFake()
         return motor
 
     def motorZ():
@@ -558,6 +560,7 @@ def initialize_hardware():
         motor = silverpak.Silverpak()
         motor.baudRate = 9600
         motor.driverAddress = 4
+        motor.setFake()
         return motor
 
     motor_creators = {
