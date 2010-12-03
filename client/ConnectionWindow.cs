@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace repatriator_client
 {
@@ -153,8 +154,11 @@ namespace repatriator_client
 
             MainWindow mainWindow = new MainWindow(connectionManager);
             Hide();
-            mainWindow.ShowDialog();
-            Close();
+            mainWindow.Show();
+            mainWindow.Disposed += new EventHandler(delegate(object _, EventArgs __)
+            {
+                Close();
+            });
         }
 
         private void enableCorrectControls()
