@@ -129,10 +129,10 @@ Messages:
         FileDownloadResult
             int8 - identifies this message as a DirectoryListingResult (enum value 4)
             int64 - byte count of the entire message including this field
-            int64 - byte count of the following file
-            <file binary data as requested by FileDownloadRequest>
             int32 - length of utf8 string filename
             <utf8 string filename>
+            int64 - byte count of the following file
+            <file binary data as requested by FileDownloadRequest>
 
         ErrorMessage
             int8 - identifies this message as an ErrorMessage (enum value 5)

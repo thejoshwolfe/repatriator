@@ -319,6 +319,10 @@ class FileDownloadResult(ServerMessage):
 
     def _serialize(self):
         buf = bytearray()
+
+        buf.extend(struct.pack(">i", len(self.file_title)))
+        buf.extend(self.file_title.encode('utf8'))
+
         try:
             file_size = os.path.getsize(self.file_path)
             with open(self.file_path, "rb") as f:
@@ -326,9 +330,6 @@ class FileDownloadResult(ServerMessage):
                 buf.extend(f.read())
         except (OSError, IOError):
             buf.extend(struct.pack(">q", 0))
-
-        buf.extend(struct.pack(">i", len(self.file_title)))
-        buf.extend(self.file_title.encode('utf8'))
 
         return buf
 
