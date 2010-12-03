@@ -43,7 +43,7 @@ namespace repatriator_client
         {
             BeginInvoke(new Action(delegate()
             {
-                downlaodAllButton.Text = obj.ToString();
+                downloadAllButton.Text = obj.ToString();
             }));
         }
 
