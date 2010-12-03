@@ -12,6 +12,7 @@ namespace repatriator_client
         private ButterflyControl butterflyControl;
         private ConnectionManager connectionManager;
         private ConnectionSettings account;
+        private int downloadTotalCount, downloadSoFar;
 
         public MainWindow(ConnectionManager connectionManager, ConnectionSettings account)
         {
@@ -39,11 +40,13 @@ namespace repatriator_client
             enableCorrectControls();
         }
 
-        private void connectionManager_downloadProgressed(float obj)
+        private void connectionManager_downloadProgressed(float value)
         {
             BeginInvoke(new Action(delegate()
             {
-                downloadAllButton.Text = obj.ToString();
+                downloadAllButton.Text = ((downloadSoFar + value) / downloadTotalCount).ToString("0.00");
+                if (value == 1.0)
+                    downloadSoFar++;
             }));
         }
 
@@ -74,6 +77,7 @@ namespace repatriator_client
                 liveViewPictureBox.Image = connectionManager.image;
                 if (previousImage != null)
                     previousImage.Dispose();
+
                 orbitSliderA.ShadowPosition = (int)connectionManager.motorPositions[0];
                 orbitSliderB.ShadowPosition = (int)connectionManager.motorPositions[1];
                 shadowMinimap.ShadowPosition = new Point((int)connectionManager.motorPositions[2], (int)connectionManager.motorPositions[3]);
@@ -93,22 +97,40 @@ namespace repatriator_client
 
         private void downloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // make sure we have a download dir
-            if (account.downloadDirectory == null)
-            {
-                FolderBrowserDialog dialog = new FolderBrowserDialog();
-                if (dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.Cancel)
-                    return;
-                account.downloadDirectory = dialog.SelectedPath;
-                Settings.save();
-            }
-
+            if (!checkDownloadDirectory())
+                return;
             // send download file messages for each file
+            downloadTotalCount = directoryListView.SelectedIndices.Count;
+            downloadSoFar = 0;
             for (int i = 0; i < directoryListView.SelectedIndices.Count; ++i)
             {
                 string filename = directoryListView.Items[directoryListView.SelectedIndices[i]].Text;
                 connectionManager.downloadFile(filename);
             }
+        }
+        private void downloadAllButton_Click(object sender, EventArgs e)
+        {
+            if (!checkDownloadDirectory())
+                return;
+            downloadTotalCount = directoryListView.Items.Count;
+            downloadSoFar = 0;
+            for (int i = 0; i < directoryListView.Items.Count; ++i)
+            {
+                string filename = directoryListView.Items[i].Text;
+                connectionManager.downloadFile(filename);
+            }
+        }
+        private bool checkDownloadDirectory()
+        {
+            // make sure we have a download dir
+            if (account.downloadDirectory != null)
+                return true;
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.Cancel)
+                return false;
+            account.downloadDirectory = dialog.SelectedPath;
+            Settings.save();
+            return true;
         }
 
         private void discardToolStripMenuItem_Click(object sender, EventArgs e)
@@ -156,15 +178,6 @@ namespace repatriator_client
         private void orbitSliderB_positionChosen()
         {
             sendIntendedMotorPositions();
-        }
-
-        private void downloadAllButton_Click(object sender, EventArgs e)
-        {
-            for (int i = 0; i < directoryListView.Items.Count; ++i)
-            {
-                string filename = directoryListView.Items[i].Text;
-                connectionManager.downloadFile(filename);
-            }
         }
     }
 }
