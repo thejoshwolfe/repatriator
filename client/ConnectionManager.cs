@@ -147,6 +147,8 @@ namespace repatriator_client
         {
             string filename = getNextDownloadFilename();
             Utils.writeFile(filename, fileDownloadEventResponse.blob);
+            // delete the file upon successful download
+            deleteFile(fileDownloadEventResponse.filename);
         }
         private int nextDownloadNumber = 0;
         private string getNextDownloadFilename()
@@ -154,7 +156,7 @@ namespace repatriator_client
             HashSet<string> existingNames = new HashSet<string>(Directory.GetFiles(connection.downloadDirectory));
             while (true)
             {
-                string filename = connection.downloadDirectory + "/img_" + nextDownloadNumber.ToString("0000") + ".jpg";
+                string filename = connection.downloadDirectory + "\\img_" + nextDownloadNumber.ToString("0000") + ".jpg";
                 if (!File.Exists(filename))
                     return filename;
                 nextDownloadNumber += 1;
@@ -571,6 +573,7 @@ namespace repatriator_client
                 if (typeCode == ResponseTypes.FileDownloadResult)
                 {
                     FileDownloadEventResponse response = new FileDownloadEventResponse();
+                    response.filename = readString();
                     response.blob = readLargeBlob();
                     return response;
                 }
@@ -752,6 +755,7 @@ namespace repatriator_client
     }
     public class FileDownloadEventResponse : EventResponse
     {
+        public string filename;
         public byte[][] blob;
     }
     public class ErrorMessageEventResponse : EventResponse

@@ -157,6 +157,15 @@ namespace repatriator_client
         {
             sendIntendedMotorPositions();
         }
+
+        private void downloadAllButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < directoryListView.Items.Count; ++i)
+            {
+                string filename = directoryListView.Items[i].Text;
+                connectionManager.downloadFile(filename);
+            }
+        }
     }
 }
 

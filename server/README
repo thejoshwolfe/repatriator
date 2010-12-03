@@ -90,12 +90,12 @@ Messages:
     From the server to the client:
 
         MagicalResponse
-            int8 - identifies this message as a MagicalResponse
+            int8 - identifies this message as a MagicalResponse (enum value 0)
             int64 - byte count of the entire message including this field (always 17)
             [ 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 ]
 
         ConnectionResult
-            int8 - identifies this message as a ConnectionResult
+            int8 - identifies this message as a ConnectionResult (enum value 1)
             int64 - byte count of the entire message including this field
             int32 - major version number of server
             int32 - minor version number of server
@@ -106,7 +106,7 @@ Messages:
                 int32 permission enum value 
 
         FullUpdate - contains a live view frame and all motor positions
-            int8 - identifies this message as a FullUpdate
+            int8 - identifies this message as a FullUpdate (enum value 2)
             int64 - byte count of the entire message including this field
             int64 - position of motor A
             int64 - position of motor B
@@ -117,7 +117,7 @@ Messages:
             <jpeg format image>
 
         DirectoryListingResult
-            int8 - identifies this message as a DirectoryListingResult
+            int8 - identifies this message as a DirectoryListingResult (enum value 3)
             int64 - byte count of the entire message including this field
             int32 - number of files returned
             for each file returned:
@@ -127,20 +127,22 @@ Messages:
                 <jpeg format image> - thumbnail
 
         FileDownloadResult
-            int8 - identifies this message as a DirectoryListingResult
+            int8 - identifies this message as a DirectoryListingResult (enum value 4)
             int64 - byte count of the entire message including this field
             int64 - byte count of the following file
             <file binary data as requested by FileDownloadRequest>
+            int32 - length of utf8 string filename
+            <utf8 string filename>
 
         ErrorMessage
-            int8 - identifies this message as an ErrorMessage
+            int8 - identifies this message as an ErrorMessage (enum value 5)
             int64 - byte count of the entire message including this field
             int32 - error number
             int32 - length of utf8 description of error below
             <utf8 error message string>
 
         ListUserResult
-            int8 - identifies this message as a ListUserResult
+            int8 - identifies this message as a ListUserResult (enum value 6)
             int64 - byte count of the entire message including this field
             int32 - number of users on the system
             for each user:
@@ -154,12 +156,12 @@ Messages:
     From the client to the server:
 
         MagicalRequest
-            int8 - identifies this message as a MagicalRequest
+            int8 - identifies this message as a MagicalRequest (enum value 0)
             int64 - byte count of the entire message including this field (always 17)
             [ 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 ]
 
         ConnectionRequest - used to initialize a session with the repatriator
-            int8 - identifies this message as a ConnectionRequest
+            int8 - identifies this message as a ConnectionRequest (enum value 1)
             int64 - byte count of the entire message including this field
             int32 - major version number of client
             int32 - minor version number of client
@@ -171,11 +173,11 @@ Messages:
             int8 - boolean - do you want the hardware to turn on? False if you're only doing admin.
 
         TakePicture - tells the server to take a picture
-            int8 - identifies this message as a TakePicture
+            int8 - identifies this message as a TakePicture (enum value 2)
             int64 - byte count of the entire message including this field (always 9)
 
         MotorMovement - tells the server to move the motors
-            int8 - identifies this message as a MotorMovement
+            int8 - identifies this message as a MotorMovement (enum value 3)
             int64 - byte count of the entire message including this field (always 49)
             int64 - position of motor A
             int64 - position of motor B
@@ -184,31 +186,17 @@ Messages:
             int64 - position of motor Z
 
         DirectoryListingRequest - requests a DirectoryListingResult message
-            int8 - identifies this message as a DirectoryListingRequest
+            int8 - identifies this message as a DirectoryListingRequest (enum value 4)
             int64 - byte count of the entire message including this field (always 9)
 
         FileDownloadRequest - requests download of a particular file
-            int8 - identifies this message as a FileDownloadRequest
+            int8 - identifies this message as a FileDownloadRequest (enum value 5)
             int64 - byte count of the entire message including this field
             int32 - length of utf8 string filename
             <utf8 string filename requested>
-        
-        FileDeleteRequest - requests deletion of a file on the server
-            int8 - identifies this message as a FileDeleteRequest
-            int64 - byte count of the entire message including this field
-            int32 - length of utf8 string filename
-            <utf8 string filename requested>
-
-        ChangePasswordRequest - changes the currently logged in user's password
-            int8 - identifies this message as a ChangePasswordRequest
-            int64 - byte count of the entire message including this field
-            int32 - length of utf8 string old password
-            <utf8 string old password>
-            int32 - length of utf8 string new password
-            <utf8 string new password>
 
         AddUser - creates a new user in the system
-            int8 - identifies this message as an AddUser
+            int8 - identifies this message as an AddUser (enum value 6)
             int64 - byte count of the entire message including this field
             int32 - length of utf8 username below
             <username - utf8 string>
@@ -217,9 +205,9 @@ Messages:
             int32 - number of permissions granted
             for each permission granted:
                 int32 permission enum value 
-            
+        
         UpdateUser - updates a user in the system with new info
-            int8 - identifies this message as an UpdateUser
+            int8 - identifies this message as an UpdateUser (enum value 7)
             int64 - byte count of the entire message including this field
             int32 - length of utf8 username below
             <username - utf8 string>
@@ -230,13 +218,27 @@ Messages:
                 int32 permission enum value 
 
         DeleteUser - deletes a user from the system
-            int8 - identifies this message as a DeleteUser
+            int8 - identifies this message as a DeleteUser (enum value 8)
             int64 - byte count of the entire message including this field
             int32 - length of utf8 username below
             <username - utf8 string>
 
+        FileDeleteRequest - requests deletion of a file on the server
+            int8 - identifies this message as a FileDeleteRequest (enum value 9)
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 string filename
+            <utf8 string filename requested>
+
+        ChangePasswordRequest - changes the currently logged in user's password
+            int8 - identifies this message as a ChangePasswordRequest (enum value 10)
+            int64 - byte count of the entire message including this field
+            int32 - length of utf8 string old password
+            <utf8 string old password>
+            int32 - length of utf8 string new password
+            <utf8 string new password>
+
         ListUserRequest - requests a list of users on the system
-            int8 - identifies this message as a ListUserRequest
+            int8 - identifies this message as a ListUserRequest (enum value 11)
             int64 - byte count of the entire message including this field
 
 
