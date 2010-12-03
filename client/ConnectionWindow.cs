@@ -147,12 +147,12 @@ namespace repatriator_client
         {
             if (connectionListView.SelectedIndices.Count != 1)
                 return;
-            ConnectionSettings conn = Settings.connections[connectionListView.SelectedIndices[0]];
-            ConnectionManager connectionManager = establishConnection(conn, true);
+            ConnectionSettings account = Settings.connections[connectionListView.SelectedIndices[0]];
+            ConnectionManager connectionManager = establishConnection(account, true);
             if (connectionManager == null)
                 return;
 
-            MainWindow mainWindow = new MainWindow(connectionManager);
+            MainWindow mainWindow = new MainWindow(connectionManager, account);
             Hide();
             mainWindow.Show();
             mainWindow.Disposed += new EventHandler(delegate(object _, EventArgs __)

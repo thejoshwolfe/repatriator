@@ -44,6 +44,9 @@ namespace repatriator_client
                                 case "password":
                                     state = 5;
                                     break;
+                                case "downloadDirectory":
+                                    state = 6;
+                                    break;
                             }
                             break;
                         case XmlNodeType.Text:
@@ -61,6 +64,9 @@ namespace repatriator_client
                                     break;
                                 case 5:
                                     connection.password = reader.Value.Trim();
+                                    break;
+                                case 6:
+                                    connection.downloadDirectory = reader.Value.Trim();
                                     break;
                             }
                             break;
@@ -84,7 +90,9 @@ namespace repatriator_client
                                 case "password":
                                     state = 1;
                                     break;
-
+                                case "downloadDirectory":
+                                    state = 1;
+                                    break;
                             }
                             break;
                     }
@@ -116,6 +124,9 @@ namespace repatriator_client
                 writer.Write("        <password>");
                 writer.Write(connection.password);
                 writer.WriteLine("</password>");
+                writer.Write("        <downloadDirectory>");
+                writer.Write(connection.downloadDirectory);
+                writer.WriteLine("</downloadDirectory>");
                 writer.WriteLine("    </connection>");
             }
             writer.WriteLine("</connections>");

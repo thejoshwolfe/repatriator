@@ -12,5 +12,6 @@ namespace repatriator_client
         public int port;
         public string username;
         public string password = ""; // empty string means no saved password
+        public string downloadDirectory = null;
     }
 }

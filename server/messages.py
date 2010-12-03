@@ -320,8 +320,8 @@ class FileDownloadResult(ServerMessage):
         buf = bytearray()
         try:
             file_size = os.path.getsize(self.file_path)
-            with open(self.file_path) as f:
-                buf.extend(file_size)
+            with open(self.file_path, "rb") as f:
+                buf.extend(struct.pack(">q", file_size))
                 buf.extend(f.read())
         except (OSError, IOError):
             buf.extend(struct.pack(">q", 0))

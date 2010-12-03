@@ -11,16 +11,19 @@ namespace repatriator_client
     {
         private ButterflyControl butterflyControl;
         private ConnectionManager connectionManager;
+        private ConnectionSettings account;
 
-        public MainWindow(ConnectionManager connectionManager)
+        public MainWindow(ConnectionManager connectionManager, ConnectionSettings account)
         {
             this.connectionManager = connectionManager;
+            this.account = account;
 
             InitializeComponent();
 
             butterflyControl = new ButterflyControl();
             butterflyElemtnHost.Child = butterflyControl;
         }
+
         private void MainWindow_Load(object sender, EventArgs e)
         {
             // attach handlers after the gui has initialized
@@ -77,10 +80,20 @@ namespace repatriator_client
 
         private void downloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // make sure we have a download dir
+            if (account.downloadDirectory == null)
+            {
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                if (dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.Cancel)
+                    return;
+                account.downloadDirectory = dialog.SelectedPath;
+                Settings.save();
+            }
+
             // send download file messages for each file
             for (int i = 0; i < directoryListView.SelectedIndices.Count; ++i)
             {
-                string filename = directoryListView.SelectedIndices[i].ToString();
+                string filename = directoryListView.Items[directoryListView.SelectedIndices[i]].Text;
                 connectionManager.downloadFile(filename);
             }
         }

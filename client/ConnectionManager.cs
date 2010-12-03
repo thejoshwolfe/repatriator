@@ -31,7 +31,6 @@ namespace repatriator_client
         private bool hardware;
         private string _password;
         public string password { set { _password = value; } }
-        private string downloadDirectory;
 
         private Socket socket;
         private StreamManager socketStream;
@@ -145,10 +144,10 @@ namespace repatriator_client
         private int nextDownloadNumber = 0;
         private string getNextDownloadFilename()
         {
-            HashSet<string> existingNames = new HashSet<string>(Directory.GetFiles(downloadDirectory));
+            HashSet<string> existingNames = new HashSet<string>(Directory.GetFiles(connection.downloadDirectory));
             while (true)
             {
-                string filename = downloadDirectory + "/img_" + nextDownloadNumber.ToString("0000");
+                string filename = connection.downloadDirectory + "/img_" + nextDownloadNumber.ToString("0000") + ".jpg";
                 if (!File.Exists(filename))
                     return filename;
                 nextDownloadNumber += 1;

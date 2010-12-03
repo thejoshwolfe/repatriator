@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("asdf", 0);
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("fdsa", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
@@ -88,9 +86,6 @@
             // 
             this.directoryListView.ContextMenuStrip = this.directoryContextMenu;
             this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.directoryListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
             this.directoryListView.LargeImageList = this.directoryImageList;
             this.directoryListView.Location = new System.Drawing.Point(0, 0);
             this.directoryListView.Name = "directoryListView";
