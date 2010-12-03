@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace repatriator_client
 {
@@ -69,6 +70,13 @@ namespace repatriator_client
                 }
             }
             return -1;
+        }
+
+        public static Point add(Point a, Point b)
+        {
+            Point result = a;
+            a.Offset(b);
+            return a;
         }
     }
 }

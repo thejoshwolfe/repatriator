@@ -86,6 +86,9 @@
     <Compile Include="EditUserAccountWindow.Designer.cs">
       <DependentUpon>EditUserAccountWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="ShadowMinimap.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ShadowSlider.cs">
       <SubType>Component</SubType>
     </Compile>

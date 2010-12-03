@@ -16,8 +16,10 @@ namespace repatriator_client
             get { return shadowPosition; }
             set
             {
-                if (!(0 <= value && value <= maxPosition))
-                    return;
+                if (value < 0)
+                    value = 0;
+                else if (value > maxPosition)
+                    value = maxPosition;
                 shadowPosition = value;
                 this.Refresh();
             }
@@ -28,8 +30,10 @@ namespace repatriator_client
             get { return position; }
             set
             {
-                if (!(0 <= value && value <= maxPosition))
-                    return;
+                if (value < 0)
+                    value = 0;
+                else if (value > maxPosition)
+                    value = maxPosition;
                 position = value;
                 this.Refresh();
             }
@@ -41,7 +45,7 @@ namespace repatriator_client
             set
             {
                 if (value <= 0)
-                    return;
+                    value = 1;
                 maxPosition = value;
                 this.Refresh();
             }
@@ -57,12 +61,8 @@ namespace repatriator_client
             }
         }
 
-        public ShadowSlider()
-        {
-            ShadowPosition = 20;
-            Position = 80;
-            MaxPosition = 100;
-        }
+        // enable double buffering
+        protected override bool DoubleBuffered { get { return true; } set { base.DoubleBuffered = value; } }
 
         private Point mouseOrign;
         private int positionOrigin;
@@ -107,7 +107,7 @@ namespace repatriator_client
                     positionChosen();
         }
 
-        private const int endMargin = 3;
+        private const int endMargin = 4;
         private int trackWidth { get { return this.Width - endMargin * 2; } }
         private int trackHeight { get { return this.Height - endMargin * 2; } }
         private float pixelsPerPositionX { get { return trackWidth / (float)maxPosition; } }
@@ -118,7 +118,7 @@ namespace repatriator_client
         {
             const int trackBreadth = 4;
             const int thumbBreadth = 15;
-            const int thumbSpan = 8;
+            const int thumbSpan = endMargin * 2;
 
             base.OnPaint(e);
             Graphics g = e.Graphics;
@@ -131,11 +131,11 @@ namespace repatriator_client
                 g.FillRectangle(Brushes.LightGray, centerX - trackBreadth / 2, endMargin, trackBreadth, trackHeight);
 
                 // shadow
-                int shadowCenterY = valueToY(ShadowPosition);
+                int shadowCenterY = valueToY(shadowPosition);
                 g.FillRectangle(Brushes.DarkGray, centerX - thumbBreadth / 2, shadowCenterY - thumbSpan / 2, thumbBreadth, thumbSpan);
 
                 // thumb
-                int thumbCenterY =  valueToY(Position);
+                int thumbCenterY = valueToY(position);
                 g.FillRectangle(Brushes.Black, centerX - thumbBreadth / 2, thumbCenterY - thumbSpan / 2, thumbBreadth, thumbSpan);
             }
             else
@@ -145,11 +145,11 @@ namespace repatriator_client
                 g.FillRectangle(Brushes.LightGray, endMargin, centerY - trackBreadth / 2, trackWidth, trackBreadth);
 
                 // shadow
-                int shadowCenterX = valueToX(ShadowPosition);
+                int shadowCenterX = valueToX(shadowPosition);
                 g.FillRectangle(Brushes.DarkGray, shadowCenterX - thumbSpan / 2, centerY - thumbBreadth / 2, thumbSpan, thumbBreadth);
 
                 // thumb
-                int thumbCenterX = valueToX(Position);
+                int thumbCenterX = valueToX(position);
                 g.FillRectangle(Brushes.Black, thumbCenterX - thumbSpan / 2, centerY - thumbBreadth / 2, thumbSpan, thumbBreadth);
             }
         }
