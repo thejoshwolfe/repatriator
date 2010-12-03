@@ -31,6 +31,8 @@ namespace repatriator_client
             directoryImageList.Images.Clear();
 
             connectionManager.refreshDirectoryList();
+
+            enableCorrectControls();
         }
 
         private void connectionManager_directoryListUpdated()
@@ -71,6 +73,38 @@ namespace repatriator_client
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             connectionManager.close();
+        }
+
+        private void downloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // send download file messages for each file
+            for (int i = 0; i < directoryListView.SelectedIndices.Count; ++i)
+            {
+                string filename = directoryListView.SelectedIndices[i].ToString();
+                connectionManager.downloadFile(filename);
+            }
+        }
+
+        private void discardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // send delete file messages for each file
+            for (int i = 0; i < directoryListView.SelectedIndices.Count; ++i)
+            {
+                string filename = directoryListView.Items[directoryListView.SelectedIndices[i]].Text;
+                connectionManager.deleteFile(filename);
+            }
+        }
+
+        private void enableCorrectControls()
+        {
+            bool an_item_is_selected = directoryListView.SelectedIndices.Count > 0;
+            downloadToolStripMenuItem.Enabled = an_item_is_selected;
+            discardToolStripMenuItem.Enabled = an_item_is_selected;
+        }
+
+        private void directoryListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            enableCorrectControls();
         }
     }
 }
