@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("asdf", 0);
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("fdsa", 0);
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("asdf", 0);
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("fdsa", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.liveViewPictureBox = new System.Windows.Forms.PictureBox();
             this.takePictureButton = new System.Windows.Forms.Button();
@@ -42,10 +42,10 @@
             this.directoryImageList = new System.Windows.Forms.ImageList(this.components);
             this.downlaodAllButton = new System.Windows.Forms.Button();
             this.liftSliderZ = new System.Windows.Forms.Panel();
+            this.shadowSlider1 = new repatriator_client.ShadowSlider();
             this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
             this.lifeSliderZ = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.shadowSlider1 = new repatriator_client.ShadowSlider();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.directoryContextMenu.SuspendLayout();
@@ -89,8 +89,8 @@
             this.directoryListView.ContextMenuStrip = this.directoryContextMenu;
             this.directoryListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.directoryListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3,
-            listViewItem4});
+            listViewItem1,
+            listViewItem2});
             this.directoryListView.LargeImageList = this.directoryImageList;
             this.directoryListView.Location = new System.Drawing.Point(0, 0);
             this.directoryListView.Name = "directoryListView";
@@ -98,6 +98,7 @@
             this.directoryListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.directoryListView.TabIndex = 1;
             this.directoryListView.UseCompatibleStateImageBehavior = false;
+            this.directoryListView.SelectedIndexChanged += new System.EventHandler(this.directoryListView_SelectedIndexChanged);
             // 
             // directoryContextMenu
             // 
@@ -112,12 +113,14 @@
             this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
             this.downloadToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.downloadToolStripMenuItem.Text = "Do&wnload";
+            this.downloadToolStripMenuItem.Click += new System.EventHandler(this.downloadToolStripMenuItem_Click);
             // 
             // discardToolStripMenuItem
             // 
             this.discardToolStripMenuItem.Name = "discardToolStripMenuItem";
             this.discardToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.discardToolStripMenuItem.Text = "&Discard";
+            this.discardToolStripMenuItem.Click += new System.EventHandler(this.discardToolStripMenuItem_Click);
             // 
             // directoryImageList
             // 
@@ -148,6 +151,18 @@
             this.liftSliderZ.Size = new System.Drawing.Size(117, 362);
             this.liftSliderZ.TabIndex = 11;
             // 
+            // shadowSlider1
+            // 
+            this.shadowSlider1.Location = new System.Drawing.Point(3, 127);
+            this.shadowSlider1.MaxPosition = 100;
+            this.shadowSlider1.Name = "shadowSlider1";
+            this.shadowSlider1.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.shadowSlider1.Position = 80;
+            this.shadowSlider1.ShadowPosition = 20;
+            this.shadowSlider1.Size = new System.Drawing.Size(17, 68);
+            this.shadowSlider1.TabIndex = 10;
+            this.shadowSlider1.Text = "shadowSlider1";
+            // 
             // butterflyElemtnHost
             // 
             this.butterflyElemtnHost.Location = new System.Drawing.Point(26, 127);
@@ -174,18 +189,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(427, 362);
             this.panel3.TabIndex = 12;
-            // 
-            // shadowSlider1
-            // 
-            this.shadowSlider1.Location = new System.Drawing.Point(3, 127);
-            this.shadowSlider1.MaxPosition = 100;
-            this.shadowSlider1.Name = "shadowSlider1";
-            this.shadowSlider1.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.shadowSlider1.Position = 80;
-            this.shadowSlider1.ShadowPosition = 20;
-            this.shadowSlider1.Size = new System.Drawing.Size(17, 68);
-            this.shadowSlider1.TabIndex = 10;
-            this.shadowSlider1.Text = "shadowSlider1";
             // 
             // MainWindow
             // 

@@ -264,7 +264,14 @@ namespace repatriator_client
         {
             socketStream.writeTakePicture();
         }
-
+        public void deleteFile(string filename)
+        {
+            socketStream.writeDeleteFile(filename);
+        }
+        public void downloadFile(string filename)
+        {
+            socketStream.writeFileDownloadRequest(filename);
+        }
         private enum ConnectionState
         {
             Inactive, Trying, Cancelling, GoodConnection,
@@ -432,6 +439,12 @@ namespace repatriator_client
             public void writeListUserRequest()
             {
                 writeSimpleMessage(RequestTypes.ListUserRequest);
+            }
+            public void writeDeleteFile(string filename)
+            {
+                FakeStreamWriter buffer = new FakeStreamWriter();
+                buffer.writeString(filename);
+                writeBufferedMessage(RequestTypes.FileDeleteRequest, buffer);
             }
             private void writeSimpleMessage(byte messageCode)
             {
