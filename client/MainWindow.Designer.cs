@@ -46,6 +46,8 @@
             this.butterflyElemtnHost = new System.Windows.Forms.Integration.ElementHost();
             this.lifeSliderZ = new System.Windows.Forms.TrackBar();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.shadowMinimap1 = new repatriator_client.ShadowMinimap();
+            this.shadowSlider2 = new repatriator_client.ShadowSlider();
             ((System.ComponentModel.ISupportInitialize)(this.liveViewPictureBox)).BeginInit();
             this.panel1.SuspendLayout();
             this.directoryContextMenu.SuspendLayout();
@@ -141,6 +143,8 @@
             // liftSliderZ
             // 
             this.liftSliderZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.liftSliderZ.Controls.Add(this.shadowSlider2);
+            this.liftSliderZ.Controls.Add(this.shadowMinimap1);
             this.liftSliderZ.Controls.Add(this.shadowSlider1);
             this.liftSliderZ.Controls.Add(this.butterflyElemtnHost);
             this.liftSliderZ.Controls.Add(this.takePictureButton);
@@ -190,6 +194,29 @@
             this.panel3.Size = new System.Drawing.Size(427, 362);
             this.panel3.TabIndex = 12;
             // 
+            // shadowMinimap1
+            // 
+            this.shadowMinimap1.Location = new System.Drawing.Point(26, 12);
+            this.shadowMinimap1.MaxPosition = new System.Drawing.Point(100, 100);
+            this.shadowMinimap1.Name = "shadowMinimap1";
+            this.shadowMinimap1.Position = new System.Drawing.Point(80, 80);
+            this.shadowMinimap1.ShadowPosition = new System.Drawing.Point(20, 20);
+            this.shadowMinimap1.Size = new System.Drawing.Size(79, 68);
+            this.shadowMinimap1.TabIndex = 11;
+            this.shadowMinimap1.Text = "shadowMinimap1";
+            // 
+            // shadowSlider2
+            // 
+            this.shadowSlider2.Location = new System.Drawing.Point(26, 104);
+            this.shadowSlider2.MaxPosition = 100;
+            this.shadowSlider2.Name = "shadowSlider2";
+            this.shadowSlider2.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.shadowSlider2.Position = 80;
+            this.shadowSlider2.ShadowPosition = 20;
+            this.shadowSlider2.Size = new System.Drawing.Size(79, 17);
+            this.shadowSlider2.TabIndex = 12;
+            this.shadowSlider2.Text = "shadowSlider2";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -231,6 +258,8 @@
         private System.Windows.Forms.ToolStripMenuItem downloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem discardToolStripMenuItem;
         private ShadowSlider shadowSlider1;
+        private ShadowSlider shadowSlider2;
+        private ShadowMinimap shadowMinimap1;
 
     }
 }
