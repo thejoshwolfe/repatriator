@@ -69,12 +69,13 @@ namespace repatriator_client
         }
         public static string bytesToString(byte[] bytes)
         {
-            int jpegStart = bytes.indexOf(new byte[] { 0xff, 0xd8 });
-            if (jpegStart != -1)
-            {
-                // omit the jpeg
-                return bytesToString(bytes, 0, jpegStart + 5) + " ... jpeg ... " + bytesToString(bytes, bytes.Length - 5, 5);
-            }
+            // TODO: fix this
+            //int jpegStart = bytes.indexOf(new byte[] { 0xff, 0xd8 });
+            //if (jpegStart != -1)
+            //{
+            //    // omit the jpeg
+            //    return bytesToString(bytes, 0, jpegStart + 5) + " ... jpeg ... " + bytesToString(bytes, bytes.Length - 5, 5);
+            //}
             return bytesToString(bytes, 0, bytes.Length);
         }
         private static string bytesToString(byte[] bytes, int start, int length)
