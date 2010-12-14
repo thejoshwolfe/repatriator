@@ -456,6 +456,8 @@ def run_camera():
             error("Unable to get camera.")
             return
 
+        camera.setAutoFocusOn(True)
+
     def takePictureCallback(pic_file):
         # create a thumbnail
         make_thumbnail(pic_file, pic_file+".thumb", 90)
