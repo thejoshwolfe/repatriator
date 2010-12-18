@@ -4,5 +4,7 @@ obj
 *.pyc
 *.dll
 *.swp
+*-build-desktop
+*.pro.user
 server/config.py
 server/data/
