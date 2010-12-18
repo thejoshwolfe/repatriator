@@ -57,7 +57,7 @@ class Server:
             block = self.request.recv(byte_count - len(full_msg))
             full_msg.extend(block)
         return full_msg
-    
+
     def _read_message(self):
         """
         actually reads the message from the open connection.
@@ -76,11 +76,15 @@ class Server:
                     debug("closing connection and exiting thread")
                     self.request.shutdown(2)
                     return
-
-                self._write_message(item)
+                with self._current_full_update_lock:
+                    if item.message_type == ServerMessage.FullUpdate:
+                        item = self._current_full_update
+                        self._current_full_update = None
+                if item != None:
+                    self._write_message(item)
             except socket.error:
                 error("socket.error when writing message, exiting thread")
-                self.message_queue.put(DummyCloseConnection())
+                self.close()
                 return
 
     def _run_reader(self):
@@ -89,11 +93,11 @@ class Server:
                 data = self._read_message()
             except socket.error:
                 debug("socket.error when reading message, exiting thread")
-                self.message_queue.put(DummyCloseConnection())
+                self.close()
                 return
             except:
                 error("something bad happened when reading from socket: {0}".format(traceback.format_exc()))
-                self.message_queue.put(DummyCloseConnection())
+                self.close()
                 return
 
             message = None
@@ -112,6 +116,8 @@ class Server:
         self.on_connection_open = on_connection_open
         self.on_connection_close = on_connection_close
         self.message_queue = queue.Queue()
+        self._current_full_update_lock = threading.RLock()
+        self._current_full_update = None
 
         self.writer_thread = threading.Thread(target=self._run_writer, name="message writer")
         self.reader_thread = threading.Thread(target=self._run_reader, name="message reader")
@@ -128,6 +134,9 @@ class Server:
         message is a ServerMessage which will be put on the outgoing message queue.
         """
         debug("adding message to outgoing queue")
+        with self._current_full_update_lock:
+            if message.message_type == ServerMessage.FullUpdate:
+                self._current_full_update = message
         self.message_queue.put(message)
 
     def wait(self):
@@ -139,9 +148,9 @@ class Server:
         self.message_queue.put(DummyCloseConnection())
 
 
+invalid_ntfs_characters = set('\\/:*?"<>|' + "".join(chr(x) for x in range(0x20)))
 def valid_filename(filename):
-    invalid_characters = r'\\/:*?"<>|'
-    return not any([c in invalid_characters for c in filename])
+    return not any(c in invalid_ntfs_characters for c in filename)
 
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
@@ -161,7 +170,7 @@ def handle_ConnectionRequest(msg):
         server.send_message(ConnectionResult(ConnectionResult.InvalidLogin))
         server.close()
         return
-    
+
     # if they request hardware to turn on, make sure they have privileges
     if msg.hardware_flag and not user.has_privilege(Privilege.OperateHardware):
         warning(msg.username + " requested hardware access but doesn't have permission")
@@ -173,7 +182,7 @@ def handle_ConnectionRequest(msg):
         server.send_message(ConnectionResult(ConnectionResult.InsufficientPrivileges, user.privileges()))
         server.close()
         return
-        
+
     debug("Successful login for user " + msg.username)
     server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges()))
 
@@ -211,7 +220,7 @@ def handle_TakePicture(msg):
 def handle_MotorMovement(msg):
     global motors
     debug("Got motor movement message")
-    
+
     for char, motor in motors.items():
         motor.goToPosition(msg.motor_pos[char])
 
@@ -241,7 +250,7 @@ def handle_FileDownloadRequest(msg):
         warning("filename which user supplied to download does not exist: {0}".format(msg.filename))
         server.send_message(ErrorMessage(ErrorMessage.FileDoesNotExist))
         return
-    
+
     server.send_message(FileDownloadResult(target_file))
 
 @must_have_privilege(Privilege.OperateHardware)
@@ -273,7 +282,7 @@ def handle_FileDeleteRequest(msg):
 def handle_ChangePasswordRequest(msg):
     global server
     debug("Got change password message")
-    
+
     global user
     try:
         user.change_password(msg.old_password, msg.new_password)
@@ -301,7 +310,7 @@ def handle_AddUser(msg):
 def handle_UpdateUser(msg):
     global server
     debug("Got update user message")
-    
+
     target_user = auth.get_user(msg.username)
     if target_user is None:
         warning("user {0} does not exist, sending error message".format(msg.username))
@@ -506,7 +515,7 @@ def on_connection_close():
 
     debug("waiting for message thread to join")
     if message_thread is not None:
-        message_queue.put(DummyCloseConnection)
+        message_queue.put(DummyCloseConnection())
         message_thread.join()
 
     # shutdown motors
@@ -617,3 +626,4 @@ def initialize_hardware():
 
 if __name__ == "__main__":
     start_server()
+
