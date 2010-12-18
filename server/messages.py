@@ -260,17 +260,17 @@ class FullUpdate(ServerMessage):
             warning("bad image data: invalid header")
             self.jpeg = bytearray()
         else:
-            ff_flag = False
+            just_saw_ff = False
             for b in frame_buffer:
                 self.jpeg.append(ord(b))
                 if b == b'\xff':
-                    ff_flag = True
-                elif b == b'\xd9' and ff_flag:
+                    just_saw_ff = True
+                elif just_saw_ff and b == b'\xd9':
                     break
                 else:
-                    ff_flag = False
+                    just_saw_ff = False
             else:
-                warning("bad image data: could not find ff flag")
+                warning("bad image data: could not find end of image (0xffd9)")
                 self.jpeg = bytearray()
 
     def _serialize(self):
