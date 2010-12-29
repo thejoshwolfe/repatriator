@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/general">
+        <file>resource/bug.ico</file>
+    </qresource>
+</RCC>

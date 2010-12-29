@@ -15,13 +15,31 @@ SOURCES += main.cpp\
     IncomingMessage.cpp \
     OutgoingMessage.cpp \
     Server.cpp \
-    IncomingMessageParser.cpp
+    IncomingMessageParser.cpp \
+    ConnectionWindow.cpp \
+    AdminWindow.cpp \
+    EditConnectionWindow.cpp \
+    EditUserAccountWindow.cpp \
+    PasswordInputWindow.cpp
 
 HEADERS  += MainWindow.h \
     ConnectionSettings.h \
     IncomingMessage.h \
     OutgoingMessage.h \
     Server.h \
-    IncomingMessageParser.h
+    IncomingMessageParser.h \
+    ConnectionWindow.h \
+    AdminWindow.h \
+    EditConnectionWindow.h \
+    EditUserAccountWindow.h \
+    PasswordInputWindow.h
 
-FORMS    += MainWindow.ui
+FORMS    += MainWindow.ui \
+    ConnectionWindow.ui \
+    AdminWindow.ui \
+    EditConnectionWindow.ui \
+    EditUserAccountWindow.ui \
+    PasswordInputWindow.ui
+
+RESOURCES += \
+    repatriator.qrc
