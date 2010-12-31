@@ -190,7 +190,7 @@ void Server::changeLoginState(ServerTypes::LoginStatus state)
 QString Server::getNextDownloadFilename()
 {
     forever {
-        QDir folder(m_connection_info.downloadDirectory);
+        QDir folder(m_connection_info.download_directory);
         QString filename = folder.absoluteFilePath(QString("img_") + QString::number(m_nextDownloadNumber) + QString(".jpg"));
         if (! QFileInfo(filename).exists())
             return filename;
@@ -208,4 +208,9 @@ void Server::finishWritingAndDisconnect()
 {
     // put a dummy message on the queue
     this->sendMessage(QSharedPointer<OutgoingMessage>(new DummyDisconnectMessage()));
+}
+
+ServerTypes::LoginStatus Server::loginStatus()
+{
+    return m_login_state;
 }

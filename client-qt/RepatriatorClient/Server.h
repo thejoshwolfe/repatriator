@@ -50,6 +50,9 @@ public slots:
     // finishes up the outgoing message queue and then performs socketDisconnect.
     void finishWritingAndDisconnect();
 
+public:
+    ServerTypes::LoginStatus loginStatus();
+
 private:
     static const int c_client_major_version;
     static const int c_client_minor_version;

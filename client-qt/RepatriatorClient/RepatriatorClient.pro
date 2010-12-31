@@ -27,7 +27,8 @@ SOURCES += \
     Connector.cpp \
     ShadowMinimap.cpp \
     ShadowSlider.cpp \
-    Rotate3DWidget.cpp
+    Rotate3DWidget.cpp \
+    ImageDisplayWidget.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     MetaTypes.h \
     ShadowMinimap.h \
     ShadowSlider.h \
-    Rotate3DWidget.h
+    Rotate3DWidget.h \
+    ImageDisplayWidget.h
 
 FORMS += \
     MainWindow.ui \

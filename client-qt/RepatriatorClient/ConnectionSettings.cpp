@@ -7,7 +7,7 @@ ConnectionSettings::ConnectionSettings() :
     port(0),
     username(),
     password(""),
-    downloadDirectory()
+    download_directory()
 {}
 
 ConnectionSettings * ConnectionSettings::loadSettings(QSettings *settings, QString prefix)
@@ -17,7 +17,7 @@ ConnectionSettings * ConnectionSettings::loadSettings(QSettings *settings, QStri
     cs->port = settings->value(prefix + "port", cs->port).toInt();
     cs->username = settings->value(prefix + "username", cs->username).toString();
     cs->password = settings->value(prefix + "password", cs->password).toString();
-    cs->downloadDirectory = settings->value(prefix + "downloadDirectory", cs->downloadDirectory).toString();
+    cs->download_directory = settings->value(prefix + "downloadDirectory", cs->download_directory).toString();
     return cs;
 }
 
@@ -27,5 +27,5 @@ void ConnectionSettings::saveSettings(QSettings *settings, QString prefix)
     settings->setValue(prefix + "port", port);
     settings->setValue(prefix + "username", username);
     settings->setValue(prefix + "password", password);
-    settings->setValue(prefix + "downloadDirectory", downloadDirectory);
+    settings->setValue(prefix + "downloadDirectory", download_directory);
 }

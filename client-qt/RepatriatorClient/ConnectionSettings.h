@@ -12,7 +12,7 @@ public:
     int port;
     QString username;
     QString password; // empty string means no saved password
-    QString downloadDirectory;
+    QString download_directory;
 
     ConnectionSettings();
 
