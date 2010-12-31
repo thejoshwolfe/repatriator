@@ -25,6 +25,7 @@ def _hash_password(salt, password):
 def _build_path(dirname):
     try:
         os.makedirs(dirname)
+        debug("made path %s" % dirname)
     except WindowsError as ex:
         pass
 
