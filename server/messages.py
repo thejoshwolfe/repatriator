@@ -187,6 +187,7 @@ class ServerMessage:
     FileDownloadResult = 4
     ErrorMessage = 5
     ListUserResult = 6
+    Ping = 7
 
     def serialize(self):
         """
@@ -205,6 +206,14 @@ class ServerMessage:
 __all__.append('DummyCloseConnection')
 class DummyCloseConnection:
     message_type = ServerMessage.DummyCloseConnection
+
+__all__.append('Ping')
+class Ping:
+    def __init__(self):
+        self.message_type = ServerMessage.Ping
+
+    def _serialize(self):
+        return bytes()
 
 __all__.append('MagicalResponse')
 class MagicalResponse(ServerMessage):

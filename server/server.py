@@ -188,6 +188,8 @@ def handle_ConnectionRequest(msg):
 
     if msg.hardware_flag:
         initialize_hardware()
+    else:
+        init_ping_thread()
 
 def must_have_privilege(privilege):
     def decorated(function):
@@ -374,7 +376,7 @@ need_camera_thread = {
 }
 
 def reset_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread
 
     # initialize variables
     finished = False
@@ -384,6 +386,7 @@ def reset_state():
     motors = None
     camera_thread_queue = queue.Queue()
     message_queue = queue.Queue()
+    ping_thread = None
 
 def start_message_loop():
     global message_thread
@@ -434,6 +437,19 @@ def run_message_loop():
         else:
             # handle directly
             message_handlers[msg.message_type](msg)
+
+def run_ping():
+    global finished
+
+    debug("running ping thread")
+
+    next_frame = time.time()
+    while not finished:
+        # if it's time, send a ping
+        now = time.time()
+        if now > next_frame:
+            server.send_message(Ping())
+            next_frame = now + 1.00
 
 def run_camera():
     global camera, message_handlers, message_queue, finished
@@ -502,16 +518,20 @@ def on_connection_open():
     debug("connection opening")
 
 def on_connection_close():
-    global finished, camera_thread, server_thread
+    global finished, camera_thread, server_thread, ping_thread
 
     debug("connection closing")
 
     # clean up
     finished = True
 
-    debug("waiting for camera thread to join")
     if camera_thread is not None:
+        debug("waiting for camera thread to join")
         camera_thread.join()
+
+    if ping_thread is not None:
+        debug("waiting for ping thread to join")
+        ping_thread.join()
 
     debug("waiting for message thread to join")
     if message_thread is not None:
@@ -531,6 +551,13 @@ def on_connection_close():
     start_message_loop()
 
     debug("ready for a new connection")
+
+def init_ping_thread():
+    global ping_thread, finished
+
+    finished = False
+    ping_thread = threading.Thread(target=run_ping, name="ping")
+    ping_thread.start()
 
 def initialize_hardware():
     global finished, camera_thread

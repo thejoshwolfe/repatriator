@@ -152,6 +152,9 @@ Messages:
                 for each permission granted:
                     int32 permission enum value 
 
+        Ping - server is just checking if you're still there
+            int8 - identifies this message as a Ping (enum value 12)
+            int64 - byte count of the entire message including this field
 
     From the client to the server:
 
@@ -240,5 +243,4 @@ Messages:
         ListUserRequest - requests a list of users on the system
             int8 - identifies this message as a ListUserRequest (enum value 11)
             int64 - byte count of the entire message including this field
-
 
