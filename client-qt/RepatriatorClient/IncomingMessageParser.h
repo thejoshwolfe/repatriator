@@ -5,14 +5,13 @@
 
 #include <QObject>
 #include <QIODevice>
+#include <QSharedPointer>
 
 class IncomingMessageParser : public QObject
 {
     Q_OBJECT
 public:
-    // this is so we can get a pointer to an instance, which  we need for
-    // qt's signals and slots mechanism.
-    static IncomingMessageParser * instance();
+    IncomingMessageParser(QIODevice * device);
 
     // return a child message class for the data
     // this method will not return until the entire message
@@ -22,12 +21,20 @@ public:
 signals:
     // emitted during message downloading
     void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * msg);
-private:
 
+    // emitted when we gather enough data to put together a message
+    void messageReceived(QSharedPointer<IncomingMessage> msg);
+private:
     static const int c_read_timeout_ms;
     static IncomingMessage * createMessageOfType(IncomingMessage::MessageCode type);
 
-    static IncomingMessageParser * s_instance;
+    QIODevice * m_device;
+
+    bool m_header_done;
+    IncomingMessage * m_in_progress_msg;
+
+private slots:
+    void readMessage();
 
 };
 

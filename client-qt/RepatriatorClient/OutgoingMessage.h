@@ -15,6 +15,7 @@ public:
 protected:
     enum MessageCode
     {
+        DummyDisconnect = -1,
         MagicalRequest = 0,
         ConnectionRequest = 1,
         TakePicture = 2,
@@ -34,6 +35,15 @@ protected:
     virtual MessageCode type() const = 0;
 
     static void writeString(QDataStream & stream, QString string);
+};
+
+class DummyDisconnectMessage : public OutgoingMessage
+{
+public:
+    DummyDisconnectMessage() {}
+protected:
+    virtual void writeMessageBody(QDataStream & ) {}
+    virtual MessageCode type() const { return DummyDisconnect; }
 };
 
 class MagicalRequestMessage : public OutgoingMessage

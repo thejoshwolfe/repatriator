@@ -5,8 +5,7 @@
 #include "Server.h"
 
 #include <QObject>
-
-class QProgressDialog;
+#include <QProgressDialog>
 
 // Connector will display a progress dialog and status and try to connect
 // to a ConnectionSettings.
@@ -43,7 +42,7 @@ signals:
 private:
     ConnectionSettings * m_connection;
     bool m_need_hardware;
-    QProgressDialog * m_progressDialog;
+    QSharedPointer<QProgressDialog> m_progressDialog;
     QSharedPointer<Server> m_server;
 
 private:
@@ -51,7 +50,7 @@ private:
     ~Connector() {}
 
     void fail(FailureReason reason);
-    void bye();
+    void cleanup(bool kill_connection = true);
 private slots:
     void updateProgressFromLoginStatus(ServerTypes::LoginStatus status);
     void cancel();

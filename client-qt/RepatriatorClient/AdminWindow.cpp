@@ -85,6 +85,8 @@ void AdminWindow::connected(QSharedPointer<Server> server)
     bool success;
     success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)), Qt::DirectConnection);
     Q_ASSERT(success);
+    success = connect(server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
+    Q_ASSERT(success);
 
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ListUserRequestMessage()));
 }
@@ -93,6 +95,12 @@ void AdminWindow::connectionFailure(Connector::FailureReason reason)
 {
     Q_UNUSED(reason);
     reject();
+}
+
+void AdminWindow::connectionEnded()
+{
+    this->close();
+    cleanup();
 }
 
 void AdminWindow::cleanup()
@@ -122,7 +130,7 @@ void AdminWindow::on_buttonBox_accepted()
         }
     }
 
-    cleanup();
+    m_server.data()->finishWritingAndDisconnect();
 }
 
 void AdminWindow::processMessage(QSharedPointer<IncomingMessage> msg)

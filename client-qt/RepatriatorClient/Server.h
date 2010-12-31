@@ -43,7 +43,12 @@ public slots:
 
     // use this to actually connect to the server
     void socketConnect();
+
+    // disconnects immediately, without finishing writing or reading messages.
     void socketDisconnect();
+
+    // finishes up the outgoing message queue and then performs socketDisconnect.
+    void finishWritingAndDisconnect();
 
 private:
     static const int c_client_major_version;

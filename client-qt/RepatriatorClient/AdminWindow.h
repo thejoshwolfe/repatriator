@@ -77,6 +77,7 @@ private slots:
     void connected(QSharedPointer<Server> server);
     void connectionFailure(Connector::FailureReason reason);
     void processMessage(QSharedPointer<IncomingMessage> msg);
+    void connectionEnded();
 };
 
 #endif // ADMINWINDOW_H

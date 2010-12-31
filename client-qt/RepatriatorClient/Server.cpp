@@ -20,16 +20,13 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
 {
     bool success;
 
-    success = connect(&m_socket, SIGNAL(connected()), this, SLOT(startReadAndWriteThreads()), Qt::DirectConnection);
+    success = connect(&m_socket, SIGNAL(connected()), this, SLOT(startReadAndWriteThreads()), Qt::QueuedConnection);
     Q_ASSERT(success);
 
-    success = connect(&m_socket, SIGNAL(disconnected()), this, SLOT(cleanUpAfterDisconnect()), Qt::DirectConnection);
+    success = connect(&m_socket, SIGNAL(disconnected()), this, SLOT(cleanUpAfterDisconnect()), Qt::QueuedConnection);
     Q_ASSERT(success);
 
     success = connect(&m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)), Qt::DirectConnection);
-    Q_ASSERT(success);
-
-    success = connect(IncomingMessageParser::instance(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SIGNAL(progress(qint64,qint64,IncomingMessage*)), Qt::DirectConnection);
     Q_ASSERT(success);
 }
 
@@ -52,22 +49,21 @@ void Server::socketDisconnect()
 
 void ReaderThread::run()
 {
-    forever {
-        QSharedPointer<IncomingMessage> msg = QSharedPointer<IncomingMessage>(IncomingMessageParser::instance()->readMessage(&m_server->m_socket));
-        if (msg.isNull()) {
-            // end the connecting
-            m_server->socketDisconnect();
-            break;
-        }
-        emit messageReceived(msg);
-    }
+    bool success;
+
+    QScopedPointer<IncomingMessageParser> parser(new IncomingMessageParser(&m_server->m_socket));
+
+    success = connect(parser.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)));
+    Q_ASSERT(success);
+
+    this->exec();
 }
 
 void WriterThread::run()
 {
     internal = new WriterThreadInternal(this);
     emit ready();
-    exec();
+    this->exec();
     delete internal;
 }
 
@@ -78,8 +74,14 @@ void WriterThreadInternal::queueMessage(QSharedPointer<OutgoingMessage> msg)
 
 void WriterThread::queueMessage(QSharedPointer<OutgoingMessage> msg)
 {
-    QDataStream stream(&m_server->m_socket);
-    msg.data()->writeToStream(stream);
+    if (dynamic_cast<DummyDisconnectMessage *>(msg.data()) != NULL) {
+        m_server->socketDisconnect();
+        return;
+    }
+    if (m_server->m_socket.isOpen()) {
+        QDataStream stream(&m_server->m_socket);
+        msg.data()->writeToStream(stream);
+    }
 }
 
 void Server::sendMessage(QSharedPointer<OutgoingMessage> message)
@@ -120,6 +122,7 @@ void Server::cleanUpAfterDisconnect()
     // reader thread will end itself when the connection is no longer valid,
     // but we need to tell writer thread to exit.
     m_writer_thread->exit();
+    m_reader_thread->exit();
 
     // wait till threads are done
     m_writer_thread->wait();
@@ -130,12 +133,19 @@ void Server::cleanUpAfterDisconnect()
     delete m_reader_thread;
     m_reader_thread = NULL;
 
-    emit socketDisconnected();
     changeLoginState(ServerTypes::Disconnected);
+    emit socketDisconnected();
 }
 
 void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
 {
+    if (msg.isNull()) {
+        // end the connection
+        qDebug() << "null message, socket disconnect";
+        socketDisconnect();
+        return;
+    }
+    qDebug() << "successfully read a message: " << msg.data()->type;
     // possibly handle the message (only for the initial setup)
     if (m_login_state == ServerTypes::WaitingForMagicalResponse && msg.data()->type == IncomingMessage::MagicalResponse) {
         MagicalResponseMessage * magic_msg = (MagicalResponseMessage *) msg.data();
@@ -191,4 +201,10 @@ void Server::handleSocketError(QAbstractSocket::SocketError error)
 {
     qDebug() << "Socket error: " << error;
     changeLoginState(ServerTypes::SocketError);
+}
+
+void Server::finishWritingAndDisconnect()
+{
+    // put a dummy message on the queue
+    this->sendMessage(QSharedPointer<OutgoingMessage>(new DummyDisconnectMessage()));
 }
