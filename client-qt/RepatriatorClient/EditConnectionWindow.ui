@@ -134,6 +134,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>addressLineEdit</tabstop>
+  <tabstop>portLineEdit</tabstop>
+  <tabstop>usernameLineEdit</tabstop>
+  <tabstop>savePasswordCheckBox</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="repatriator.qrc"/>
  </resources>

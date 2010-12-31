@@ -77,6 +77,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>usernameLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>adminCheckBox</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="repatriator.qrc"/>
  </resources>

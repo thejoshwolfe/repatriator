@@ -107,6 +107,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>usersList</tabstop>
+  <tabstop>changePasswordButton</tabstop>
+  <tabstop>deleteButton</tabstop>
+  <tabstop>adminPrivilegesCheckBox</tabstop>
+  <tabstop>newButton</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="repatriator.qrc"/>
  </resources>

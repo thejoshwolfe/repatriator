@@ -138,6 +138,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>connectionTable</tabstop>
+  <tabstop>adminButton</tabstop>
+  <tabstop>editButton</tabstop>
+  <tabstop>deleteButton</tabstop>
+  <tabstop>newButton</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="repatriator.qrc"/>
  </resources>
