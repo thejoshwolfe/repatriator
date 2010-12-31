@@ -1,10 +1,10 @@
 #include "AdminWindow.h"
 #include "ui_AdminWindow.h"
 
-#include "Connector.h"
 #include "OutgoingMessage.h"
 #include "PasswordInputWindow.h"
 #include "EditUserAccountWindow.h"
+#include "Connector.h"
 
 AdminWindow * AdminWindow::s_instance = NULL;
 
@@ -50,7 +50,7 @@ void AdminWindow::showAdmin(ConnectionSettings *connection)
     Connector * connector = Connector::create(connection, false);
 
     bool success;
-    success = connect(connector, SIGNAL(failure(int)), this, SLOT(connectionFailure(int)));
+    success = connect(connector, SIGNAL(failure(int)), this, SLOT(connectionFailure(int)), Qt::QueuedConnection);
     Q_ASSERT(success);
     success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
     Q_ASSERT(success);
@@ -81,10 +81,9 @@ void AdminWindow::on_buttonBox_rejected()
 
 void AdminWindow::connected(QSharedPointer<Server> server)
 {
-    bool success;
-
     m_server = server;
 
+    bool success;
     success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
 

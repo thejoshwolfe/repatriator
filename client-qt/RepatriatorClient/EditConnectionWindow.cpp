@@ -56,6 +56,8 @@ bool EditConnectionWindow::showNew(ConnectionSettings * connection)
     ui->savePasswordCheckBox->setChecked(false);
     ui->savePasswordCheckBox->setText("");
 
+    ui->addressLineEdit->setFocus(Qt::OtherFocusReason);
+
     enableCorrectControls();
 
     this->exec();
@@ -75,6 +77,8 @@ bool EditConnectionWindow::showEdit(ConnectionSettings * connection)
     bool save_password = connection->password.length() != 0;
     ui->savePasswordCheckBox->setChecked(save_password);
     ui->passwordLineEdit->setText(save_password ? c_static_password : "");
+
+    ui->addressLineEdit->setFocus(Qt::OtherFocusReason);
 
     enableCorrectControls();
 
@@ -104,8 +108,8 @@ void EditConnectionWindow::updateConnectionWithControls()
     m_connection->host = ui->addressLineEdit->text();
     m_connection->port = ui->portLineEdit->text().toInt();
     m_connection->username = ui->usernameLineEdit->text();
-    m_connection->password = (ui->savePasswordCheckBox->isChecked() && ui->passwordLineEdit->text() != c_static_password) ?
-        ui->passwordLineEdit->text() : "";
+    if (ui->savePasswordCheckBox->isChecked() && ui->passwordLineEdit->text() != c_static_password)
+        m_connection->password = ui->passwordLineEdit->text();
 }
 
 void EditConnectionWindow::on_savePasswordCheckBox_toggled(bool checked)

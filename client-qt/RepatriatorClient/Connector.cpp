@@ -25,21 +25,24 @@ void Connector::go()
     if (password.isEmpty()) {
         password = PasswordInputWindow::instance()->showGetPassword(tr("Authentication Required"), tr("&Login"), m_connection->username);
         if (password.isNull()) {
-            fail(Cancelled);
+            emit failure(Cancelled);
+            this->disconnect();
             delete this;
             return;
         }
     }
 
     m_server = QSharedPointer<Server>(new Server(*m_connection, password, m_need_hardware));
-    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(int)), this, SLOT(updateProgressFromLoginStatus(int)));
+    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(Server::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(Server::LoginStatus)));
     Q_ASSERT(success);
 
     m_progressDialog = new QProgressDialog();
+    m_progressDialog->setWindowModality(Qt::ApplicationModal);
     m_progressDialog->setWindowFlags(Qt::Dialog);
-    m_progressDialog->setWindowTitle(tr("Connecting to Server"));
+    m_progressDialog->setWindowTitle(tr("Initializing..."));
     m_progressDialog->setMinimum(0);
     m_progressDialog->setMaximum(4);
+    m_progressDialog->setMinimumDuration(0);
     success = connect(m_progressDialog, SIGNAL(canceled()), this, SLOT(cancel()));
     Q_ASSERT(success);
 
@@ -47,9 +50,8 @@ void Connector::go()
     m_server.data()->socketConnect();
 }
 
-void Connector::updateProgressFromLoginStatus(int _status)
+void Connector::updateProgressFromLoginStatus(Server::LoginStatus status)
 {
-    Server::LoginStatus status = (Server::LoginStatus) _status;
     switch(status) {
         case Server::Disconnected:
             m_progressDialog->setLabelText(tr("Disconnected."));
@@ -88,6 +90,11 @@ void Connector::updateProgressFromLoginStatus(int _status)
             m_progressDialog->setValue(4);
             emit success(m_server);
             bye();
+            return;
+        case Server::SocketError:
+            m_progressDialog->setLabelText(tr("Socket error."));
+            m_progressDialog->setValue(4);
+            fail(UnableToConnect);
             return;
     }
     Q_ASSERT(false);

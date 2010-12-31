@@ -27,6 +27,9 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
     success = connect(&m_socket, SIGNAL(disconnected()), this, SLOT(cleanUpAfterDisconnect()));
     Q_ASSERT(success);
 
+    success = connect(&m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
+    Q_ASSERT(success);
+
     connect(IncomingMessageParser::instance(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SIGNAL(progress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
 }
@@ -177,4 +180,10 @@ QString Server::getNextDownloadFilename()
             return filename;
         m_nextDownloadNumber += 1;
     }
+}
+
+void Server::handleSocketError(QAbstractSocket::SocketError error)
+{
+    qDebug() << "Socket error: " << error;
+    changeLoginState(SocketError);
 }

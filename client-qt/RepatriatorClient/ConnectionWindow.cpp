@@ -66,9 +66,7 @@ void ConnectionWindow::on_adminButton_clicked()
         int selected_row = ui->connectionTable->selectedItems().at(0)->row();
         ConnectionSettings * conn = Settings::connections.at(selected_row);
 
-        this->hide();
         AdminWindow::instance()->showAdmin(conn);
-        this->show();
     } else {
         refreshConnections();
     }

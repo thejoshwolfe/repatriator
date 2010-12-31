@@ -30,6 +30,7 @@ public:
         LoginIsInvalid,
         InsufficientPrivileges,
         Success,
+        SocketError,
     };
 
     enum Permission
@@ -71,7 +72,7 @@ signals:
     // memory leak.
     void messageReceived(QSharedPointer<IncomingMessage> message);
 
-    void loginStatusUpdated(int status); // LoginStatus
+    void loginStatusUpdated(Server::LoginStatus status); // LoginStatus
     void socketDisconnected();
 
     // gives you progress of incoming messages.
@@ -116,6 +117,7 @@ private slots:
     void startReadAndWriteThreads();
     void cleanUpAfterDisconnect();
     void processIncomingMessage(QSharedPointer<IncomingMessage>);
+    void handleSocketError(QAbstractSocket::SocketError);
 
     friend class ReaderThread;
     friend class WriterThread;

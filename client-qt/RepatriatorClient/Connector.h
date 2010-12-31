@@ -28,6 +28,8 @@ public:
 public:
     // use this instead of a constructor
     static Connector * create(ConnectionSettings * connection, bool need_hardware);
+
+public slots:
     // after you hook up your slots, call go. you will either get success
     // or failure.
     void go();
@@ -36,7 +38,7 @@ signals:
     // be careful because the object no longer exists when these signals are emitted.
     // success comes with a server pointer that is connected and authenticated.
     void success(QSharedPointer<Server> server);
-    void failure(int reason); // FailureReason
+    void failure(int reason); // type FailureReason
 
 private:
     ConnectionSettings * m_connection;
@@ -51,7 +53,7 @@ private:
     void fail(FailureReason reason);
     void bye();
 private slots:
-    void updateProgressFromLoginStatus(int);
+    void updateProgressFromLoginStatus(Server::LoginStatus status);
     void cancel();
 
 };
