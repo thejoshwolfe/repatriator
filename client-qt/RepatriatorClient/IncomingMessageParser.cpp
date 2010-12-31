@@ -31,14 +31,14 @@ IncomingMessage * IncomingMessageParser::readMessage(QIODevice * device)
 
     // wait for stream to fill up with entire message
     qint64 message_byte_count = total_byte_count - header_byte_count;
-    emit progress(qMin(device->bytesAvailable(), message_byte_count), message_byte_count);
+    emit progress(qMin(device->bytesAvailable(), message_byte_count), message_byte_count, msg);
     while (device->bytesAvailable() < message_byte_count) {
         if (! device->waitForReadyRead(c_read_timeout_ms)) {
             Q_ASSERT(false);
             qWarning() << "timeout when reading message body";
             return NULL;
         }
-        emit progress(qMin(device->bytesAvailable(), message_byte_count), message_byte_count);
+        emit progress(qMin(device->bytesAvailable(), message_byte_count), message_byte_count, msg);
     }
     msg->parse(stream);
 

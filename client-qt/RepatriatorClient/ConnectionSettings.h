@@ -3,6 +3,8 @@
 
 #include <QString>
 
+class QSettings;
+
 class ConnectionSettings
 {
 public:
@@ -12,13 +14,11 @@ public:
     QString password; // empty string means no saved password
     QString downloadDirectory;
 
-    ConnectionSettings() :
-        host(),
-        port(0),
-        username(),
-        password(""),
-        downloadDirectory()
-    {}
+    ConnectionSettings();
+
+    static ConnectionSettings * loadSettings(QSettings * settings, QString prefix);
+    void saveSettings(QSettings * settings, QString prefix);
+
 };
 
 #endif // CONNECTIONSETTINGS_H

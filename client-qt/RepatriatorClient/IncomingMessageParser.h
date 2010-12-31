@@ -21,7 +21,7 @@ public:
 
 signals:
     // emitted during message downloading
-    void progress(qint64 bytesTransferred, qint64 bytesTotal);
+    void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * msg);
 private:
 
     static const int c_read_timeout_ms;

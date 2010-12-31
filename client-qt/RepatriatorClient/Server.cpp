@@ -3,7 +3,6 @@
 #include <QDir>
 
 #include "IncomingMessageParser.h"
-#include "IncomingMessage.h"
 #include "OutgoingMessage.h"
 
 const int Server::c_client_major_version = 0;
@@ -28,11 +27,13 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
     success = connect(&m_socket, SIGNAL(disconnected()), this, SLOT(cleanUpAfterDisconnect()));
     Q_ASSERT(success);
 
-    success = connect(m_reader_thread, SIGNAL(messageReceived(IncomingMessage *)), this, SLOT(processIncomingMessage(IncomingMessage *)));
+    connect(IncomingMessageParser::instance(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SIGNAL(progress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
+}
 
-    success = connect(IncomingMessageParser::instance(), SIGNAL(progress(qint64,qint64)), this, SLOT(emitProgress(qint64,qint64)));
-    Q_ASSERT(success);
+Server::~Server()
+{
+    socketDisconnect();
 }
 
 void Server::socketConnect()
@@ -49,8 +50,8 @@ void Server::socketDisconnect()
 void ReaderThread::run()
 {
     forever {
-        IncomingMessage * msg = IncomingMessageParser::instance()->readMessage(&m_server->m_socket);
-        if (msg == NULL) {
+        QSharedPointer<IncomingMessage> msg = QSharedPointer<IncomingMessage>(IncomingMessageParser::instance()->readMessage(&m_server->m_socket));
+        if (msg.isNull()) {
             // end the connecting
             m_server->socketDisconnect();
             break;
@@ -87,10 +88,15 @@ void Server::sendMessage(OutgoingMessage *message)
 
 void Server::startReadAndWriteThreads()
 {
+    bool success;
+
     // reset state
     m_nextDownloadNumber = 1;
     m_reader_thread = new ReaderThread(this);
     m_writer_thread = new WriterThread(this);
+
+    success = connect(m_reader_thread, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processIncomingMessage(QSharedPointer<IncomingMessage>)));
+    Q_ASSERT(success);
 
     // kick off threads
     m_reader_thread->start();
@@ -119,11 +125,11 @@ void Server::cleanUpAfterDisconnect()
     changeLoginState(Disconnected);
 }
 
-void Server::processIncomingMessage(IncomingMessage *msg)
+void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
 {
     // possibly handle the message (only for the initial setup)
-    if (m_login_state == WaitingForMagicalResponse && msg->type == IncomingMessage::MagicalResponse) {
-        MagicalResponseMessage * magic_msg = (MagicalResponseMessage *) msg;
+    if (m_login_state == WaitingForMagicalResponse && msg.data()->type == IncomingMessage::MagicalResponse) {
+        MagicalResponseMessage * magic_msg = (MagicalResponseMessage *) msg.data();
         if (magic_msg->is_valid) {
             changeLoginState(WaitingForConnectionResult);
             sendMessage(new ConnectionRequestMessage(c_client_major_version, c_client_minor_version, c_client_build_version, m_connection_info.username, m_password, m_hardware));
@@ -133,8 +139,8 @@ void Server::processIncomingMessage(IncomingMessage *msg)
             socketDisconnect();
             return;
         }
-    } else if (m_login_state == WaitingForConnectionResult && msg->type == IncomingMessage::ConnectionResult) {
-        ConnectionResultMessage * connection_result = (ConnectionResultMessage *) msg;
+    } else if (m_login_state == WaitingForConnectionResult && msg.data()->type == IncomingMessage::ConnectionResult) {
+        ConnectionResultMessage * connection_result = (ConnectionResultMessage *) msg.data();
         if (connection_result->connection_status == ConnectionResultMessage::InsufficientPrivileges) {
             changeLoginState(InsufficientPrivileges);
             socketDisconnect();
@@ -159,11 +165,6 @@ void Server::changeLoginState(LoginStatus state)
 {
     m_login_state = state;
     emit loginStatusUpdated(Connecting);
-}
-
-void Server::emitProgress(qint64 bytesTransferred, qint64 bytesTotal)
-{
-    emit progress(bytesTransferred, bytesTotal);
 }
 
 QString Server::getNextDownloadFilename()

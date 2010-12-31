@@ -7,6 +7,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QImage>
+#include <QSharedPointer>
 
 class IncomingMessage;
 class OutgoingMessage;
@@ -50,21 +51,31 @@ public:
         QString filename;
         QImage thumbnail;
     };
+public:
+    explicit Server(ConnectionSettings connection_info, QString password, bool hardware);
+    ~Server();
+
+signals:
+    // use this signal to listen for incoming messages
+    // YOU are responsible for deleting them when done.
+    // that means if you don't listen to this signal, you have a giant
+    // memory leak.
+    void messageReceived(QSharedPointer<IncomingMessage> message);
+
+    void loginStatusUpdated(int status); // LoginStatus
+    void socketDisconnected();
+
+    // gives you progress of incoming messages.
+    // don't try to access the data of message because it will be garbage. do that in
+    // messageReceived. use it only to tell messages apart.
+    void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * message);
 
 public slots:
     void sendMessage(OutgoingMessage * message);
 
+    // use this to actually connect to the server
     void socketConnect();
     void socketDisconnect();
-
-signals:
-    void messageReceived(IncomingMessage * message);
-    void loginStatusUpdated(LoginStatus status);
-    void socketDisconnected();
-    void progress(qint64 bytesTransferred, qint64 bytesTotal);
-
-public:
-    explicit Server(ConnectionSettings connection_info, QString password, bool hardware);
 
 private:
     static const int c_client_major_version;
@@ -95,8 +106,7 @@ private:
 private slots:
     void startReadAndWriteThreads();
     void cleanUpAfterDisconnect();
-    void processIncomingMessage(IncomingMessage * msg);
-    void emitProgress(qint64 bytesTransferred, qint64 bytesTotal);
+    void processIncomingMessage(QSharedPointer<IncomingMessage>);
 
     friend class ReaderThread;
     friend class WriterThread;
@@ -109,7 +119,7 @@ public:
     ReaderThread(Server * server) : m_server(server) {}
     void run();
 signals:
-    void messageReceived(IncomingMessage * message);
+    void messageReceived(QSharedPointer<IncomingMessage> message);
 private:
     Server * m_server;
 };

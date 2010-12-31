@@ -4,14 +4,15 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT += core gui network
 
 TARGET = RepatriatorClient
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        MainWindow.cpp \
+SOURCES += \
+    main.cpp \
+    MainWindow.cpp \
     IncomingMessage.cpp \
     OutgoingMessage.cpp \
     Server.cpp \
@@ -20,9 +21,13 @@ SOURCES += main.cpp\
     AdminWindow.cpp \
     EditConnectionWindow.cpp \
     EditUserAccountWindow.cpp \
-    PasswordInputWindow.cpp
+    PasswordInputWindow.cpp \
+    Settings.cpp \
+    ConnectionSettings.cpp \
+    Connector.cpp
 
-HEADERS  += MainWindow.h \
+HEADERS += \
+    MainWindow.h \
     ConnectionSettings.h \
     IncomingMessage.h \
     OutgoingMessage.h \
@@ -32,9 +37,12 @@ HEADERS  += MainWindow.h \
     AdminWindow.h \
     EditConnectionWindow.h \
     EditUserAccountWindow.h \
-    PasswordInputWindow.h
+    PasswordInputWindow.h \
+    Settings.h \
+    Connector.h
 
-FORMS    += MainWindow.ui \
+FORMS += \
+    MainWindow.ui \
     ConnectionWindow.ui \
     AdminWindow.ui \
     EditConnectionWindow.ui \

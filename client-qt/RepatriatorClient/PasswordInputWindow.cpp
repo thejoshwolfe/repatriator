@@ -1,6 +1,8 @@
 #include "PasswordInputWindow.h"
 #include "ui_PasswordInputWindow.h"
 
+PasswordInputWindow * PasswordInputWindow::s_instance = NULL;
+
 PasswordInputWindow::PasswordInputWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PasswordInputWindow)
@@ -23,4 +25,30 @@ void PasswordInputWindow::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+PasswordInputWindow * PasswordInputWindow::instance()
+{
+    if (! s_instance)
+        s_instance = new PasswordInputWindow();
+    return s_instance;
+}
+
+QString PasswordInputWindow::showGetPassword(QString username)
+{
+    ui->usernameLabel->setText(username);
+    ui->passwordLineEdit->setText("");
+    ui->passwordLineEdit->setFocus(Qt::OtherFocusReason);
+    this->exec();
+    return m_return_password;
+}
+
+void PasswordInputWindow::on_buttonBox_accepted()
+{
+    m_return_password = ui->passwordLineEdit->text();
+}
+
+void PasswordInputWindow::on_buttonBox_rejected()
+{
+    m_return_password = QString();
 }
