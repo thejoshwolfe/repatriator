@@ -43,6 +43,15 @@ public:
     public:
         QString username;
         QSet<Permission> permissions;
+
+        UserInfo(QString username, QSet<Permission> permissions) :
+            username(username),
+            permissions(permissions)
+        {}
+        UserInfo() :
+            username(),
+            permissions()
+        {}
     };
 
     class DirectoryItem

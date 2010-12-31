@@ -17,6 +17,12 @@ ConnectionWindow::ConnectionWindow(QWidget *parent) :
     ui(new Ui::ConnectionWindow)
 {
     ui->setupUi(this);
+
+    m_loginButton = new QPushButton(tr("&Login"), this);
+
+    ui->buttonBox->clear();
+    ui->buttonBox->addButton(m_loginButton, QDialogButtonBox::AcceptRole);
+    ui->buttonBox->addButton(QDialogButtonBox::Cancel);
 }
 
 ConnectionWindow::~ConnectionWindow()
@@ -50,11 +56,6 @@ ConnectionWindow * ConnectionWindow::instance()
     if (! s_instance)
         s_instance = new ConnectionWindow();
     return s_instance;
-}
-
-void ConnectionWindow::on_cancelButton_clicked()
-{
-    this->close();
 }
 
 void ConnectionWindow::on_adminButton_clicked()
@@ -127,7 +128,7 @@ void ConnectionWindow::enableCorrectControls()
     ui->adminButton->setEnabled(enableButtons);
     ui->editButton->setEnabled(enableButtons);
     ui->deleteButton->setEnabled(enableButtons);
-    ui->loginButton->setEnabled(enableButtons);
+    m_loginButton->setEnabled(enableButtons);
 }
 
 void ConnectionWindow::on_editButton_clicked()
@@ -157,7 +158,23 @@ void ConnectionWindow::on_deleteButton_clicked()
     refreshConnections();
 }
 
-void ConnectionWindow::on_loginButton_clicked()
+void ConnectionWindow::on_connectionTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+    Q_UNUSED(currentRow);
+    Q_UNUSED(currentColumn);
+    Q_UNUSED(previousRow);
+    Q_UNUSED(previousColumn);
+    enableCorrectControls();
+}
+
+void ConnectionWindow::on_connectionTable_cellDoubleClicked(int row, int column)
+{
+    Q_UNUSED(row);
+    Q_UNUSED(column);
+    on_buttonBox_accepted();
+}
+
+void ConnectionWindow::on_buttonBox_accepted()
 {
     Q_ASSERT(ui->connectionTable->selectedItems().count() == 3);
 
@@ -172,16 +189,7 @@ void ConnectionWindow::on_loginButton_clicked()
     }
 }
 
-void ConnectionWindow::on_connectionTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+void ConnectionWindow::on_buttonBox_rejected()
 {
-    Q_UNUSED(currentRow);
-    Q_UNUSED(currentColumn);
-    Q_UNUSED(previousRow);
-    Q_UNUSED(previousColumn);
-    enableCorrectControls();
-}
-
-void ConnectionWindow::on_connectionTable_cellDoubleClicked(int row, int column)
-{
-    on_loginButton_clicked();
+    this->close();
 }

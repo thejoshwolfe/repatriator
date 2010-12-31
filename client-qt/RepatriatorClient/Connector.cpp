@@ -23,7 +23,7 @@ void Connector::go()
 
     QString password = m_connection->password;
     if (password.isEmpty()) {
-        password = PasswordInputWindow::instance()->showGetPassword(m_connection->username);
+        password = PasswordInputWindow::instance()->showGetPassword(tr("Authentication Required"), tr("&Login"), m_connection->username);
         if (password.isNull()) {
             fail(Cancelled);
             delete this;

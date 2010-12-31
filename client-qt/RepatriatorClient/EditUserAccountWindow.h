@@ -12,14 +12,33 @@ class EditUserAccountWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit EditUserAccountWindow(QWidget *parent = 0);
-    ~EditUserAccountWindow();
+    class UserAccount {
+    public:
+        QString username;
+        QString password;
+        bool is_admin;
+    };
+
+public:
+    static EditUserAccountWindow * instance();
+
+    QSharedPointer<UserAccount> showGetNewUser();
+    void showEditUser(QSharedPointer<UserAccount> account);
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
+    explicit EditUserAccountWindow(QWidget *parent = 0);
+    ~EditUserAccountWindow();
     Ui::EditUserAccountWindow *ui;
+    static EditUserAccountWindow * s_instance;
+
+    QSharedPointer<UserAccount> m_account;
+
+private slots:
+    void on_buttonBox_rejected();
+    void on_buttonBox_accepted();
 };
 
 #endif // EDITUSERACCOUNTWINDOW_H

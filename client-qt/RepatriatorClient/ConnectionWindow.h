@@ -2,6 +2,7 @@
 #define CONNECTIONWINDOW_H
 
 #include <QDialog>
+#include <QPushButton>
 
 namespace Ui {
     class ConnectionWindow;
@@ -23,6 +24,8 @@ private:
 
     static ConnectionWindow * s_instance;
 
+    QPushButton * m_loginButton;
+
 private:
     explicit ConnectionWindow(QWidget *parent = 0);
     ~ConnectionWindow();
@@ -30,14 +33,14 @@ private:
     void enableCorrectControls();
 
 private slots:
+    void on_buttonBox_rejected();
+    void on_buttonBox_accepted();
     void on_connectionTable_cellDoubleClicked(int row, int column);
     void on_connectionTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
-    void on_loginButton_clicked();
     void on_deleteButton_clicked();
     void on_editButton_clicked();
     void on_newButton_clicked();
     void on_adminButton_clicked();
-    void on_cancelButton_clicked();
 
 };
 

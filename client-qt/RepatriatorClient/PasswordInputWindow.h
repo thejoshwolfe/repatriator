@@ -15,7 +15,7 @@ class PasswordInputWindow : public QDialog
 public:
     ~PasswordInputWindow();
     static PasswordInputWindow * instance();
-    QString showGetPassword(QString username);
+    QString showGetPassword(QString dialog_title, QString ok_text, QString username);
 
 protected:
     void changeEvent(QEvent *e);

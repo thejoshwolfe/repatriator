@@ -34,8 +34,14 @@ PasswordInputWindow * PasswordInputWindow::instance()
     return s_instance;
 }
 
-QString PasswordInputWindow::showGetPassword(QString username)
+QString PasswordInputWindow::showGetPassword(QString dialog_title, QString ok_text, QString username)
 {
+    this->setWindowTitle(dialog_title);
+
+    ui->buttonBox->clear();
+    ui->buttonBox->addButton(ok_text, QDialogButtonBox::AcceptRole);
+    ui->buttonBox->addButton(QDialogButtonBox::Cancel);
+
     ui->usernameLabel->setText(username);
     ui->passwordLineEdit->setText("");
     ui->passwordLineEdit->setFocus(Qt::OtherFocusReason);
