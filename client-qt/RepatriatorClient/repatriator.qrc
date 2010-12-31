@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/general">
         <file>resource/bug.ico</file>
+        <file>resource/camera.png</file>
     </qresource>
 </RCC>

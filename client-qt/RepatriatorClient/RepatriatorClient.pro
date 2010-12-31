@@ -24,7 +24,10 @@ SOURCES += \
     PasswordInputWindow.cpp \
     Settings.cpp \
     ConnectionSettings.cpp \
-    Connector.cpp
+    Connector.cpp \
+    ShadowMinimap.cpp \
+    ShadowSlider.cpp \
+    Rotate3DWidget.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -41,7 +44,10 @@ HEADERS += \
     Settings.h \
     Connector.h \
     ServerTypes.h \
-    MetaTypes.h
+    MetaTypes.h \
+    ShadowMinimap.h \
+    ShadowSlider.h \
+    Rotate3DWidget.h
 
 FORMS += \
     MainWindow.ui \
@@ -53,3 +59,5 @@ FORMS += \
 
 RESOURCES += \
     repatriator.qrc
+
+RC_FILE = repatriator.rc
