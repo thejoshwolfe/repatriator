@@ -17,6 +17,7 @@ public:
         FileDownloadResult = 4,
         ErrorMessage = 5,
         ListUserResult = 6,
+        Ping = 7,
     };
 
     MessageCode type;
@@ -102,6 +103,12 @@ public:
     QList<ServerTypes::UserInfo> users;
 
     virtual void parse(QDataStream & stream);
+};
+
+class PingMessage : public IncomingMessage
+{
+public:
+    virtual void parse(QDataStream &) {}
 };
 
 

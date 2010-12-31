@@ -72,6 +72,8 @@ IncomingMessage * IncomingMessageParser::createMessageOfType(IncomingMessage::Me
             return new ErrorMessage;
         case IncomingMessage::ListUserResult:
             return new ListUserResultMessage;
+        case IncomingMessage::Ping:
+            return new PingMessage;
     }
     Q_ASSERT(false);
     return NULL;

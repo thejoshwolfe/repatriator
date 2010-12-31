@@ -139,15 +139,16 @@ void Server::cleanUpAfterDisconnect()
 
 void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
 {
+    // possibly handle the message (only for the initial setup)
     if (msg.isNull()) {
         // end the connection
         qDebug() << "null message, socket disconnect";
         socketDisconnect();
         return;
-    }
-    qDebug() << "successfully read a message: " << msg.data()->type;
-    // possibly handle the message (only for the initial setup)
-    if (m_login_state == ServerTypes::WaitingForMagicalResponse && msg.data()->type == IncomingMessage::MagicalResponse) {
+    } else if (msg.data()->type == IncomingMessage::Ping) {
+        // just ignore it
+        return;
+    } else if (m_login_state == ServerTypes::WaitingForMagicalResponse && msg.data()->type == IncomingMessage::MagicalResponse) {
         MagicalResponseMessage * magic_msg = (MagicalResponseMessage *) msg.data();
         if (magic_msg->is_valid) {
             changeLoginState(ServerTypes::WaitingForConnectionResult);
