@@ -44,7 +44,8 @@ void Server::socketConnect()
 
 void Server::socketDisconnect()
 {
-    m_socket.disconnectFromHost();
+    if (m_socket.isOpen())
+        m_socket.disconnectFromHost();
 }
 
 void ReaderThread::run()

@@ -42,7 +42,7 @@ private:
     ConnectionSettings * m_connection;
     bool m_need_hardware;
     QProgressDialog * m_progressDialog;
-    Server * m_server;
+    QSharedPointer<Server> m_server;
 
 private:
     explicit Connector(ConnectionSettings * connection, bool need_hardware);

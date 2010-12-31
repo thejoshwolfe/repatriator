@@ -14,7 +14,7 @@ Connector::Connector(ConnectionSettings * connection, bool need_hardware) :
     m_connection(connection),
     m_need_hardware(need_hardware),
     m_progressDialog(NULL),
-    m_server(NULL)
+    m_server()
 {}
 
 void Connector::go()
@@ -31,8 +31,8 @@ void Connector::go()
         }
     }
 
-    m_server = new Server(*m_connection, password, m_need_hardware);
-    success = connect(m_server, SIGNAL(loginStatusUpdated(int)), this, SLOT(updateProgressFromLoginStatus(int)));
+    m_server = QSharedPointer<Server>(new Server(*m_connection, password, m_need_hardware));
+    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(int)), this, SLOT(updateProgressFromLoginStatus(int)));
     Q_ASSERT(success);
 
     m_progressDialog = new QProgressDialog();
@@ -44,7 +44,7 @@ void Connector::go()
     Q_ASSERT(success);
 
     m_progressDialog->setValue(0);
-    m_server->socketConnect();
+    m_server.data()->socketConnect();
 }
 
 void Connector::updateProgressFromLoginStatus(int _status)
@@ -86,7 +86,7 @@ void Connector::updateProgressFromLoginStatus(int _status)
         case Server::Success:
             m_progressDialog->setLabelText(tr("Success."));
             m_progressDialog->setValue(4);
-            emit success(QSharedPointer<Server>(m_server));
+            emit success(m_server);
             bye();
             return;
     }
@@ -101,7 +101,6 @@ void Connector::cancel()
 void Connector::fail(FailureReason reason)
 {
     emit failure(reason);
-    delete m_server;
     bye();
 }
 
@@ -109,7 +108,7 @@ void Connector::bye()
 {
     delete m_progressDialog;
     this->disconnect(); // unhook all signals pointed here
-    m_server->socketDisconnect();
+    m_server.data()->socketDisconnect();
 
     delete this;
 }
