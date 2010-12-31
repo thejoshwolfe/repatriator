@@ -208,7 +208,7 @@ class DummyCloseConnection:
     message_type = ServerMessage.DummyCloseConnection
 
 __all__.append('Ping')
-class Ping:
+class Ping(ServerMessage):
     def __init__(self):
         self.message_type = ServerMessage.Ping
 
