@@ -225,6 +225,8 @@ def handle_MotorMovement(msg):
 
     for char, motor in motors.items():
         motor.goToPosition(msg.motor_pos[char])
+    
+    camera.autoFocus()
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_DirectoryListingRequest(msg):
@@ -480,8 +482,6 @@ def run_camera():
         else:
             error("Unable to get camera.")
             return
-
-        camera.setAutoFocusOn(True)
 
     def takePictureCallback(pic_file):
         # create a thumbnail
