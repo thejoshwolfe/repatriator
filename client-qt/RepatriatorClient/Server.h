@@ -2,15 +2,15 @@
 #define MESSAGE_HANDLER_H
 
 #include "ConnectionSettings.h"
+#include "IncomingMessage.h"
+#include "OutgoingMessage.h"
+#include "ServerTypes.h"
 
 #include <QObject>
 #include <QThread>
 #include <QTcpSocket>
-#include <QImage>
 #include <QSharedPointer>
 
-class IncomingMessage;
-class OutgoingMessage;
 class ReaderThread;
 class WriterThread;
 
@@ -19,48 +19,6 @@ class WriterThread;
 class Server : public QObject
 {
     Q_OBJECT
-public:
-    enum LoginStatus
-    {
-        Disconnected,
-        Connecting,
-        WaitingForMagicalResponse,
-        WaitingForConnectionResult,
-        ServerIsBogus,
-        LoginIsInvalid,
-        InsufficientPrivileges,
-        Success,
-        SocketError,
-    };
-
-    enum Permission
-    {
-        OperateHardware = 0,
-        ManageUsers = 1,
-    };
-
-    class UserInfo
-    {
-    public:
-        QString username;
-        QSet<Permission> permissions;
-
-        UserInfo(QString username, QSet<Permission> permissions) :
-            username(username),
-            permissions(permissions)
-        {}
-        UserInfo() :
-            username(),
-            permissions()
-        {}
-    };
-
-    class DirectoryItem
-    {
-    public:
-        QString filename;
-        QImage thumbnail;
-    };
 public:
     explicit Server(ConnectionSettings connection_info, QString password, bool hardware);
     ~Server();
@@ -72,7 +30,7 @@ signals:
     // memory leak.
     void messageReceived(QSharedPointer<IncomingMessage> message);
 
-    void loginStatusUpdated(Server::LoginStatus status); // LoginStatus
+    void loginStatusUpdated(ServerTypes::LoginStatus status);
     void socketDisconnected();
 
     // gives you progress of incoming messages.
@@ -81,7 +39,7 @@ signals:
     void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * message);
 
 public slots:
-    void sendMessage(OutgoingMessage * message);
+    void sendMessage(QSharedPointer<OutgoingMessage> message);
 
     // use this to actually connect to the server
     void socketConnect();
@@ -105,12 +63,12 @@ private:
 
     QTcpSocket m_socket;
 
-    LoginStatus m_login_state;
+    ServerTypes::LoginStatus m_login_state;
 
     int m_nextDownloadNumber;
 
 private:
-    void changeLoginState(LoginStatus state);
+    void changeLoginState(ServerTypes::LoginStatus state);
     QString getNextDownloadFilename();
 
 private slots:
@@ -118,6 +76,7 @@ private slots:
     void cleanUpAfterDisconnect();
     void processIncomingMessage(QSharedPointer<IncomingMessage>);
     void handleSocketError(QAbstractSocket::SocketError);
+    void handleWriterThreadReady();
 
     friend class ReaderThread;
     friend class WriterThread;
@@ -139,6 +98,7 @@ private:
 class WriterThreadInternal;
 class WriterThread : public QThread
 {
+    Q_OBJECT
 public:
     WriterThread(Server * server) : m_server(server) {}
     void run();
@@ -147,10 +107,14 @@ public:
     // queued connections operate correctly.
     WriterThreadInternal * internal;
 
+signals:
+    // emitted after the thread is running and done initializing
+    void ready();
+
 private:
     Server * m_server;
 
-    void queueMessage(OutgoingMessage * msg);
+    void queueMessage(QSharedPointer<OutgoingMessage> msg);
 
     friend class WriterThreadInternal;
 };
@@ -161,7 +125,7 @@ class WriterThreadInternal : public QObject
 public:
     WriterThreadInternal(WriterThread * owner) : m_owner(owner) {}
 public slots:
-    void queueMessage(OutgoingMessage * msg);
+    void queueMessage(QSharedPointer<OutgoingMessage> msg);
 private:
     WriterThread * m_owner;
 };

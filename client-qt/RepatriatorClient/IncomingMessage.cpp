@@ -48,7 +48,7 @@ void ConnectionResultMessage::parse(QDataStream &stream)
     for (qint32 i = 0; i < permission_count; i++) {
         qint32 permission;
         stream >> permission;
-        permissions.insert((Server::Permission) permission);
+        permissions.insert((ServerTypes::Permission) permission);
     }
 }
 
@@ -67,7 +67,7 @@ void DirectoryListingResultMessage::parse(QDataStream &stream)
     qint32 file_count;
     stream >> file_count;
     for (qint32 i = 0; i < file_count; i++) {
-        Server::DirectoryItem directory_item;
+        ServerTypes::DirectoryItem directory_item;
         directory_item.filename = readString(stream);
         directory_item.thumbnail = readImage(stream);
         directory_list.append(directory_item);
@@ -93,14 +93,14 @@ void ListUserResultMessage::parse(QDataStream &stream)
     qint32 user_count;
     stream >> user_count;
     for (qint32 i = 0; i < user_count; i++) {
-        Server::UserInfo user_info;
+        ServerTypes::UserInfo user_info;
         user_info.username = readString(stream);
         qint32 permission_count;
         stream >> permission_count;
         for (qint32 j = 0; j < permission_count; j++) {
             qint32 permission;
             stream >> permission;
-            user_info.permissions.insert((Server::Permission) permission);
+            user_info.permissions.insert((ServerTypes::Permission) permission);
         }
         users.append(user_info);
     }

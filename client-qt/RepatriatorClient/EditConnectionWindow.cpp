@@ -15,7 +15,7 @@ EditConnectionWindow::EditConnectionWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     bool success;
-    success = connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)), this, SLOT(delegateFocusEvent(QWidget*,QWidget*)));
+    success = connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)), this, SLOT(delegateFocusEvent(QWidget*,QWidget*)), Qt::DirectConnection);
     Q_ASSERT(success);
 }
 

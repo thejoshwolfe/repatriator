@@ -4,7 +4,6 @@
 #include "OutgoingMessage.h"
 #include "PasswordInputWindow.h"
 #include "EditUserAccountWindow.h"
-#include "Connector.h"
 
 AdminWindow * AdminWindow::s_instance = NULL;
 
@@ -50,9 +49,9 @@ void AdminWindow::showAdmin(ConnectionSettings *connection)
     Connector * connector = Connector::create(connection, false);
 
     bool success;
-    success = connect(connector, SIGNAL(failure(int)), this, SLOT(connectionFailure(int)), Qt::QueuedConnection);
+    success = connect(connector, SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
     Q_ASSERT(success);
-    success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
+    success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)), Qt::DirectConnection);
     Q_ASSERT(success);
 
     connector->go();
@@ -61,11 +60,11 @@ void AdminWindow::showAdmin(ConnectionSettings *connection)
     this->exec();
 }
 
-void AdminWindow::updateUserList(QList<Server::UserInfo> users)
+void AdminWindow::updateUserList(QList<ServerTypes::UserInfo> users)
 {
     ui->usersList->clear();
     m_users.clear();
-    foreach (Server::UserInfo user, users) {
+    foreach (ServerTypes::UserInfo user, users) {
         ui->usersList->addItem(user.username);
         m_users.insert(user.username, QSharedPointer<DetailedUserInfo>(new DetailedUserInfo(user)));
     }
@@ -84,13 +83,13 @@ void AdminWindow::connected(QSharedPointer<Server> server)
     m_server = server;
 
     bool success;
-    success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
+    success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)), Qt::DirectConnection);
     Q_ASSERT(success);
 
-    m_server.data()->sendMessage(new ListUserRequestMessage());
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ListUserRequestMessage()));
 }
 
-void AdminWindow::connectionFailure(int reason)
+void AdminWindow::connectionFailure(Connector::FailureReason reason)
 {
     Q_UNUSED(reason);
     reject();
@@ -109,13 +108,13 @@ void AdminWindow::on_buttonBox_accepted()
         switch (user.data()->changed_status)
         {
             case DetailedUserInfo::New:
-                m_server.data()->sendMessage(new AddUserMessage(user.data()->username, user.data()->password, user.data()->permissions));
+                m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new AddUserMessage(user.data()->username, user.data()->password, user.data()->permissions)));
                 break;
             case DetailedUserInfo::Updated:
-                m_server.data()->sendMessage(new UpdateUserMessage(user.data()->username, user.data()->password, user.data()->permissions));
+                m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new UpdateUserMessage(user.data()->username, user.data()->password, user.data()->permissions)));
                 break;
             case DetailedUserInfo::Deleted:
-                m_server.data()->sendMessage(new DeleteUserMessage(user.data()->username));
+                m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DeleteUserMessage(user.data()->username)));
                 break;
             case DetailedUserInfo::Unchanged:
                 // do nothing
@@ -176,7 +175,7 @@ void AdminWindow::on_usersList_itemSelectionChanged()
     if (userIsSelected) {
         QString username = ui->usersList->selectedItems().at(0)->text();
         QSharedPointer<DetailedUserInfo> user = m_users.value(username);
-        ui->adminPrivilegesCheckBox->setChecked(user.data()->permissions.contains(Server::ManageUsers));
+        ui->adminPrivilegesCheckBox->setChecked(user.data()->permissions.contains(ServerTypes::ManageUsers));
     } else {
         // no selection
         ui->adminPrivilegesCheckBox->setChecked(false);
@@ -212,9 +211,9 @@ void AdminWindow::on_newButton_clicked()
     user.data()->username = new_account.data()->username;
     user.data()->password = new_account.data()->password;
 
-    user.data()->permissions.insert(Server::OperateHardware);
+    user.data()->permissions.insert(ServerTypes::OperateHardware);
     if (new_account.data()->is_admin)
-        user.data()->permissions.insert(Server::ManageUsers);
+        user.data()->permissions.insert(ServerTypes::ManageUsers);
 
     if (m_users.contains(user.data()->username)) {
         // previously deleted. turn this into an update

@@ -3,7 +3,9 @@
 
 #include "ConnectionSettings.h"
 #include "Server.h"
+#include "ServerTypes.h"
 #include "IncomingMessage.h"
+#include "Connector.h"
 
 #include <QDialog>
 #include <QSharedPointer>
@@ -34,7 +36,7 @@ private:
 
     QSharedPointer<Server> m_server;
 
-    class DetailedUserInfo : public Server::UserInfo {
+    class DetailedUserInfo : public ServerTypes::UserInfo {
     public:
         enum ChangedStatus {
             Unchanged,
@@ -51,8 +53,8 @@ private:
             changed_status(Unchanged)
         {}
 
-        DetailedUserInfo(Server::UserInfo & source) :
-            Server::UserInfo(source.username, source.permissions),
+        DetailedUserInfo(ServerTypes::UserInfo & source) :
+            ServerTypes::UserInfo(source.username, source.permissions),
             password(""),
             changed_status(Unchanged)
         {}
@@ -62,7 +64,7 @@ private:
 
 private:
     void cleanup();
-    void updateUserList(QList<Server::UserInfo> users);
+    void updateUserList(QList<ServerTypes::UserInfo> users);
 
 private slots:
     void on_newButton_clicked();
@@ -73,7 +75,7 @@ private slots:
     void on_buttonBox_rejected();
 
     void connected(QSharedPointer<Server> server);
-    void connectionFailure(int reason);
+    void connectionFailure(Connector::FailureReason reason);
     void processMessage(QSharedPointer<IncomingMessage> msg);
 };
 

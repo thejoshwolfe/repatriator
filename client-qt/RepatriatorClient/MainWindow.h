@@ -3,6 +3,7 @@
 
 #include "ConnectionSettings.h"
 #include "Server.h"
+#include "Connector.h"
 
 #include <QMainWindow>
 #include <QSharedPointer>
@@ -34,7 +35,7 @@ private:
 
 private slots:
     void connected(QSharedPointer<Server> server);
-    void connectionFailure(int reason);
+    void connectionFailure(Connector::FailureReason reason);
 
 };
 

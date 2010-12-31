@@ -1,15 +1,14 @@
 #ifndef OUTGOING_MESSAGE_H
 #define OUTGOING_MESSAGE_H
 
-#include "Server.h"
+#include "ServerTypes.h"
 
 #include <QObject>
 #include <QDataStream>
 #include <QSet>
 
-class OutgoingMessage : public QObject
+class OutgoingMessage
 {
-    Q_OBJECT
 public:
     void writeToStream(QDataStream & stream);
 
@@ -35,11 +34,6 @@ protected:
     virtual MessageCode type() const = 0;
 
     static void writeString(QDataStream & stream, QString string);
-
-signals:
-
-public slots:
-
 };
 
 class MagicalRequestMessage : public OutgoingMessage
@@ -130,8 +124,8 @@ class UpdateUserMessage : public OutgoingMessage
 public:
     QString username;
     QString password;
-    QSet<Server::Permission> permissions;
-    UpdateUserMessage(QString username, QString password, QSet<Server::Permission> permissions) :
+    QSet<ServerTypes::Permission> permissions;
+    UpdateUserMessage(QString username, QString password, QSet<ServerTypes::Permission> permissions) :
         username(username), password(password), permissions(permissions) {}
 protected:
     virtual void writeMessageBody(QDataStream & stream);
@@ -142,7 +136,7 @@ protected:
 class AddUserMessage : public UpdateUserMessage
 {
 public:
-    AddUserMessage(QString username, QString password, QSet<Server::Permission> permissions) :
+    AddUserMessage(QString username, QString password, QSet<ServerTypes::Permission> permissions) :
             UpdateUserMessage(username, password, permissions) {}
 protected:
     virtual MessageCode type() const { return AddUser; }

@@ -1,5 +1,7 @@
 #include "IncomingMessageParser.h"
 
+#include <QDebug>
+
 const int IncomingMessageParser::c_read_timeout_ms = 2000;
 IncomingMessageParser * IncomingMessageParser::s_instance = NULL;
 

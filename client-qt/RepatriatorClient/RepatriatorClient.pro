@@ -39,7 +39,9 @@ HEADERS += \
     EditUserAccountWindow.h \
     PasswordInputWindow.h \
     Settings.h \
-    Connector.h
+    Connector.h \
+    ServerTypes.h \
+    MetaTypes.h
 
 FORMS += \
     MainWindow.ui \

@@ -2,7 +2,6 @@
 #include "ui_MainWindow.h"
 
 #include "ConnectionWindow.h"
-#include "Connector.h"
 
 MainWindow * MainWindow::s_instance = NULL;
 
@@ -42,9 +41,9 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
     Connector * connector = Connector::create(connection, true);
 
     bool success;
-    success = connect(connector, SIGNAL(failure(int)), this, SLOT(connectionFailure(int)));
+    success = connect(connector, SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::DirectConnection);
     Q_ASSERT(success);
-    success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
+    success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)), Qt::DirectConnection);
     Q_ASSERT(success);
 
     connector->go();
@@ -57,7 +56,7 @@ void MainWindow::connected(QSharedPointer<Server> server)
     m_server = server;
 }
 
-void MainWindow::connectionFailure(int reason)
+void MainWindow::connectionFailure(Connector::FailureReason reason)
 {
     Q_UNUSED(reason);
     ConnectionWindow::instance()->show();

@@ -54,7 +54,7 @@ void UpdateUserMessage::writeMessageBody(QDataStream &stream)
     writeString(stream, username);
     writeString(stream, password);
     stream << (qint32) permissions.count();
-    foreach (Server::Permission permission, permissions)
+    foreach (ServerTypes::Permission permission, permissions)
         stream << (qint32) permission;
 }
 

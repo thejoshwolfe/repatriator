@@ -1,11 +1,10 @@
 #ifndef INCOMING_MESSAGE_H
 #define INCOMING_MESSAGE_H
 
-#include <QObject>
 #include <QIODevice>
 #include <QImage>
 
-#include "Server.h"
+#include "ServerTypes.h"
 
 class IncomingMessage
 {
@@ -56,7 +55,7 @@ public:
     qint32 minor_version;
     qint32 revision_version;
     ConnectionResultStatus connection_status;
-    QSet<Server::Permission> permissions;
+    QSet<ServerTypes::Permission> permissions;
 
     virtual void parse(QDataStream & stream);
 };
@@ -74,7 +73,7 @@ public:
 class DirectoryListingResultMessage : public IncomingMessage
 {
 public:
-    QList<Server::DirectoryItem> directory_list;
+    QList<ServerTypes::DirectoryItem> directory_list;
 
     virtual void parse(QDataStream & stream);
 };
@@ -100,7 +99,7 @@ public:
 class ListUserResultMessage : public IncomingMessage
 {
 public:
-    QList<Server::UserInfo> users;
+    QList<ServerTypes::UserInfo> users;
 
     virtual void parse(QDataStream & stream);
 };

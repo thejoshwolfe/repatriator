@@ -38,7 +38,7 @@ signals:
     // be careful because the object no longer exists when these signals are emitted.
     // success comes with a server pointer that is connected and authenticated.
     void success(QSharedPointer<Server> server);
-    void failure(int reason); // type FailureReason
+    void failure(Connector::FailureReason reason);
 
 private:
     ConnectionSettings * m_connection;
@@ -53,7 +53,7 @@ private:
     void fail(FailureReason reason);
     void bye();
 private slots:
-    void updateProgressFromLoginStatus(Server::LoginStatus status);
+    void updateProgressFromLoginStatus(ServerTypes::LoginStatus status);
     void cancel();
 
 };
