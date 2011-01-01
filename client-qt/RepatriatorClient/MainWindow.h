@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QSharedPointer>
 #include <QProgressDialog>
+#include <QVector>
 
 namespace Ui {
     class MainWindow;
@@ -35,6 +36,7 @@ private:
     ConnectionSettings * m_connection_settings;
 
     QString m_quit_after_this_file;
+    QVector<qint64> m_target_motor_positions;
 
 private:
     void cleanup();
@@ -43,8 +45,12 @@ private:
     void updateShadowPositions(QVector<qint64> motor_positions);
     void saveFile(QByteArray blob, QString filename);
     bool checkDownloadDirectory();
+    void sendTargetMotorPositions();
 
 private slots:
+    void on_orbitSliderA_valueChanged(int value);
+    void on_orbitSliderB_valueChanged(int value);
+    void on_liftSliderZ_valueChanged(int value);
     void on_picturesList_itemSelectionChanged();
     void on_actionDiscardSelectedFiles_triggered();
     void on_actionDownloadAllAndQuit_triggered();
@@ -52,6 +58,9 @@ private slots:
     void on_actionChangeDownloadFolder_triggered();
     void on_actionTakeSnapshot_triggered();
     void on_snapshotButton_clicked();
+    void on_shadowMinimap_positionChosen(QPoint);
+
+
     void connected(QSharedPointer<Server> server);
     void connectionFailure(Connector::FailureReason reason);
 

@@ -13,7 +13,8 @@ MainWindow * MainWindow::s_instance = NULL;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_progressDialog(new QProgressDialog(this, Qt::Dialog))
+    m_progressDialog(new QProgressDialog(this, Qt::Dialog)),
+    m_target_motor_positions(5)
 {
     m_progressDialog->setWindowModality(Qt::NonModal);
     m_progressDialog->setWindowTitle(tr("Receiving data"));
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     this->setCentralWidget(ui->displayWidget);
+    this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
 MainWindow::~MainWindow()
@@ -140,10 +142,10 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
 
 void MainWindow::updateShadowPositions(QVector<qint64> motor_positions)
 {
-//    orbitSliderA.ShadowPosition = (int)connectionManager.motorPositions[0];
-//    orbitSliderB.ShadowPosition = (int)connectionManager.motorPositions[1];
-//    shadowMinimap.ShadowPosition = new Point((int)connectionManager.motorPositions[2], (int)connectionManager.motorPositions[3]);
-//    liftSliderZ.ShadowPosition = (int)connectionManager.motorPositions[4];
+    ui->orbitSliderA->setShadowPosition((int)motor_positions.at(0));
+    ui->orbitSliderB->setShadowPosition((int)motor_positions.at(1));
+    ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
+    ui->liftSliderZ->setShadowPosition((int)motor_positions.at(4));
 }
 
 void MainWindow::saveFile(QByteArray blob, QString filename)
@@ -258,4 +260,35 @@ void MainWindow::on_actionDiscardSelectedFiles_triggered()
 void MainWindow::on_picturesList_itemSelectionChanged()
 {
     enableCorrectControls();
+}
+
+void MainWindow::on_shadowMinimap_positionChosen(QPoint)
+{
+    sendTargetMotorPositions();
+}
+
+void MainWindow::sendTargetMotorPositions()
+{
+    m_target_motor_positions[0] = ui->orbitSliderA->value();
+    m_target_motor_positions[1] = ui->orbitSliderB->value();
+    m_target_motor_positions[2] = ui->shadowMinimap->position().x();
+    m_target_motor_positions[3] = ui->shadowMinimap->position().y();
+    m_target_motor_positions[4] = ui->liftSliderZ->value();
+
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new MotorMovementMessage(m_target_motor_positions)));
+}
+
+void MainWindow::on_liftSliderZ_valueChanged(int)
+{
+    sendTargetMotorPositions();
+}
+
+void MainWindow::on_orbitSliderB_valueChanged(int)
+{
+    sendTargetMotorPositions();
+}
+
+void MainWindow::on_orbitSliderA_valueChanged(int)
+{
+    sendTargetMotorPositions();
 }

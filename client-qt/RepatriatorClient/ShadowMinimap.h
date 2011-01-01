@@ -21,7 +21,7 @@ public:
     void setMaxPosition(QPoint pt);
 
 signals:
-    void positionChosen();
+    void positionChosen(QPoint position);
 
 protected:
     void paintEvent(QPaintEvent *);

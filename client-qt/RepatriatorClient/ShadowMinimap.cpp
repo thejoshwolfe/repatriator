@@ -70,7 +70,7 @@ void ShadowMinimap::mouseReleaseEvent(QMouseEvent * e)
 
     m_mouse_down = false;
     if (m_position_origin != m_position)
-        emit positionChosen();
+        emit positionChosen(m_position);
 
     e->accept();
 }

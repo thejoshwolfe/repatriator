@@ -50,6 +50,6 @@ void ImageDisplayWidget::resizeEvent(QResizeEvent *)
 
 void ImageDisplayWidget::scaleCurrentFrame()
 {
-    QRectF widgetSize = this->rect();
-    m_currentFrame = m_currentFrame.scaledToWidth(widgetSize.width());
+    if (! m_currentFrame.isNull())
+        m_currentFrame = m_currentFrame.scaled(this->rect().size(), Qt::KeepAspectRatio);
 }
