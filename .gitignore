@@ -8,3 +8,4 @@ obj
 *.pro.user
 server/config.py
 server/data/
+build/

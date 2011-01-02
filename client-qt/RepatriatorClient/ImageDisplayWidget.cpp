@@ -31,12 +31,9 @@ void ImageDisplayWidget::paintEvent(QPaintEvent *)
     float y = widgetSize.height() / 2 - m_currentFrame.height() / 2;
 
     if (m_videoMutex.tryLock()) {
-        if (m_currentFrame.isNull()) {
-            // haven't seen any frames yet, clear the runway
-            painter.fillRect(widgetSize, Qt::black);
-        } else {
+        painter.fillRect(widgetSize, Qt::black);
+        if (!m_currentFrame.isNull())
             painter.drawPixmap(x, y, m_currentFrame);
-        }
         m_videoMutex.unlock();
     }
 }
