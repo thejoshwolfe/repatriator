@@ -54,7 +54,7 @@ bool EditConnectionWindow::showNew(ConnectionSettings * connection)
     ui->portLineEdit->setText("");
     ui->usernameLineEdit->setText("");
     ui->savePasswordCheckBox->setChecked(false);
-    ui->savePasswordCheckBox->setText("");
+    ui->passwordLineEdit->setText("");
 
     ui->addressLineEdit->setFocus(Qt::OtherFocusReason);
 
