@@ -514,6 +514,10 @@ def run_camera():
             time.sleep(0.05)
             continue
 
+    # shut down the camera
+    del camera
+    edsdk.terminate()
+
 def on_connection_open():
     debug("connection opening")
 
