@@ -80,6 +80,9 @@ void MainWindow::connected(QSharedPointer<Server> server)
     success = connect(m_server.data(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SLOT(showProgress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
 
+    ConnectionResultMessage * connection_result  = (ConnectionResultMessage *) server.data()->connectionResultMessage().data();
+    changeMotorBounds(connection_result->motor_boundaries);
+
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DirectoryListingRequestMessage()));
 
     enableCorrectControls();
@@ -291,4 +294,18 @@ void MainWindow::on_orbitSliderB_valueChanged(int)
 void MainWindow::on_orbitSliderA_valueChanged(int)
 {
     sendTargetMotorPositions();
+}
+
+void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> bounds)
+{
+    ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
+    ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
+
+    ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
+    ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
+
+    ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
+
+    ui->liftSliderZ->setMinimum(bounds.at(4).min);
+    ui->liftSliderZ->setMaximum(bounds.at(4).max);
 }

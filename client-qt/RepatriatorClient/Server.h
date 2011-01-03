@@ -23,6 +23,8 @@ public:
     explicit Server(ConnectionSettings connection_info, QString password, bool hardware);
     ~Server();
 
+    // returns the ConnectionResultMessage that the server gave upon connection
+    QSharedPointer<IncomingMessage> connectionResultMessage() const { return m_connection_result; }
 signals:
     // use this signal to listen for incoming messages
     // YOU are responsible for deleting them when done.
@@ -37,7 +39,6 @@ signals:
     // don't try to access the data of message because it will be garbage. do that in
     // messageReceived. use it only to tell messages apart.
     void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * message);
-
 public slots:
     void sendMessage(QSharedPointer<OutgoingMessage> message);
 
@@ -78,6 +79,7 @@ private:
 private:
     void changeLoginState(ServerTypes::LoginStatus state);
     QString getNextDownloadFilename();
+    QSharedPointer<IncomingMessage> m_connection_result;
 
 private slots:
     void startReadAndWriteThreads();

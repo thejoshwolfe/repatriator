@@ -46,6 +46,7 @@ private:
     void saveFile(QByteArray blob, QString filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
+    void changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> motor_boundaries);
 
 private slots:
     void on_orbitSliderA_valueChanged(int value);
@@ -67,7 +68,6 @@ private slots:
     void processMessage(QSharedPointer<IncomingMessage> msg);
     void connectionEnded();
     void showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMessage * msg);
-
 };
 
 #endif // MAINWINDOW_H

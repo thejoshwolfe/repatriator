@@ -50,6 +50,14 @@ void ConnectionResultMessage::parse(QDataStream &stream)
         stream >> permission;
         permissions.insert((ServerTypes::Permission) permission);
     }
+    if (permissions.contains(ServerTypes::OperateHardware)) {
+        for (int i = 0; i < 5; i++) {
+            MotorBoundaries bounds;
+            stream >> bounds.min;
+            stream >> bounds.max;
+            motor_boundaries.append(bounds);
+        }
+    }
 }
 
 void FullUpdateMessage::parse(QDataStream &stream)
