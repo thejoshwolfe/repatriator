@@ -346,7 +346,7 @@ def handle_ListUserRequest(msg):
     server.send_message(ListUserResult(auth.list_users()))
 
 
-def motorStoppedMovingHandler():
+def motorStoppedMovingHandler(stopped_moving_reason):
     global need_to_auto_focus, camera_thread_queue
     need_to_auto_focus = True
     camera_thread_queue.put(DummyAutoFocus())
