@@ -461,7 +461,7 @@ def run_ping():
             next_frame = now + 1.00
 
 def run_camera():
-    global camera, message_handlers, message_queue, finished
+    global camera, message_handlers, message_queue, finished, need_to_auto_focus
 
     debug("running camera")
 
