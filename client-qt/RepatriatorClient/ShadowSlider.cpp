@@ -27,7 +27,7 @@ void ShadowSlider::paintEvent(QPaintEvent * ev)
     option.sliderValue = m_shadow_position;
     option.tickInterval = 0;
     option.tickPosition = QSlider::NoTicks;
-    option.upsideDown = ! this->invertedAppearance();
+    option.upsideDown = this->orientation() == Qt::Vertical && ! this->invertedAppearance();
     option.subControls = QStyle::SC_DialHandle;
 
     QPainter painter(this);
