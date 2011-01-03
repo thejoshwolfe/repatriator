@@ -52,7 +52,7 @@ void ShadowMinimap::mousePressEvent(QMouseEvent * e)
 
 void ShadowMinimap::mouseMoveEvent(QMouseEvent * e)
 {
-    if (! m_mouse_down || e->button() != Qt::LeftButton)
+    if (! m_mouse_down || ! (e->buttons() & Qt::LeftButton))
         return;
 
     QPoint pixel_delta = e->pos() - m_mouse_origin;
