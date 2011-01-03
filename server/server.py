@@ -559,6 +559,14 @@ def on_connection_close():
 
     debug("connection closing")
 
+    # send motors to 0
+    if motors is not None:
+        for motor in motors.values():
+            motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
+            if motor.fancy:
+                debug("sending motor " + repr(motor.name) + " to 0")
+                motor.goToPosition(0)
+
     # clean up
     finished = True
 
@@ -575,8 +583,15 @@ def on_connection_close():
         message_queue.put(DummyCloseConnection())
         message_thread.join()
 
+    debug("waiting for motors to get to 0")
+    if motors is not None:
+        for motor in motors.values():
+            while not motor.isReady():
+                debug("waiting for motor " + repr(motor.name))
+                time.sleep(1)
+
     # shutdown motors
-    global motors
+    debug("disposing motors")
     if motors is not None:
         for motor in motors.values():
             motor.dispose()
@@ -611,6 +626,7 @@ def initialize_hardware():
         motor.maxPosition = settings['MOTOR_%s_MAX' % char]
         if settings['MOTOR_%s_FAKE' % char]:
             motor.setFake()
+        motor.name = char
         motor.stoppedMovingHandlers.append(motorStoppedMovingHandler)
         return motor
 
