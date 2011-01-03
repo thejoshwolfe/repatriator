@@ -5,16 +5,14 @@
 
 #include <QMessageBox>
 
-Connector * Connector::create(ConnectionSettings *connection, bool need_hardware)
-{
-    return new Connector(connection, need_hardware);
-}
-
 Connector::Connector(ConnectionSettings * connection, bool need_hardware) :
     m_connection(connection),
     m_need_hardware(need_hardware),
     m_progressDialog(),
     m_server()
+{}
+
+Connector::~Connector()
 {}
 
 void Connector::go()
@@ -27,13 +25,12 @@ void Connector::go()
         if (password.isNull()) {
             emit failure(Cancelled);
             this->disconnect();
-            delete this;
             return;
         }
     }
 
     m_server = QSharedPointer<Server>(new Server(*m_connection, password, m_need_hardware));
-    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(ServerTypes::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)), Qt::QueuedConnection);
+    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(ServerTypes::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)));
     Q_ASSERT(success);
 
     m_progressDialog = QSharedPointer<QProgressDialog>(new QProgressDialog());
@@ -43,7 +40,7 @@ void Connector::go()
     m_progressDialog.data()->setMinimum(0);
     m_progressDialog.data()->setMaximum(4);
     m_progressDialog.data()->setMinimumDuration(100);
-    success = connect(m_progressDialog.data(), SIGNAL(canceled()), this, SLOT(cancel()), Qt::DirectConnection);
+    success = connect(m_progressDialog.data(), SIGNAL(canceled()), this, SLOT(cancel()));
     Q_ASSERT(success);
 
     m_progressDialog.data()->setValue(0);
@@ -116,6 +113,4 @@ void Connector::cleanup(bool kill_connection)
 
     if (kill_connection)
         m_server.data()->socketDisconnect();
-
-    delete this;
 }

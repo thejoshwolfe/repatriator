@@ -46,15 +46,16 @@ void AdminWindow::showAdmin(ConnectionSettings *connection)
     ui->usersList->setFocus(Qt::OtherFocusReason);
 
     // establish connection
-    Connector * connector = Connector::create(connection, false);
+
+    QScopedPointer<Connector> connector(new Connector(connection, false));
 
     bool success;
-    success = connect(connector, SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
+    success = connect(connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
     Q_ASSERT(success);
-    success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)), Qt::DirectConnection);
+    success = connect(connector.data(), SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
     Q_ASSERT(success);
 
-    connector->go();
+    connector.data()->go();
 
     // show modal
     this->exec();
@@ -83,7 +84,7 @@ void AdminWindow::connected(QSharedPointer<Server> server)
     m_server = server;
 
     bool success;
-    success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)), Qt::DirectConnection);
+    success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
     success = connect(server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
     Q_ASSERT(success);

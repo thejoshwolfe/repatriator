@@ -13,11 +13,6 @@ class IncomingMessageParser : public QObject
 public:
     IncomingMessageParser(QIODevice * device);
 
-    // return a child message class for the data
-    // this method will not return until the entire message
-    // is received or there is an error.
-    IncomingMessage * readMessage(QIODevice * device);
-
 signals:
     // emitted during message downloading
     void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * msg);

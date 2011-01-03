@@ -1,8 +1,8 @@
 #include "Server.h"
 
-#include <QDir>
-
 #include "IncomingMessageParser.h"
+
+#include <QDir>
 
 const int Server::c_client_major_version = 0;
 const int Server::c_client_minor_version = 0;
@@ -15,123 +15,98 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
     m_connection_info(connection_info),
     m_password(password),
     m_hardware(hardware),
-    m_reader_thread(NULL),
-    m_writer_thread(NULL)
+    m_socket_thread(NULL),
+    m_socket(NULL),
+    m_parser(NULL)
 {
+    // we run in m_socket_thread
+    m_socket_thread = new QThread(this);
+    m_socket_thread->start();
+    this->moveToThread(m_socket_thread);
+
     bool success;
-
-    success = connect(&m_socket, SIGNAL(connected()), this, SLOT(startReadAndWriteThreads()), Qt::QueuedConnection);
-    Q_ASSERT(success);
-
-    success = connect(&m_socket, SIGNAL(disconnected()), this, SLOT(cleanUpAfterDisconnect()), Qt::QueuedConnection);
-    Q_ASSERT(success);
-
-    success = connect(&m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)), Qt::DirectConnection);
+    success = QMetaObject::invokeMethod(this, "initialize", Qt::QueuedConnection);
     Q_ASSERT(success);
 }
 
 Server::~Server()
 {
-    socketDisconnect();
+    delete m_parser;
+}
+
+void Server::initialize()
+{
+    Q_ASSERT(this->thread() == m_socket_thread);
+
+    m_socket = new QTcpSocket(this);
+
+    bool success;
+
+    success = connect(m_socket, SIGNAL(connected()), this, SLOT(handleConnected()));
+    Q_ASSERT(success);
+
+    success = connect(m_socket, SIGNAL(disconnected()), this, SLOT(cleanUpAfterDisconnect()));
+    Q_ASSERT(success);
+
+    success = connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
+    Q_ASSERT(success);
 }
 
 void Server::socketConnect()
 {
+    Q_ASSERT(this->thread() == m_socket_thread);
+    Q_ASSERT(m_socket);
+
     changeLoginState(ServerTypes::Connecting);
-    m_socket.connectToHost(m_connection_info.host, m_connection_info.port);
+    m_socket->connectToHost(m_connection_info.host, m_connection_info.port);
 }
 
 void Server::socketDisconnect()
 {
-    if (m_socket.isOpen())
-        m_socket.disconnectFromHost();
+    Q_ASSERT(this->thread() == m_socket_thread);
+
+    if (m_socket->isOpen())
+        m_socket->disconnectFromHost();
 }
 
-void ReaderThread::run()
+void Server::sendMessage(QSharedPointer<OutgoingMessage> msg)
 {
-    bool success;
+    Q_ASSERT(this->thread() == m_socket_thread);
 
-    QScopedPointer<IncomingMessageParser> parser(new IncomingMessageParser(&m_server->m_socket));
-
-    success = connect(parser.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)));
-    Q_ASSERT(success);
-
-    this->exec();
-}
-
-void WriterThread::run()
-{
-    internal = new WriterThreadInternal(this);
-    emit ready();
-    this->exec();
-    delete internal;
-}
-
-void WriterThreadInternal::queueMessage(QSharedPointer<OutgoingMessage> msg)
-{
-    m_owner->queueMessage(msg);
-}
-
-void WriterThread::queueMessage(QSharedPointer<OutgoingMessage> msg)
-{
     if (dynamic_cast<DummyDisconnectMessage *>(msg.data()) != NULL) {
-        m_server->socketDisconnect();
+        socketDisconnect();
         return;
     }
-    if (m_server->m_socket.isOpen()) {
-        QDataStream stream(&m_server->m_socket);
+    if (m_socket->isOpen()) {
+        QDataStream stream(m_socket);
         msg.data()->writeToStream(stream);
     }
 }
 
-void Server::sendMessage(QSharedPointer<OutgoingMessage> message)
+void Server::handleConnected()
 {
-    bool success;
-    success = QMetaObject::invokeMethod(m_writer_thread->internal, "queueMessage", Qt::QueuedConnection, Q_ARG(QSharedPointer<OutgoingMessage>, message));
-    Q_ASSERT(success);
-}
-
-void Server::startReadAndWriteThreads()
-{
-    bool success;
-
     // reset state
     m_nextDownloadNumber = 1;
-    m_reader_thread = new ReaderThread(this);
-    m_writer_thread = new WriterThread(this);
 
-    success = connect(m_reader_thread, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processIncomingMessage(QSharedPointer<IncomingMessage>)), Qt::DirectConnection);
+    delete m_parser;
+    m_parser = new IncomingMessageParser(m_socket);
+
+    bool success;
+
+    success = connect(m_parser, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processIncomingMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
-    success = connect(m_writer_thread, SIGNAL(ready()), this, SLOT(handleWriterThreadReady()), Qt::DirectConnection);
-    Q_ASSERT(success);
 
-    // kick off threads
-    m_reader_thread->start();
-    m_writer_thread->start();
-
-}
-
-void Server::handleWriterThreadReady()
-{
     changeLoginState(ServerTypes::WaitingForMagicalResponse);
     sendMessage(QSharedPointer<OutgoingMessage>(new MagicalRequestMessage()));
+
 }
 
 void Server::cleanUpAfterDisconnect()
 {
-    // reader thread will end itself when the connection is no longer valid,
-    // but we need to tell writer thread to exit.
-    m_writer_thread->exit();
-    m_reader_thread->exit();
+    Q_ASSERT(this->thread() == m_socket_thread);
 
-    // wait till threads are done
-    m_writer_thread->wait();
-    delete m_writer_thread;
-    m_writer_thread = NULL;
-
-    m_reader_thread->wait();
-    delete m_reader_thread;
-    m_reader_thread = NULL;
+    m_socket_thread->exit();
+    m_socket_thread->wait();
 
     changeLoginState(ServerTypes::Disconnected);
     emit socketDisconnected();

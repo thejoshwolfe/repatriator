@@ -2,6 +2,7 @@
 #define METATYPES_H
 
 #include <QMetaType>
+#include <QAbstractSocket>
 
 #include "IncomingMessage.h"
 #include "OutgoingMessage.h"
@@ -14,6 +15,7 @@ namespace MetaTypes {
         qRegisterMetaType<QSharedPointer<IncomingMessage> >("QSharedPointer<IncomingMessage>");
         qRegisterMetaType<QSharedPointer<OutgoingMessage> >("QSharedPointer<OutgoingMessage>");
         qRegisterMetaType<ServerTypes::LoginStatus>("ServerTypes::LoginStatus");
+        qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
     }
 }
 

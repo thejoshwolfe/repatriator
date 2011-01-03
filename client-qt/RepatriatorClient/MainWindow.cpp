@@ -55,15 +55,15 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
 
     enableCorrectControls();
 
-    Connector * connector = Connector::create(connection, true);
+    QScopedPointer<Connector> connector(new Connector(connection, true));
 
     bool success;
-    success = connect(connector, SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::DirectConnection);
+    success = connect(connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)));
     Q_ASSERT(success);
-    success = connect(connector, SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)), Qt::DirectConnection);
+    success = connect(connector.data(), SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
     Q_ASSERT(success);
 
-    connector->go();
+    connector.data()->go();
 
     this->show();
 }
@@ -73,7 +73,7 @@ void MainWindow::connected(QSharedPointer<Server> server)
     m_server = server;
 
     bool success;
-    success = connect(m_server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)), Qt::DirectConnection);
+    success = connect(m_server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
     success = connect(m_server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
     Q_ASSERT(success);

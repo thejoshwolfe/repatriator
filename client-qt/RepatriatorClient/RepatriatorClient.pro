@@ -9,6 +9,7 @@ QT += core gui network
 TARGET = RepatriatorClient
 TEMPLATE = app
 
+CONFIG -= exceptions
 
 SOURCES += \
     main.cpp \
