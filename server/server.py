@@ -346,9 +346,12 @@ def handle_ListUserRequest(msg):
     server.send_message(ListUserResult(auth.list_users()))
 
 
-def motorStoppedMovingHandler(stopped_moving_reason):
+def motorStoppedMovingHandler(reason):
+    if reason != silverpak.StoppedMovingReason.Normal:
+        return
     global need_to_auto_focus, camera_thread_queue
     need_to_auto_focus = True
+    debug("a motor stopped moving. setting auto focus flag.")
     camera_thread_queue.put(DummyAutoFocus())
 
 message_handlers = {
@@ -518,6 +521,7 @@ def run_camera():
             msg = camera_thread_queue.get(block=False)
             if msg.message_type == ClientMessage.DummyAutoFocus:
                 if need_to_auto_focus:
+                    debug("Telling camera to auto focus")
                     camera.autoFocus()
                     need_to_auto_focus = False
             else:
