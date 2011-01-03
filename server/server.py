@@ -229,11 +229,13 @@ def handle_MotorMovement(msg):
         return
     for char, motor in motors.items():
         try:
-            motor.goToPosition(msg.motor_pos[char])
+            intended_position = msg.motor_pos[char]
+            if motor.position() != intended_position:
+                debug("moving motor " + repr(char) + " from " + repr(motor.position()) + " to " + repr(intended_position))
+                motor.goToPosition(intended_position)
         except silverpak.InvalidSilverpakOperationException as e:
             warning("Can't move motor: " + str(e))
             pass
-    camera.autoFocus()
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_DirectoryListingRequest(msg):
@@ -408,6 +410,7 @@ def init_state():
     motor_chars = ['A', 'B', 'X', 'Y', 'Z']
     need_to_auto_focus = False
 
+
 def start_message_loop():
     global message_thread
     message_thread = threading.Thread(target=run_message_loop, name="message handler")
@@ -415,6 +418,7 @@ def start_message_loop():
 
 def start_server():
     init_state()
+    set_power_switch(False)
 
     # wait for a connection
     class _Server(socketserver.StreamRequestHandler):
