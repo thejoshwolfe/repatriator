@@ -4,8 +4,8 @@
 
 ShadowMinimap::ShadowMinimap(QWidget *parent) :
     QWidget(parent),
-    m_shadow_position(20, 20),
-    m_position(80, 80),
+    m_shadow_position(0, 0),
+    m_position(0, 0),
     m_max_position(100, 100),
     m_mouse_down(false),
     c_thumb_size(20, 16),
