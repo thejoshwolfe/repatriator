@@ -224,8 +224,15 @@ def handle_MotorMovement(msg):
     global motors
     debug("Got motor movement message")
 
+    if motors is None:
+        warning("Can't move motors yet. they haven't been found")
+        return
     for char, motor in motors.items():
-        motor.goToPosition(msg.motor_pos[char])
+        try:
+            motor.goToPosition(msg.motor_pos[char])
+        except silverpak.InvalidSilverpakOperationException as e:
+            warning("Can't move motor: " + str(e))
+            pass
     
     camera.autoFocus()
 
@@ -504,7 +511,11 @@ def run_camera():
         # if it's time, send a live view frame
         now = time.time()
         if now > next_frame:
-            server.send_message(FullUpdate(camera.liveViewMemoryView(), {char: motor.position() for char, motor in motors.items()}))
+            if motors is None:
+                motor_positions = {char: 0 for char in motor_chars}
+            else:
+                motor_positions = {char: motor.position() for char, motor in motors.items()}
+            server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions))
             camera.grabLiveViewFrame()
             next_frame = now + 0.20
 
@@ -582,30 +593,37 @@ def initialize_hardware():
             motor.setFake()
         return motor
 
-    global motors, motor_chars
-    motors = {char: create_motor(char) for char in motor_chars}
+    local_motors = {char: create_motor(char) for char in motor_chars}
 
     found = {char: False for char in motor_chars}
-    all_found = False
-    tries = 0
-    while not all_found and tries < 15:
-        all_found = True
-        tries += 1
-        for char, motor in motors.items():
-            if found[char]:
-                continue
-            found[char] = motor.findAndConnect()
-            if not found[char]:
-                warning("Unable to find and connect to silverpak motor '{0}', waiting a sec and trying again".format(char))
-                all_found = False
-            else:
+    threads = []
+    for char, motor in local_motors.items():
+        def find_motor(char, motor):
+            for _ in range(15):
+                found[char] = motor.findAndConnect()
+                if not found[char]:
+                    warning("Unable to find and connect to silverpak motor '{0}', waiting a sec and trying again".format(char))
+                    time.sleep(1)
+                    if finished:
+                        # never mind
+                        return
+                    # try again
+                    continue
+                # success
+                debug("found motor " + repr(char))
                 motor.fullInit()
-        if not all_found:
-            time.sleep(1)
-            if finished:
                 return
-    if not all_found:
+        thread = threading.Thread(target=find_motor, name="motor " + repr(char) + " finder", args=[char, motor])
+        thread.start()
+        threads.append(thread)
+    for thread in threads:
+        thread.join()
+    if not all(found.values()):
         error("Unable to find and connect to all motors.")
+        # leave motors None
+        return
+    global motors
+    motors = local_motors
 
 if __name__ == "__main__":
     start_server()
