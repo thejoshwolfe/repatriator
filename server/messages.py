@@ -230,13 +230,18 @@ class ConnectionResult(ServerMessage):
     InsufficientPrivileges = 1 
     Success = 2
 
-    def __init__(self, status, privileges=None):
+    def __init__(self, status, privileges=None, motor_boundaries=None):
+        """
+        motor_boundaries is a 5-tuple of 2-tuples - min, max for each motor.
+        """
         if privileges is None:
             privileges = set()
 
         self.message_type = ServerMessage.ConnectionResult
         self.privileges = privileges
         self.status = status
+        self.motor_boundaries = motor_boundaries
+
         
     def _serialize(self):
         major, minor, revision = version
@@ -249,7 +254,10 @@ class ConnectionResult(ServerMessage):
         buf.extend(struct.pack(">i", len(self.privileges)))
         for privilege in self.privileges:
             buf.extend(struct.pack(">i", privilege))
-
+        if self.motor_boundaries is not None:
+            for min_value, max_value in self.motor_boundaries:
+                buf.extend(struct.pack(">q", min_value))
+                buf.extend(struct.pack(">q", max_value))
         return buf
 
 __all__.append('FullUpdate')

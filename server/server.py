@@ -159,7 +159,7 @@ def handle_MagicalRequest(msg):
     server.send_message(MagicalResponse())
 
 def handle_ConnectionRequest(msg):
-    global user, server
+    global user, server, motor_chars
 
     debug("Got connection request message")
     debug("version: {0}".format(str(msg.version)))
@@ -184,7 +184,8 @@ def handle_ConnectionRequest(msg):
         return
 
     debug("Successful login for user " + msg.username)
-    server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges()))
+    motor_boundaries = [(settings['MOTOR_%s_MIN' % char], settings['MOTOR_%s_MAX' % char]) for char in motor_chars]
+    server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges(), motor_boundaries))
 
     if msg.hardware_flag:
         initialize_hardware()
@@ -378,7 +379,7 @@ need_camera_thread = {
 }
 
 def init_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread, motor_chars
 
     # initialize variables
     finished = False
@@ -389,6 +390,7 @@ def init_state():
     camera_thread_queue = queue.Queue()
     message_queue = queue.Queue()
     ping_thread = None
+    motor_chars = ['A', 'B', 'X', 'Y', 'Z']
 
 def start_message_loop():
     global message_thread
@@ -568,69 +570,22 @@ def initialize_hardware():
     camera_thread = threading.Thread(target=run_camera, name="camera")
     camera_thread.start()
 
-    def motorA():
+    def create_motor(char):
         motor = silverpak.Silverpak()
-        motor.baudRate = 9600
-        motor.driverAddress = 5
-        motor.fancy = False
-        motor.velocity = 300000
-        motor.acceleration = 500
-        motor.maxPosition = 242000 * 2
-        return motor
-
-    def motorB():
-        motor = silverpak.Silverpak()
-        motor.baudRate = 9600
-        motor.driverAddress = 1
-        motor.maxPosition = 10000
-        return motor
-
-    def motorX():
-        # TODO: this information is wrong
-        motor = silverpak.Silverpak()
-        motor.baudRate = 9600
-        motor.driverAddress = 2
-        motor.setFake()
-        return motor
-
-    def motorY():
-        # TODO: this information is wrong
-        motor = silverpak.Silverpak()
-        motor.baudRate = 9600
-        motor.driverAddress = 3
-        motor.setFake()
-        return motor
-
-    def motorZ():
-        # TODO: this information is wrong
-        motor = silverpak.Silverpak()
-        motor.baudRate = 9600
-        motor.driverAddress = 4
-        motor.maxPosition = 5000000
-        motor.setFake()
-        return motor
-
-    motor_creators = {
-        'A': motorA,
-        'B': motorB,
-        'X': motorX,
-        'Y': motorY,
-        'Z': motorZ,
-    }
-
-    global motors
-    motors = {char: create_motor() for char, create_motor in motor_creators.items()}
-    if settings['FAKE_MOTOR']:
-        for motor in motors.values():
+        motor.baudRate = settings['MOTOR_%s_BAUD_RATE' % char]
+        motor.driverAddress = settings['MOTOR_%s_DRIVER_ADDRESS' % char]
+        motor.fancy = settings['MOTOR_%s_FANCY' % char]
+        motor.velocity = settings['MOTOR_%s_VELOCITY' % char]
+        motor.acceleration = settings['MOTOR_%s_ACCELERATION' % char]
+        motor.maxPosition = settings['MOTOR_%s_MAX' % char]
+        if settings['MOTOR_%s_FAKE' % char]:
             motor.setFake()
+        return motor
 
-    found = {
-        'A': False,
-        'B': False,
-        'X': False,
-        'Y': False,
-        'Z': False,
-    }
+    global motors, motor_chars
+    motors = {char: create_motor() for char in motor_chars}
+
+    found = {char: False for char in motor_chars}
     all_found = False
     tries = 0
     while not all_found and tries < 15:

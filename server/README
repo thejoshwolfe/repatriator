@@ -108,6 +108,17 @@ Messages:
             int32 - number of permissions granted
             for each permission granted:
                 int32 permission enum value 
+            if the permissions included hardware access:
+                int64 - minimum boundary for motor A
+                int64 - maximum boundary for motor A
+                int64 - minimum boundary for motor B
+                int64 - maximum boundary for motor B
+                int64 - minimum boundary for motor X
+                int64 - maximum boundary for motor X
+                int64 - minimum boundary for motor Y
+                int64 - maximum boundary for motor Y
+                int64 - minimum boundary for motor Z
+                int64 - maximum boundary for motor Z
 
         FullUpdate - contains a live view frame and all motor positions
             int8 - identifies this message as a FullUpdate (enum value 2)

@@ -171,6 +171,7 @@ void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
             return;
         } else if (connection_result->connection_status == ConnectionResultMessage::Success) {
             changeLoginState(ServerTypes::Success);
+            m_connection_result = msg;
             return;
         } else {
             Q_ASSERT(false);
