@@ -8,6 +8,7 @@ __all__ = []
 
 __all__.append('ClientMessage')
 class ClientMessage:
+    DummyAutoFocus = -2
     DummyCloseConnection = -1
     MagicalRequest = 0
     ConnectionRequest = 1
@@ -85,6 +86,10 @@ class ClientMessage:
         msg.message_type = raw_data[0]
         msg.parse()
         return msg
+
+__all__.append('DummyAutoFocus')
+class DummyAutoFocus():
+    message_type = ClientMessage.DummyAutoFocus
 
 __all__.append('MagicalRequest')
 class MagicalRequest(ClientMessage):
