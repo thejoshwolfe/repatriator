@@ -233,7 +233,6 @@ def handle_MotorMovement(msg):
         except silverpak.InvalidSilverpakOperationException as e:
             warning("Can't move motor: " + str(e))
             pass
-    
     camera.autoFocus()
 
 @must_have_privilege(Privilege.OperateHardware)
@@ -354,6 +353,15 @@ def handle_ListUserRequest(msg):
     debug("Got list user request message")
     server.send_message(ListUserResult(auth.list_users()))
 
+
+def motorStoppedMovingHandler(reason):
+    if reason != silverpak.StoppedMovingReason.Normal:
+        return
+    global need_to_auto_focus, camera_thread_queue
+    need_to_auto_focus = True
+    debug("a motor stopped moving. setting auto focus flag.")
+    camera_thread_queue.put(DummyAutoFocus())
+
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,
     ClientMessage.ConnectionRequest: handle_ConnectionRequest,
@@ -386,7 +394,7 @@ need_camera_thread = {
 }
 
 def init_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread, motor_chars
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread, motor_chars, need_to_auto_focus
 
     # initialize variables
     finished = False
@@ -398,6 +406,7 @@ def init_state():
     message_queue = queue.Queue()
     ping_thread = None
     motor_chars = ['A', 'B', 'X', 'Y', 'Z']
+    need_to_auto_focus = False
 
 def start_message_loop():
     global message_thread
@@ -463,7 +472,7 @@ def run_ping():
             next_frame = now + 1.00
 
 def run_camera():
-    global camera, message_handlers, message_queue, finished
+    global camera, message_handlers, message_queue, finished, need_to_auto_focus
 
     debug("running camera")
 
@@ -522,13 +531,20 @@ def run_camera():
         # process messages that have to be run in camera thread
         try:
             msg = camera_thread_queue.get(block=False)
-            message_handlers[msg.message_type](msg)
+            if msg.message_type == ClientMessage.DummyAutoFocus:
+                if need_to_auto_focus:
+                    debug("Telling camera to auto focus")
+                    camera.autoFocus()
+                    need_to_auto_focus = False
+            else:
+                message_handlers[msg.message_type](msg)
         except queue.Empty:
             time.sleep(0.05)
             continue
 
     # shut down the camera
     del camera
+    camera = None
     edsdk.terminate()
 
 def on_connection_open():
@@ -591,6 +607,7 @@ def initialize_hardware():
         motor.maxPosition = settings['MOTOR_%s_MAX' % char]
         if settings['MOTOR_%s_FAKE' % char]:
             motor.setFake()
+        motor.stoppedMovingHandlers.append(motorStoppedMovingHandler)
         return motor
 
     local_motors = {char: create_motor(char) for char in motor_chars}
