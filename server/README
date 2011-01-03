@@ -23,6 +23,10 @@ Configuration:
 
     Try omitting this file first, and then use it if you need to.
     
+Running:
+    
+    run klugemeister.bat or ./klugemeister.sh to run the server forever.
+
 How the server handles authentication:
     
     Auth data is represented as a dictionary:
