@@ -377,7 +377,7 @@ need_camera_thread = {
     ClientMessage.ListUserRequest: False,
 }
 
-def reset_state():
+def init_state():
     global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread
 
     # initialize variables
@@ -396,7 +396,7 @@ def start_message_loop():
     message_thread.start()
 
 def start_server():
-    reset_state()
+    init_state()
 
     # wait for a connection
     class _Server(socketserver.StreamRequestHandler):
@@ -550,11 +550,8 @@ def on_connection_close():
 
     set_power_switch(on=False)
 
-    debug("resetting state")
-    reset_state()
-    start_message_loop()
-
-    debug("ready for a new connection")
+    debug("done with life. comitting seppuku")
+    sys.exit(0)
 
 def init_ping_thread():
     global ping_thread, finished
