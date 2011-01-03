@@ -414,9 +414,6 @@ def start_server():
                 on_connection_close()
 
     _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
-    global shutdown_server
-    def shutdown_server():
-        _server.shutdown()
     global server_thread
     server_thread = threading.Thread(target=_server.serve_forever, name="socket server")
     server_thread.start()
@@ -554,7 +551,7 @@ def on_connection_close():
     set_power_switch(on=False)
 
     debug("done with life. comitting seppuku")
-    shutdown_server()
+    os._exit(0)
 
 def init_ping_thread():
     global ping_thread, finished
