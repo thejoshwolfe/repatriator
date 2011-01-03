@@ -46,9 +46,13 @@ void ConnectionWindow::showEvent(QShowEvent *)
 {
     refreshConnections();
 
-    // select the first one
-    if (ui->connectionTable->rowCount() > 0)
-        ui->connectionTable->setCurrentCell(0, 0);
+    // select the most recent one
+    if (ui->connectionTable->rowCount() > Settings::last_connection_index)
+        ui->connectionTable->selectRow(Settings::last_connection_index);
+    else if (ui->connectionTable->rowCount() > 0)
+        ui->connectionTable->selectRow(0);
+
+    enableCorrectControls();
 }
 
 ConnectionWindow * ConnectionWindow::instance()
@@ -60,9 +64,9 @@ ConnectionWindow * ConnectionWindow::instance()
 
 void ConnectionWindow::on_adminButton_clicked()
 {
-    Q_ASSERT(ui->connectionTable->selectedItems().count() == 3);
-
-    if (ui->connectionTable->selectedItems().count() == 3) {
+    bool one_selected = oneConnectionIsSelected();
+    Q_ASSERT(one_selected);
+    if (one_selected) {
         int selected_row = ui->connectionTable->selectedItems().at(0)->row();
         ConnectionSettings * conn = Settings::connections.at(selected_row);
 
@@ -86,16 +90,12 @@ void ConnectionWindow::on_newButton_clicked()
     refreshConnections();
 
     // select the new one
-    ui->connectionTable->setCurrentCell(ui->connectionTable->rowCount() - 1, 0);
+    ui->connectionTable->selectRow(ui->connectionTable->rowCount() - 1);
+    enableCorrectControls();
 }
 
 void ConnectionWindow::refreshConnections()
 {
-    // maybe perserve selection
-//    int selection = -1;
-//    foreach (int selectedIndex in connectionListView.SelectedIndices)
-//        selection = selectedIndex; // will only happen once.
-
     // load contents
     ui->connectionTable->setRowCount(Settings::connections.count());
     for (int i = 0; i < Settings::connections.count(); i++) {
@@ -109,20 +109,12 @@ void ConnectionWindow::refreshConnections()
         ui->connectionTable->setItem(i, 2, usernameItem);
     }
 
-    // restore selection
-//    if (selection != -1 && connectionListView.Items.Count != 0)
-//    {
-//        if (selection >= connectionListView.Items.Count)
-//            selection = connectionListView.Items.Count - 1;
-//        connectionListView.Items[selection].Selected = true;
-//    }
-
     enableCorrectControls();
 }
 
 void ConnectionWindow::enableCorrectControls()
 {
-    bool enableButtons = (ui->connectionTable->selectedItems().count() == 3);
+    bool enableButtons = oneConnectionIsSelected();
     ui->adminButton->setEnabled(enableButtons);
     ui->editButton->setEnabled(enableButtons);
     ui->deleteButton->setEnabled(enableButtons);
@@ -131,9 +123,9 @@ void ConnectionWindow::enableCorrectControls()
 
 void ConnectionWindow::on_editButton_clicked()
 {
-    Q_ASSERT(ui->connectionTable->selectedItems().count() == 3);
-
-    if (ui->connectionTable->selectedItems().count() == 3) {
+    bool one_selected = oneConnectionIsSelected();
+    Q_ASSERT(one_selected);
+    if (one_selected) {
         int selected_row = ui->connectionTable->selectedItems().at(0)->row();
         ConnectionSettings * conn = Settings::connections.at(selected_row);
         EditConnectionWindow * editor = EditConnectionWindow::instance();
@@ -146,23 +138,14 @@ void ConnectionWindow::on_editButton_clicked()
 
 void ConnectionWindow::on_deleteButton_clicked()
 {
-    Q_ASSERT(ui->connectionTable->selectedItems().count() == 3);
-
-    if (ui->connectionTable->selectedItems().count() == 3) {
+    bool one_selected = oneConnectionIsSelected();
+    Q_ASSERT(one_selected);
+    if (one_selected) {
         int selected_row = ui->connectionTable->selectedItems().at(0)->row();
         Settings::connections.removeAt(selected_row);
         Settings::save();
     }
     refreshConnections();
-}
-
-void ConnectionWindow::on_connectionTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
-{
-    Q_UNUSED(currentRow);
-    Q_UNUSED(currentColumn);
-    Q_UNUSED(previousRow);
-    Q_UNUSED(previousColumn);
-    enableCorrectControls();
 }
 
 void ConnectionWindow::on_connectionTable_cellDoubleClicked(int row, int column)
@@ -174,10 +157,15 @@ void ConnectionWindow::on_connectionTable_cellDoubleClicked(int row, int column)
 
 void ConnectionWindow::on_buttonBox_accepted()
 {
-    Q_ASSERT(ui->connectionTable->selectedItems().count() == 3);
-
-    if (ui->connectionTable->selectedItems().count() == 3) {
+    bool one_selected = oneConnectionIsSelected();
+    Q_ASSERT(one_selected);
+    if (one_selected) {
         int selected_row = ui->connectionTable->selectedItems().at(0)->row();
+
+        // remember to auto-select next time
+        Settings::last_connection_index = selected_row;
+        Settings::save();
+
         ConnectionSettings * conn = Settings::connections.at(selected_row);
 
         this->hide();
@@ -190,4 +178,14 @@ void ConnectionWindow::on_buttonBox_accepted()
 void ConnectionWindow::on_buttonBox_rejected()
 {
     this->close();
+}
+
+bool ConnectionWindow::oneConnectionIsSelected() const
+{
+    return ui->connectionTable->selectedItems().count() == 3;
+}
+
+void ConnectionWindow::on_connectionTable_itemSelectionChanged()
+{
+    enableCorrectControls();
 }

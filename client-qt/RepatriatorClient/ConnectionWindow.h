@@ -31,12 +31,13 @@ private:
     ~ConnectionWindow();
     void refreshConnections();
     void enableCorrectControls();
+    bool oneConnectionIsSelected() const;
 
 private slots:
+    void on_connectionTable_itemSelectionChanged();
     void on_buttonBox_rejected();
     void on_buttonBox_accepted();
     void on_connectionTable_cellDoubleClicked(int row, int column);
-    void on_connectionTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_deleteButton_clicked();
     void on_editButton_clicked();
     void on_newButton_clicked();
