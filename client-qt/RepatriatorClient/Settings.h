@@ -11,6 +11,7 @@ class Settings
 {
 public:
     static QList<ConnectionSettings *> connections;
+    static int last_connection_index;
 
     // read the settings on disk into this class
     static void load();
