@@ -17,8 +17,8 @@ Canon camera.
 
 client:
 
-The client runs in the .NET framework and uses network communication to interact
-with the server.
+The client is cross-platform using the Qt framework and uses network
+communication to interact with the server.
 
 
 
