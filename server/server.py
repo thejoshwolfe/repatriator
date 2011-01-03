@@ -583,7 +583,7 @@ def initialize_hardware():
         return motor
 
     global motors, motor_chars
-    motors = {char: create_motor() for char in motor_chars}
+    motors = {char: create_motor(char) for char in motor_chars}
 
     found = {char: False for char in motor_chars}
     all_found = False
