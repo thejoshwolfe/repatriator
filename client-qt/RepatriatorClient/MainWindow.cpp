@@ -29,6 +29,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // adjust the vertical spacer to the slider's height that is next to it
     ui->orbitVerticalSpacer->changeSize(ui->orbitVerticalSpacer->geometry().width(), ui->orbitSliderB->height(), QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+    m_pictures_context_menu = new QMenu(this);
+    m_pictures_context_menu->addAction(ui->actionSelectAll);
+    m_pictures_context_menu->addSeparator();
+    m_pictures_context_menu->addAction(ui->actionDownload);
+    m_pictures_context_menu->addAction(ui->actionDiscardSelectedFiles);
+    m_pictures_context_menu->addSeparator();
+    m_pictures_context_menu->addAction(ui->actionDownloadAllAndQuit);
 }
 
 MainWindow::~MainWindow()
@@ -156,6 +164,7 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
     foreach (ServerTypes::DirectoryItem item, items) {
         ui->picturesList->addItem(new QListWidgetItem(QIcon(QPixmap::fromImage(item.thumbnail)), item.filename));
     }
+    enableCorrectControls();
 }
 
 void MainWindow::updateShadowPositions(QVector<qint64> motor_positions)
@@ -198,10 +207,13 @@ void MainWindow::showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMes
 
 void MainWindow::enableCorrectControls()
 {
+    bool an_item_exists = ui->picturesList->count() > 0;
+    ui->actionDownloadAllAndQuit->setEnabled(an_item_exists);
+    ui->actionSelectAll->setEnabled(an_item_exists);
+
     bool an_item_is_selected = ui->picturesList->selectedItems().count() > 0;
     ui->actionDownload->setEnabled(an_item_is_selected);
     ui->actionDiscardSelectedFiles->setEnabled(an_item_is_selected);
-    ui->actionDownloadAllAndQuit->setEnabled(ui->picturesList->count() > 0);
 
     bool server_connected = ! m_server.isNull() && (m_server.data()->loginStatus() == ServerTypes::Success);
     ui->actionTakeSnapshot->setEnabled(server_connected);
@@ -350,4 +362,9 @@ QString MainWindow::getNextDownloadFilename()
             return filename;
         m_next_download_number += 1;
     }
+}
+
+void MainWindow::on_picturesList_customContextMenuRequested(QPoint pos)
+{
+    m_pictures_context_menu->popup(ui->picturesList->mapToGlobal(pos));
 }
