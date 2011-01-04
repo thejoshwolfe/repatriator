@@ -646,7 +646,7 @@ def initialize_hardware():
             def go_to_startup_handler(*args):
                 motor.stoppedMovingHandlers.remove(go_to_startup_handler)
                 motor.stoppedMovingHandlers.append(done_initializing_handler)
-                if not move_motor(motor, settings['MOTOR_%s_START_POSITION']):
+                if not move_motor(motor, settings['MOTOR_%s_START_POSITION' % char]):
                     # no initial position. just call the final step
                     done_initializing_handler()
             for _ in range(15):
