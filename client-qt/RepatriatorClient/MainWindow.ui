@@ -152,6 +152,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QListWidget" name="picturesList">
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::ExtendedSelection</enum>
        </property>
@@ -179,6 +182,8 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionSelectAll"/>
+    <addaction name="separator"/>
     <addaction name="actionDownload"/>
     <addaction name="actionDiscardSelectedFiles"/>
     <addaction name="separator"/>
@@ -282,6 +287,17 @@
     <string>Lets you choose a new location where you want pictures to be downloaded to.</string>
    </property>
   </action>
+  <action name="actionSelectAll">
+   <property name="text">
+    <string>&amp;Select All</string>
+   </property>
+   <property name="toolTip">
+    <string>Highlight all of the downloadable pictures</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -318,5 +334,22 @@
  <resources>
   <include location="repatriator.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionSelectAll</sender>
+   <signal>triggered()</signal>
+   <receiver>picturesList</receiver>
+   <slot>selectAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>322</x>
+     <y>455</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

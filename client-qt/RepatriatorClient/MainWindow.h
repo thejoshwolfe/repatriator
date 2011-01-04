@@ -9,6 +9,7 @@
 #include <QSharedPointer>
 #include <QProgressDialog>
 #include <QVector>
+#include <QMenu>
 
 namespace Ui {
     class MainWindow;
@@ -45,6 +46,7 @@ private:
     int m_next_download_number;
     // set this to true if we are expecting the server to close the connection
     bool m_quit_after_close;
+    QMenu * m_pictures_context_menu;
 
 private:
     void cleanup();
@@ -58,6 +60,7 @@ private:
     QString getNextDownloadFilename();
 
 private slots:
+    void on_picturesList_customContextMenuRequested(QPoint pos);
     void on_orbitSliderA_valueChanged(int value);
     void on_orbitSliderB_valueChanged(int value);
     void on_liftSliderZ_valueChanged(int value);
