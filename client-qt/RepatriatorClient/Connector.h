@@ -25,8 +25,8 @@ public:
     };
 
 public:
-    // use this instead of a constructor
-    static Connector * create(ConnectionSettings * connection, bool need_hardware);
+    explicit Connector(ConnectionSettings * connection, bool need_hardware);
+    virtual ~Connector();
 
 public slots:
     // after you hook up your slots, call go. you will either get success
@@ -46,11 +46,9 @@ private:
     QSharedPointer<Server> m_server;
 
 private:
-    explicit Connector(ConnectionSettings * connection, bool need_hardware);
-    ~Connector() {}
 
     void fail(FailureReason reason);
-    void cleanup(bool kill_connection = true);
+    void cleanup();
 private slots:
     void updateProgressFromLoginStatus(ServerTypes::LoginStatus status);
     void cancel();

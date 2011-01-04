@@ -5,16 +5,14 @@
 
 #include <QMessageBox>
 
-Connector * Connector::create(ConnectionSettings *connection, bool need_hardware)
-{
-    return new Connector(connection, need_hardware);
-}
-
 Connector::Connector(ConnectionSettings * connection, bool need_hardware) :
     m_connection(connection),
     m_need_hardware(need_hardware),
     m_progressDialog(),
     m_server()
+{}
+
+Connector::~Connector()
 {}
 
 void Connector::go()
@@ -27,7 +25,6 @@ void Connector::go()
         if (password.isNull()) {
             emit failure(Cancelled);
             this->disconnect();
-            delete this;
             return;
         }
     }
@@ -43,7 +40,7 @@ void Connector::go()
     m_progressDialog.data()->setMinimum(0);
     m_progressDialog.data()->setMaximum(4);
     m_progressDialog.data()->setMinimumDuration(100);
-    success = connect(m_progressDialog.data(), SIGNAL(canceled()), this, SLOT(cancel()), Qt::DirectConnection);
+    success = connect(m_progressDialog.data(), SIGNAL(canceled()), this, SLOT(cancel()));
     Q_ASSERT(success);
 
     m_progressDialog.data()->setValue(0);
@@ -84,7 +81,6 @@ void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
             m_progressDialog.data()->setLabelText(tr("Success."));
             m_progressDialog.data()->setValue(4);
             emit success(m_server);
-            cleanup(false);
             return;
         case ServerTypes::SocketError:
             m_progressDialog.data()->setLabelText(tr("Socket error."));
@@ -110,12 +106,7 @@ void Connector::fail(FailureReason reason)
     cleanup();
 }
 
-void Connector::cleanup(bool kill_connection)
+void Connector::cleanup()
 {
-    this->disconnect(); // unhook all signals pointed here
-
-    if (kill_connection)
-        m_server.data()->socketDisconnect();
-
-    delete this;
+    m_server.data()->socketDisconnect();
 }
