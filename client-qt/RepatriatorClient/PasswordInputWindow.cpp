@@ -8,6 +8,12 @@ PasswordInputWindow::PasswordInputWindow(QWidget *parent) :
     ui(new Ui::PasswordInputWindow)
 {
     ui->setupUi(this);
+
+    bool success;
+    success = connect(this, SIGNAL(accepted()), this, SLOT(handleAccepted()));
+    Q_ASSERT(success);
+    success = connect(this, SIGNAL(rejected()), this, SLOT(handhandleRejected()));
+    Q_ASSERT(success);
 }
 
 PasswordInputWindow::~PasswordInputWindow()
@@ -51,10 +57,20 @@ QString PasswordInputWindow::showGetPassword(QString dialog_title, QString ok_te
 
 void PasswordInputWindow::on_buttonBox_accepted()
 {
+    handleAccepted();
+}
+
+void PasswordInputWindow::handleAccepted()
+{
     m_return_password = ui->passwordLineEdit->text();
 }
 
 void PasswordInputWindow::on_buttonBox_rejected()
+{
+    handleRejected();
+}
+
+void PasswordInputWindow::handleRejected()
 {
     m_return_password = QString();
 }

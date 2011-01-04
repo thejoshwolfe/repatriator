@@ -29,6 +29,9 @@ private:
 private slots:
     void on_buttonBox_rejected();
     void on_buttonBox_accepted();
+
+    void handleRejected();
+    void handleAccepted();
 };
 
 #endif // PASSWORDINPUTWINDOW_H

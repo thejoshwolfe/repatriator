@@ -17,6 +17,10 @@ EditConnectionWindow::EditConnectionWindow(QWidget *parent) :
     bool success;
     success = connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)), this, SLOT(delegateFocusEvent(QWidget*,QWidget*)));
     Q_ASSERT(success);
+    success = connect(this, SIGNAL(accepted()), this, SLOT(handleAccepted()));
+    Q_ASSERT(success);
+    success = connect(this, SIGNAL(rejected()), this, SLOT(handleRejected()));
+    Q_ASSERT(success);
 }
 
 EditConnectionWindow::~EditConnectionWindow()
@@ -94,11 +98,21 @@ void EditConnectionWindow::enableCorrectControls()
 
 void EditConnectionWindow::on_buttonBox_accepted()
 {
+    handleAccepted();
+}
+
+void EditConnectionWindow::handleAccepted()
+{
     updateConnectionWithControls();
     m_accepted = true;
 }
 
 void EditConnectionWindow::on_buttonBox_rejected()
+{
+    handleRejected();
+}
+
+void EditConnectionWindow::handleRejected()
 {
     m_accepted = false;
 }

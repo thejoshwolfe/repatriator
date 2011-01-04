@@ -12,6 +12,13 @@ AdminWindow::AdminWindow(QWidget *parent) :
     ui(new Ui::AdminWindow)
 {
     ui->setupUi(this);
+
+    bool success;
+    success = connect(this, SIGNAL(accepted()), this, SLOT(handleAccepted()));
+    Q_ASSERT(success);
+    success = connect(this, SIGNAL(rejected()), this, SLOT(handleRejected()));
+    Q_ASSERT(success);
+
 }
 
 AdminWindow::~AdminWindow()
@@ -76,6 +83,11 @@ void AdminWindow::updateUserList(QList<ServerTypes::UserInfo> users)
 
 void AdminWindow::on_buttonBox_rejected()
 {
+    handleRejected();
+}
+
+void AdminWindow::handleRejected()
+{
     cleanup();
 }
 
@@ -110,6 +122,11 @@ void AdminWindow::cleanup()
 }
 
 void AdminWindow::on_buttonBox_accepted()
+{
+    handleAccepted();
+}
+
+void AdminWindow::handleAccepted()
 {
     // apply changes
     foreach (QSharedPointer<DetailedUserInfo> user, m_users)

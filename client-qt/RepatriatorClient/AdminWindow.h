@@ -74,6 +74,9 @@ private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 
+    void handleAccepted();
+    void handleRejected();
+
     void connected(QSharedPointer<Server> server);
     void connectionFailure(Connector::FailureReason reason);
     void processMessage(QSharedPointer<IncomingMessage> msg);
