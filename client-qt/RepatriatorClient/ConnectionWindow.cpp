@@ -23,6 +23,12 @@ ConnectionWindow::ConnectionWindow(QWidget *parent) :
     ui->buttonBox->clear();
     ui->buttonBox->addButton(m_loginButton, QDialogButtonBox::AcceptRole);
     ui->buttonBox->addButton(QDialogButtonBox::Cancel);
+
+    bool success;
+    success = connect(this, SIGNAL(rejected()), this, SLOT(handleRejected()));
+    Q_ASSERT(success);
+    success = connect(this, SIGNAL(accepted()), this, SLOT(handleAccepted()));
+    Q_ASSERT(success);
 }
 
 ConnectionWindow::~ConnectionWindow()
@@ -45,6 +51,16 @@ void ConnectionWindow::changeEvent(QEvent *e)
 void ConnectionWindow::showEvent(QShowEvent *)
 {
     refreshConnections();
+
+    this->restoreGeometry(Settings::connection_window_geometry);
+
+    Q_ASSERT(ui->connectionTable->columnCount() == Settings::connection_column_width.count());
+    for (int i = 0; i < Settings::connection_column_width.count(); i++) {
+        if (Settings::connection_column_width.at(i) <= 0)
+            ui->connectionTable->resizeColumnToContents(i);
+        else
+            ui->connectionTable->setColumnWidth(i, Settings::connection_column_width.at(i));
+    }
 
     // select the most recent one
     if (ui->connectionTable->rowCount() > Settings::last_connection_index)
@@ -157,6 +173,44 @@ void ConnectionWindow::on_connectionTable_cellDoubleClicked(int row, int column)
 
 void ConnectionWindow::on_buttonBox_accepted()
 {
+    this->accept();
+}
+
+void ConnectionWindow::hideEvent(QHideEvent *)
+{
+    // save window geometry and such
+    Settings::connection_window_geometry = this->saveGeometry();
+
+    // column widths
+    Q_ASSERT(ui->connectionTable->columnCount() == Settings::connection_column_width.count());
+    for (int i = 0; i < Settings::connection_column_width.count(); i++)
+        Settings::connection_column_width.replace(i, ui->connectionTable->columnWidth(i));
+
+    Settings::save();
+}
+
+void ConnectionWindow::on_buttonBox_rejected()
+{
+    this->reject();
+}
+
+bool ConnectionWindow::oneConnectionIsSelected() const
+{
+    return ui->connectionTable->selectedItems().count() == 3;
+}
+
+void ConnectionWindow::on_connectionTable_itemSelectionChanged()
+{
+    enableCorrectControls();
+}
+
+void ConnectionWindow::handleRejected()
+{
+    this->close();
+}
+
+void ConnectionWindow::handleAccepted()
+{
     bool one_selected = oneConnectionIsSelected();
     Q_ASSERT(one_selected);
     if (one_selected) {
@@ -173,19 +227,4 @@ void ConnectionWindow::on_buttonBox_accepted()
     } else {
         refreshConnections();
     }
-}
-
-void ConnectionWindow::on_buttonBox_rejected()
-{
-    this->close();
-}
-
-bool ConnectionWindow::oneConnectionIsSelected() const
-{
-    return ui->connectionTable->selectedItems().count() == 3;
-}
-
-void ConnectionWindow::on_connectionTable_itemSelectionChanged()
-{
-    enableCorrectControls();
 }

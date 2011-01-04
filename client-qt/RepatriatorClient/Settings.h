@@ -4,6 +4,8 @@
 #include "ConnectionSettings.h"
 
 #include <QList>
+#include <QVector>
+#include <QByteArray>
 
 class QSettings;
 
@@ -12,6 +14,10 @@ class Settings
 public:
     static QList<ConnectionSettings *> connections;
     static int last_connection_index;
+    static QVector<int> connection_column_width;
+    static QByteArray connection_window_geometry;
+    static QByteArray main_window_geometry;
+    static QByteArray main_window_state;
 
     // read the settings on disk into this class
     static void load();

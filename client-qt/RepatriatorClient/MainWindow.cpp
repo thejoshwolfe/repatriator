@@ -309,3 +309,16 @@ void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundar
     ui->liftSliderZ->setMinimum(bounds.at(4).min);
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
 }
+
+void MainWindow::showEvent(QShowEvent *)
+{
+    this->restoreGeometry(Settings::main_window_geometry);
+    this->restoreState(Settings::main_window_state);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *)
+{
+    Settings::main_window_geometry = this->saveGeometry();
+    Settings::main_window_state = this->saveState();
+    Settings::save();
+}

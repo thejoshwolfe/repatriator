@@ -18,6 +18,7 @@ public:
 protected:
     void changeEvent(QEvent *e);
     void showEvent(QShowEvent *);
+    void hideEvent(QHideEvent *);
 
 private:
     Ui::ConnectionWindow *ui;
@@ -42,6 +43,9 @@ private slots:
     void on_editButton_clicked();
     void on_newButton_clicked();
     void on_adminButton_clicked();
+
+    void handleRejected();
+    void handleAccepted();
 
 };
 
