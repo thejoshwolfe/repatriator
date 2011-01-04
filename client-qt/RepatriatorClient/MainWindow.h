@@ -42,6 +42,8 @@ private:
 
     QSharedPointer<Connector> m_connector;
 
+    int m_next_download_number;
+
 private:
     void cleanup();
     void enableCorrectControls();
@@ -51,6 +53,7 @@ private:
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> motor_boundaries);
+    QString getNextDownloadFilename();
 
 private slots:
     void on_orbitSliderA_valueChanged(int value);

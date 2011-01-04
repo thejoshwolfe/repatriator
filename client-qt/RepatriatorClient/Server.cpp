@@ -98,9 +98,6 @@ void Server::sendMessage(QSharedPointer<OutgoingMessage> msg)
 
 void Server::handleConnected()
 {
-    // reset state
-    m_nextDownloadNumber = 1;
-
     delete m_parser;
     m_parser = new IncomingMessageParser(m_socket);
 
@@ -183,17 +180,6 @@ void Server::changeLoginState(ServerTypes::LoginStatus state)
 {
     m_login_state = state;
     emit loginStatusUpdated(state);
-}
-
-QString Server::getNextDownloadFilename()
-{
-    forever {
-        QDir folder(m_connection_info.download_directory);
-        QString filename = folder.absoluteFilePath(QString("img_") + QString::number(m_nextDownloadNumber) + QString(".jpg"));
-        if (! QFileInfo(filename).exists())
-            return filename;
-        m_nextDownloadNumber += 1;
-    }
 }
 
 void Server::handleSocketError(QAbstractSocket::SocketError error)

@@ -73,14 +73,11 @@ private:
 
     ServerTypes::LoginStatus m_login_state;
 
-    int m_nextDownloadNumber;
-
     QSharedPointer<IncomingMessage> m_connection_result;
 
 
 private:
     void changeLoginState(ServerTypes::LoginStatus state);
-    QString getNextDownloadFilename();
 
 private slots:
     void initialize();

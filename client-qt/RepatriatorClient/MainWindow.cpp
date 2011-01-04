@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(new QProgressDialog(this, Qt::Dialog)),
-    m_target_motor_positions(5)
+    m_target_motor_positions(5),
+    m_next_download_number(1)
 {
     m_progressDialog->setWindowModality(Qt::NonModal);
     m_progressDialog->setWindowTitle(tr("Receiving data"));
@@ -126,7 +127,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         case IncomingMessage::FileDownloadResult:
         {
             FileDownloadResultMessage * file_download_msg = (FileDownloadResultMessage *) msg.data();
-            saveFile(file_download_msg->file, file_download_msg->filename);
+            saveFile(file_download_msg->file, getNextDownloadFilename());
             break;
         }
         default:
@@ -321,4 +322,15 @@ void MainWindow::resizeEvent(QResizeEvent *)
     Settings::main_window_geometry = this->saveGeometry();
     Settings::main_window_state = this->saveState();
     Settings::save();
+}
+
+QString MainWindow::getNextDownloadFilename()
+{
+    forever {
+        QDir folder(m_connection_settings->download_directory);
+        QString filename = folder.absoluteFilePath(QString("img_") + QString::number(m_next_download_number) + QString(".jpg"));
+        if (! QFileInfo(filename).exists())
+            return filename;
+        m_next_download_number += 1;
+    }
 }
