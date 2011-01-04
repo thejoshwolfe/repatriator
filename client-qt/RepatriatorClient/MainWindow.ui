@@ -29,49 +29,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>630</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menu_File">
-    <property name="title">
-     <string>&amp;File</string>
-    </property>
-    <addaction name="actionDownload"/>
-    <addaction name="actionDiscardSelectedFiles"/>
-    <addaction name="separator"/>
-    <addaction name="actionDownloadAllAndQuit"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuit"/>
-   </widget>
-   <widget class="QMenu" name="menu_Camera">
-    <property name="title">
-     <string>&amp;Camera</string>
-    </property>
-    <addaction name="actionTakeSnapshot"/>
-   </widget>
-   <widget class="QMenu" name="menu_Motors">
-    <property name="title">
-     <string>&amp;Motors</string>
-    </property>
-    <addaction name="actionGoHome"/>
-   </widget>
-   <widget class="QMenu" name="menuSe_ttings">
-    <property name="title">
-     <string>Se&amp;ttings</string>
-    </property>
-    <addaction name="actionChangeDownloadFolder"/>
-   </widget>
-   <addaction name="menu_File"/>
-   <addaction name="menu_Camera"/>
-   <addaction name="menu_Motors"/>
-   <addaction name="menuSe_ttings"/>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="verticalDock">
    <property name="features">
@@ -178,6 +135,42 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>630</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionDownload"/>
+    <addaction name="actionDiscardSelectedFiles"/>
+    <addaction name="separator"/>
+    <addaction name="actionDownloadAllAndQuit"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Camera">
+    <property name="title">
+     <string>&amp;Camera</string>
+    </property>
+    <addaction name="actionTakeSnapshot"/>
+   </widget>
+   <widget class="QMenu" name="menuSe_ttings">
+    <property name="title">
+     <string>Se&amp;ttings</string>
+    </property>
+    <addaction name="actionChangeDownloadFolder"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Camera"/>
+   <addaction name="menuSe_ttings"/>
   </widget>
   <action name="actionDownload">
    <property name="text">
