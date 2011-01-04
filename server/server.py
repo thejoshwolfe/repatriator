@@ -641,11 +641,12 @@ def initialize_hardware():
         motor.stoppedMovingHandlers.append(motorStoppedMovingHandler)
         return motor
 
-    local_motors = {char: create_motor(char) for char in motor_chars}
+    global motors
+    motors = {char: create_motor(char) for char in motor_chars}
 
     found = {char: False for char in motor_chars}
     threads = []
-    for char, motor in local_motors.items():
+    for char, motor in motors.items():
         def find_motor(char, motor):
             def done_initializing_handler(*args):
                 motor.stoppedMovingHandlers.remove(done_initializing_handler)
@@ -685,8 +686,6 @@ def initialize_hardware():
         error("Unable to find and connect to all motors.")
         # leave motors None
         return
-    global motors
-    motors = local_motors
 
 if __name__ == "__main__":
     start_server()
