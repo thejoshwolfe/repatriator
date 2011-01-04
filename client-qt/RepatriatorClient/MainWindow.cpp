@@ -70,7 +70,6 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
 
 void MainWindow::connected(QSharedPointer<Server> server)
 {
-    m_connector.clear();
     m_server = server;
 
     bool success;
@@ -91,7 +90,6 @@ void MainWindow::connected(QSharedPointer<Server> server)
 
 void MainWindow::connectionFailure(Connector::FailureReason reason)
 {
-    m_connector.clear();
     Q_UNUSED(reason);
     ConnectionWindow::instance()->show();
     this->hide();
