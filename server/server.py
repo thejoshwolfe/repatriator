@@ -228,14 +228,18 @@ def handle_MotorMovement(msg):
         warning("Can't move motors yet. they haven't been found")
         return
     for char, motor in motors.items():
-        try:
-            intended_position = msg.motor_pos[char]
-            if motor.position() != intended_position:
-                debug("moving motor " + repr(char) + " from " + repr(motor.position()) + " to " + repr(intended_position))
-                motor.goToPosition(intended_position)
-        except silverpak.InvalidSilverpakOperationException as e:
-            warning("Can't move motor: " + str(e))
-            pass
+        move_motor(motor, msg.motor_pos[char])
+
+def move_motor(motor, intended_position):
+    if motor.position() == intended_position:
+        return False
+    try:
+        debug("moving motor " + repr(motor.name) + " from " + repr(motor.position()) + " to " + repr(intended_position))
+        motor.goToPosition(intended_position)
+    except silverpak.InvalidSilverpakOperationException as e:
+        warning("Can't move motor: " + str(e))
+        pass
+    return True
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_DirectoryListingRequest(msg):
@@ -396,18 +400,19 @@ need_camera_thread = {
 }
 
 def init_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motors, ping_thread, motor_chars, need_to_auto_focus
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motor_chars, motors, motor_is_initialized, ping_thread, need_to_auto_focus
 
     # initialize variables
     finished = False
     user = None
     camera_thread = None
     message_thread = None
+    motor_chars = ['A', 'B', 'X', 'Y', 'Z']
     motors = None
+    motor_is_initialized = {char: False for char in motor_chars}
     camera_thread_queue = queue.Queue()
     message_queue = queue.Queue()
     ping_thread = None
-    motor_chars = ['A', 'B', 'X', 'Y', 'Z']
     need_to_auto_focus = False
 
 
@@ -565,7 +570,7 @@ def on_connection_close():
             motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
             if motor.fancy:
                 debug("sending motor " + repr(motor.name) + " to 0")
-                motor.goToPosition(0)
+                move_motor(motor, 0)
 
     # clean up
     finished = True
@@ -578,21 +583,20 @@ def on_connection_close():
         debug("waiting for ping thread to join")
         ping_thread.join()
 
-    debug("waiting for message thread to join")
     if message_thread is not None:
+        debug("waiting for message thread to join")
         message_queue.put(DummyCloseConnection())
         message_thread.join()
 
-    debug("waiting for motors to get to 0")
     if motors is not None:
+        debug("waiting for motors to get to 0")
         for motor in motors.values():
             while not motor.isReady():
                 debug("waiting for motor " + repr(motor.name))
                 time.sleep(1)
 
-    # shutdown motors
-    debug("disposing motors")
     if motors is not None:
+        debug("disposing motors")
         for motor in motors.values():
             motor.dispose()
 
@@ -636,6 +640,15 @@ def initialize_hardware():
     threads = []
     for char, motor in local_motors.items():
         def find_motor(char, motor):
+            def done_initializing_handler(args*):
+                motor.stoppedMovingHandlers.remove(done_initializing_handler)
+                motor_is_initialized[char] = True
+            def go_to_startup_handler(args*):
+                motor.stoppedMovingHandlers.remove(go_to_startup_handler)
+                motor.stoppedMovingHandlers.append(done_initializing_handler)
+                if not move_motor(motor, settings['MOTOR_%s_START_POSITION']):
+                    # no initial position. just call the final step
+                    done_initializing_handler()
             for _ in range(15):
                 found[char] = motor.findAndConnect()
                 if not found[char]:
@@ -648,7 +661,13 @@ def initialize_hardware():
                     continue
                 # success
                 debug("found motor " + repr(char))
+                motor.stoppedMovingHandlers.append(go_to_startup_handler)
                 motor.fullInit()
+                # wait for initialization
+                while not motor_is_initialized[char]:
+                    debug("waiting for motor " + repr(char) + " to initialize")
+                    time.sleep(1)
+                debug("motor " + repr(char) + " is done initializing")
                 return
         thread = threading.Thread(target=find_motor, name="motor " + repr(char) + " finder", args=[char, motor])
         thread.start()

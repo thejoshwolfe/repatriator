@@ -24,6 +24,7 @@ settings = {
     'MOTOR_A_DRIVER_ADDRESS': 5,    # used to identify the motor on the serial port
     'MOTOR_A_FANCY': False,         # whether to use limit switch and tracking
     'MOTOR_A_FAKE': False,          # fake=True to use debug motor which does not use real hardware
+    'MOTOR_A_START_POSITION': 0,
 
     'MOTOR_B_MIN': 0,
     'MOTOR_B_MAX': 10000,
@@ -33,6 +34,7 @@ settings = {
     'MOTOR_B_DRIVER_ADDRESS': 1,
     'MOTOR_B_FANCY': True,
     'MOTOR_B_FAKE': False,
+    'MOTOR_B_START_POSITION': 0,
 
     'MOTOR_X_MIN': 0,
     'MOTOR_X_MAX': 500000,
@@ -42,6 +44,7 @@ settings = {
     'MOTOR_X_DRIVER_ADDRESS': 2,
     'MOTOR_X_FANCY': True,
     'MOTOR_X_FAKE': False,
+    'MOTOR_X_START_POSITION': 0,
 
     'MOTOR_Y_MIN': 0,
     'MOTOR_Y_MAX': 500000,
@@ -51,6 +54,7 @@ settings = {
     'MOTOR_Y_DRIVER_ADDRESS': 3,
     'MOTOR_Y_FANCY': True,
     'MOTOR_Y_FAKE': False,
+    'MOTOR_Y_START_POSITION': 0,
 
     'MOTOR_Z_MIN': 0,
     'MOTOR_Z_MAX': 500000,
@@ -60,6 +64,7 @@ settings = {
     'MOTOR_Z_DRIVER_ADDRESS': 4,
     'MOTOR_Z_FANCY': True,
     'MOTOR_Z_FAKE': False,
+    'MOTOR_Z_START_POSITION': 0,
 }
 try:
     import config
