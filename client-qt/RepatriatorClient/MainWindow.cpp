@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow * MainWindow::s_instance = NULL;
 
@@ -15,7 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     m_progressDialog(new QProgressDialog(this, Qt::Dialog)),
     m_target_motor_positions(5),
-    m_next_download_number(1)
+    m_next_download_number(1),
+    m_quit_after_close(false)
 {
     m_progressDialog->setWindowModality(Qt::NonModal);
     m_progressDialog->setWindowTitle(tr("Receiving data"));
@@ -101,8 +103,17 @@ void MainWindow::connectionFailure(Connector::FailureReason reason)
 
 void MainWindow::connectionEnded()
 {
-    this->close();
-    cleanup();
+    if (m_quit_after_close) {
+        this->close();
+        cleanup();
+    } else {
+        // unexpected
+        QMessageBox::warning(this, tr("Server Closed Connection"),
+            tr("The remote server closed the connection. You'll have to reconnect if you weren't done."), QMessageBox::Ok);
+        ConnectionWindow::instance()->show();
+        this->close();
+        cleanup();
+    }
 }
 
 void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)

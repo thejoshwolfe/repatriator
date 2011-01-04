@@ -44,11 +44,12 @@ private:
     bool m_need_hardware;
     QSharedPointer<QProgressDialog> m_progressDialog;
     QSharedPointer<Server> m_server;
+    bool m_done;
 
 private:
-
     void fail(FailureReason reason);
-    void cleanup();
+    void cleanup(bool kill_connection = true);
+
 private slots:
     void updateProgressFromLoginStatus(ServerTypes::LoginStatus status);
     void cancel();

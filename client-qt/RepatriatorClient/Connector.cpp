@@ -9,7 +9,8 @@ Connector::Connector(ConnectionSettings * connection, bool need_hardware) :
     m_connection(connection),
     m_need_hardware(need_hardware),
     m_progressDialog(),
-    m_server()
+    m_server(),
+    m_done(false)
 {}
 
 Connector::~Connector()
@@ -49,6 +50,8 @@ void Connector::go()
 
 void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
 {
+    if (m_done)
+        return;
     switch(status) {
         case ServerTypes::Connecting:
             m_progressDialog.data()->setLabelText(tr("Connecting..."));
@@ -81,6 +84,7 @@ void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
             m_progressDialog.data()->setLabelText(tr("Success."));
             m_progressDialog.data()->setValue(4);
             emit success(m_server);
+            cleanup(false);
             return;
         case ServerTypes::SocketError:
             m_progressDialog.data()->setLabelText(tr("Socket error."));
@@ -106,7 +110,10 @@ void Connector::fail(FailureReason reason)
     cleanup();
 }
 
-void Connector::cleanup()
+void Connector::cleanup(bool kill_connection)
 {
-    m_server.data()->socketDisconnect();
+    m_done = true;
+    disconnect(this);
+    if (kill_connection)
+        m_server.data()->socketDisconnect();
 }

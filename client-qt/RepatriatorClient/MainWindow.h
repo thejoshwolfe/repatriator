@@ -43,6 +43,8 @@ private:
     QSharedPointer<Connector> m_connector;
 
     int m_next_download_number;
+    // set this to true if we are expecting the server to close the connection
+    bool m_quit_after_close;
 
 private:
     void cleanup();
