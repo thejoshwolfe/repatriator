@@ -10,6 +10,8 @@
 class OutgoingMessage
 {
 public:
+    virtual ~OutgoingMessage() {}
+
     void writeToStream(QDataStream & stream);
 
 protected:
@@ -137,6 +139,7 @@ public:
     QSet<ServerTypes::Permission> permissions;
     UpdateUserMessage(QString username, QString password, QSet<ServerTypes::Permission> permissions) :
         username(username), password(password), permissions(permissions) {}
+    virtual~UpdateUserMessage() {}
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return UpdateUser; }

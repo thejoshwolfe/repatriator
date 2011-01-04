@@ -24,6 +24,8 @@ public:
     qint64 byte_count;
 
 public:
+    virtual ~IncomingMessage() {}
+
     // parse the message after the header and populate member variables
     // the stream is guaranteed to have the entire message ready to read
     virtual void parse(QDataStream & stream) = 0;
