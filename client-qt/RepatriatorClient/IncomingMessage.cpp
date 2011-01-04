@@ -1,6 +1,7 @@
 #include "IncomingMessage.h"
 
 #include <QDataStream>
+#include <QDebug>
 
 const qint8 MagicalResponseMessage::c_magical_response[] = { 0xb5, 0xac, 0x71, 0x2a, 0x08, 0x3d, 0xe5, 0x07 };
 
