@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>558</height>
+    <width>646</width>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,7 +44,7 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
       <widget class="ShadowMinimap" name="shadowMinimap" native="true">
        <property name="sizePolicy">
@@ -84,30 +84,54 @@
       </layout>
      </item>
      <item>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="1" column="0">
-        <widget class="ShadowSlider" name="orbitSliderA">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <spacer name="orbitVerticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>19</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="ShadowSlider" name="orbitSliderA">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="1" column="1">
-        <widget class="Rotate3DWidget" name="orbit3D" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="ShadowSlider" name="orbitSliderB">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="ShadowSlider" name="orbitSliderB">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Rotate3DWidget" name="orbit3D" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -141,7 +165,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>630</width>
+     <width>646</width>
      <height>25</height>
     </rect>
    </property>
@@ -283,7 +307,6 @@
   <tabstop>snapshotButton</tabstop>
   <tabstop>liftSliderZ</tabstop>
   <tabstop>orbitSliderB</tabstop>
-  <tabstop>orbitSliderA</tabstop>
   <tabstop>picturesList</tabstop>
  </tabstops>
  <resources>

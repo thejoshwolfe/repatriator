@@ -24,6 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setCentralWidget(ui->displayWidget);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
+    // adjust the vertical spacer to the slider's height that is next to it
+    ui->orbitVerticalSpacer->changeSize(ui->orbitVerticalSpacer->geometry().width(), ui->orbitSliderB->height(), QSizePolicy::Minimum, QSizePolicy::Fixed);
 }
 
 MainWindow::~MainWindow()
