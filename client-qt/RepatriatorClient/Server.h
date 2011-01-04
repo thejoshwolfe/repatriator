@@ -84,6 +84,7 @@ private:
 
 private slots:
     void initialize();
+    void terminate();
     void handleConnected();
     void cleanUpAfterDisconnect();
     void processIncomingMessage(QSharedPointer<IncomingMessage>);

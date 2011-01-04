@@ -48,7 +48,7 @@ private:
 private:
 
     void fail(FailureReason reason);
-    void cleanup(bool kill_connection = true);
+    void cleanup();
 private slots:
     void updateProgressFromLoginStatus(ServerTypes::LoginStatus status);
     void cancel();

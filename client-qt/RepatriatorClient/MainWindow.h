@@ -38,6 +38,8 @@ private:
     QString m_quit_after_this_file;
     QVector<qint64> m_target_motor_positions;
 
+    QSharedPointer<Connector> m_connector;
+
 private:
     void cleanup();
     void enableCorrectControls();

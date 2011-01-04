@@ -3,6 +3,7 @@
 #include "IncomingMessageParser.h"
 
 #include <QDir>
+#include <QCoreApplication>
 
 const int Server::c_client_major_version = 0;
 const int Server::c_client_minor_version = 0;
@@ -36,7 +37,7 @@ Server::~Server()
 
 void Server::initialize()
 {
-    Q_ASSERT(this->thread() == m_socket_thread);
+    Q_ASSERT(QThread::currentThread() == m_socket_thread);
 
     m_socket = new QTcpSocket(this);
 
@@ -54,7 +55,11 @@ void Server::initialize()
 
 void Server::socketConnect()
 {
-    Q_ASSERT(this->thread() == m_socket_thread);
+    if (QThread::currentThread() != m_socket_thread) {
+        bool success = QMetaObject::invokeMethod(this, "socketConnect", Qt::QueuedConnection);
+        Q_ASSERT(success);
+        return;
+    }
     Q_ASSERT(m_socket);
 
     changeLoginState(ServerTypes::Connecting);
@@ -63,7 +68,11 @@ void Server::socketConnect()
 
 void Server::socketDisconnect()
 {
-    Q_ASSERT(this->thread() == m_socket_thread);
+    if (QThread::currentThread() != m_socket_thread) {
+        bool success = QMetaObject::invokeMethod(this, "socketDisconnect", Qt::QueuedConnection);
+        Q_ASSERT(success);
+        return;
+    }
 
     if (m_socket->isOpen())
         m_socket->disconnectFromHost();
@@ -71,7 +80,11 @@ void Server::socketDisconnect()
 
 void Server::sendMessage(QSharedPointer<OutgoingMessage> msg)
 {
-    Q_ASSERT(this->thread() == m_socket_thread);
+    if (QThread::currentThread() != m_socket_thread) {
+        bool success = QMetaObject::invokeMethod(this, "sendMessage", Qt::QueuedConnection, QGenericReturnArgument(), Q_ARG(QSharedPointer<OutgoingMessage>, msg));
+        Q_ASSERT(success);
+        return;
+    }
 
     if (dynamic_cast<DummyDisconnectMessage *>(msg.data()) != NULL) {
         socketDisconnect();
@@ -103,8 +116,17 @@ void Server::handleConnected()
 
 void Server::cleanUpAfterDisconnect()
 {
-    Q_ASSERT(this->thread() == m_socket_thread);
+    qDebug() << "Cleaning up, disconnected";
+    m_socket_thread->exit();
+    this->moveToThread(QCoreApplication::instance()->thread());
+    bool success;
+    success = QMetaObject::invokeMethod(this, "terminate", Qt::QueuedConnection);
+    Q_ASSERT(success);
+}
 
+void Server::terminate()
+{
+    Q_ASSERT(QThread::currentThread() == QCoreApplication::instance()->thread());
     m_socket_thread->exit();
     m_socket_thread->wait();
 

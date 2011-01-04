@@ -30,7 +30,7 @@ void Connector::go()
     }
 
     m_server = QSharedPointer<Server>(new Server(*m_connection, password, m_need_hardware));
-    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(ServerTypes::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)));
+    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(ServerTypes::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)), Qt::QueuedConnection);
     Q_ASSERT(success);
 
     m_progressDialog = QSharedPointer<QProgressDialog>(new QProgressDialog());
@@ -81,7 +81,6 @@ void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
             m_progressDialog.data()->setLabelText(tr("Success."));
             m_progressDialog.data()->setValue(4);
             emit success(m_server);
-            cleanup(false);
             return;
         case ServerTypes::SocketError:
             m_progressDialog.data()->setLabelText(tr("Socket error."));
@@ -107,10 +106,7 @@ void Connector::fail(FailureReason reason)
     cleanup();
 }
 
-void Connector::cleanup(bool kill_connection)
+void Connector::cleanup()
 {
-    this->disconnect(); // unhook all signals pointed here
-
-    if (kill_connection)
-        m_server.data()->socketDisconnect();
+    m_server.data()->socketDisconnect();
 }

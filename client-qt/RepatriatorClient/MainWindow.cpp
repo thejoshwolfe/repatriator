@@ -55,21 +55,22 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
 
     enableCorrectControls();
 
-    QScopedPointer<Connector> connector(new Connector(connection, true));
+    m_connector = QSharedPointer<Connector>(new Connector(connection, true));
 
     bool success;
-    success = connect(connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)));
+    success = connect(m_connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
     Q_ASSERT(success);
-    success = connect(connector.data(), SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
+    success = connect(m_connector.data(), SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
     Q_ASSERT(success);
 
-    connector.data()->go();
+    m_connector.data()->go();
 
     this->show();
 }
 
 void MainWindow::connected(QSharedPointer<Server> server)
 {
+    m_connector.clear();
     m_server = server;
 
     bool success;
@@ -90,6 +91,7 @@ void MainWindow::connected(QSharedPointer<Server> server)
 
 void MainWindow::connectionFailure(Connector::FailureReason reason)
 {
+    m_connector.clear();
     Q_UNUSED(reason);
     ConnectionWindow::instance()->show();
     this->hide();
