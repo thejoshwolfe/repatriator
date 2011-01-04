@@ -26,7 +26,7 @@ public:
 protected:
     void changeEvent(QEvent *e);
     void showEvent(QShowEvent *);
-    void resizeEvent(QResizeEvent *);
+    void closeEvent(QCloseEvent *);
 
 private:
     explicit MainWindow(QWidget *parent = 0);

@@ -313,11 +313,14 @@ void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundar
 
 void MainWindow::showEvent(QShowEvent *)
 {
-    this->restoreGeometry(Settings::main_window_geometry);
-    this->restoreState(Settings::main_window_state);
+    bool success;
+    success = this->restoreGeometry(Settings::main_window_geometry);
+    Q_ASSERT(success);
+    success = this->restoreState(Settings::main_window_state);
+    Q_ASSERT(success);
 }
 
-void MainWindow::resizeEvent(QResizeEvent *)
+void MainWindow::closeEvent(QCloseEvent *)
 {
     Settings::main_window_geometry = this->saveGeometry();
     Settings::main_window_state = this->saveState();
