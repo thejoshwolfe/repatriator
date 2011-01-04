@@ -267,13 +267,14 @@ class ConnectionResult(ServerMessage):
 
 __all__.append('FullUpdate')
 class FullUpdate(ServerMessage):
-    def __init__(self, frame_buffer, motor_positions):
+    def __init__(self, frame_buffer, motor_positions, motor_states):
         """
         frame_buffer is a memoryview of the live view picture
         motor_positions is a dictionary of the motor character to position.
         """
         self.message_type = ServerMessage.FullUpdate
-        self.motor_pos = motor_positions
+        self.motor_positions = motor_positions
+        self.motor_states = motor_states
 
         self.jpeg = bytearray()
 
@@ -297,11 +298,9 @@ class FullUpdate(ServerMessage):
 
     def _serialize(self):
         buf = bytearray()
-        buf.extend(struct.pack(">q", self.motor_pos['A']))
-        buf.extend(struct.pack(">q", self.motor_pos['B']))
-        buf.extend(struct.pack(">q", self.motor_pos['X']))
-        buf.extend(struct.pack(">q", self.motor_pos['Y']))
-        buf.extend(struct.pack(">q", self.motor_pos['Z']))
+        for char in ['A', 'B', 'X', 'Y', 'Z']:
+            buf.extend(struct.pack(">b", self.motor_states[char]))
+            buf.extend(struct.pack(">q", self.motor_positions[char]))
         buf.extend(struct.pack(">q", len(self.jpeg)))
         buf.extend(self.jpeg)
         return buf

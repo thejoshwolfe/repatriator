@@ -64,6 +64,9 @@ void ConnectionResultMessage::parse(QDataStream &stream)
 void FullUpdateMessage::parse(QDataStream &stream)
 {
     for (int i = 1; i <= 5; i++) {
+        qint8 state;
+        stream >> state;
+        motor_states.append(state);
         qint64 pos;
         stream >> pos;
         motor_positions.append((long) pos);

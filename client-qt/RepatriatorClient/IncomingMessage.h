@@ -73,6 +73,7 @@ class FullUpdateMessage : public IncomingMessage
 {
 public:
     // always A, B, X, Y, Z
+    QVector<qint8> motor_states;
     QVector<qint64> motor_positions;
     QImage image;
 
