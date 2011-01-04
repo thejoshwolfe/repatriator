@@ -640,10 +640,10 @@ def initialize_hardware():
     threads = []
     for char, motor in local_motors.items():
         def find_motor(char, motor):
-            def done_initializing_handler(args*):
+            def done_initializing_handler(*args):
                 motor.stoppedMovingHandlers.remove(done_initializing_handler)
                 motor_is_initialized[char] = True
-            def go_to_startup_handler(args*):
+            def go_to_startup_handler(*args):
                 motor.stoppedMovingHandlers.remove(go_to_startup_handler)
                 motor.stoppedMovingHandlers.append(done_initializing_handler)
                 if not move_motor(motor, settings['MOTOR_%s_START_POSITION']):
