@@ -537,7 +537,7 @@ def run_camera():
                 motor_states = {
                     char:
                         (int(motor_is_initialized[char]) << 0) |
-                        (int(motor.isRready())           << 1)
+                        (int(motor.isReady())            << 1)
                     for char, motor in motors.items()
                 }
             server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
