@@ -131,7 +131,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         {
             FullUpdateMessage * full_update_msg = (FullUpdateMessage *) msg.data();
             ui->displayWidget->prepareDisplayImage(full_update_msg->image);
-            updateShadowPositions(full_update_msg->motor_positions);
+            updateShadowPositions(full_update_msg->motor_states, full_update_msg->motor_positions);
             break;
         }
         case IncomingMessage::ErrorMessage:
@@ -167,12 +167,27 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
     enableCorrectControls();
 }
 
-void MainWindow::updateShadowPositions(QVector<qint64> motor_positions)
+void MainWindow::updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position)
 {
-    ui->orbitSliderA->setShadowPosition((int)motor_positions.at(0));
-    ui->orbitSliderB->setShadowPosition((int)motor_positions.at(1));
+    bool is_initialized = (bool)(motor_state & FullUpdateMessage::MotorIsInitialized);
+    int value = (int)motor_position;
+    if (is_initialized) {
+        slider->setEnabled(true);
+    } else {
+        slider->setEnabled(false);
+        slider->setValue(value);
+    }
+    slider->setShadowPosition(value);
+}
+
+void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions)
+{
+    updateShadowPosition(ui->orbitSliderA, motor_states.at(0), motor_positions.at(0));
+    updateShadowPosition(ui->orbitSliderB, motor_states.at(1), motor_positions.at(1));
+    updateShadowPosition(ui->liftSliderZ, motor_states.at(4), motor_positions.at(4));
+
+    ui->shadowMinimap->setEnabled((bool)(motor_states.at(2) & FullUpdateMessage::MotorIsInitialized) && (bool)(motor_states.at(3) & FullUpdateMessage::MotorIsInitialized));
     ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
-    ui->liftSliderZ->setShadowPosition((int)motor_positions.at(4));
 }
 
 void MainWindow::saveFile(QByteArray blob, QString filename)

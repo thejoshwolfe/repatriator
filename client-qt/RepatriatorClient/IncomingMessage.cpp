@@ -61,6 +61,8 @@ void ConnectionResultMessage::parse(QDataStream &stream)
     }
 }
 
+qint8 const FullUpdateMessage::MotorIsInitialized = 1 << 0;
+
 void FullUpdateMessage::parse(QDataStream &stream)
 {
     for (int i = 1; i <= 5; i++) {
