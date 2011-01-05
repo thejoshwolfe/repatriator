@@ -184,7 +184,7 @@ def handle_ConnectionRequest(msg):
         return
 
     debug("Successful login for user " + msg.username)
-    motor_boundaries = [(settings['MOTOR_%s_MIN' % char], settings['MOTOR_%s_MAX' % char]) for char in motor_chars]
+    motor_boundaries = [[settings['MOTOR_%s_%s' % (char, setting_name)] for setting_name in ("MIN", "MAX", "START_POSITION")] for char in motor_chars]
     server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges(), motor_boundaries))
 
     if msg.hardware_flag:
@@ -534,12 +534,7 @@ def run_camera():
                 motor_states = {char: 0 for char in motor_chars}
             else:
                 motor_positions = {char: motor.position() for char, motor in motors.items()}
-                motor_states = {
-                    char:
-                        (int(motor_is_initialized[char]) << 0) |
-                        (int(motor.isReady())            << 1)
-                    for char, motor in motors.items()
-                }
+                motor_states = {char: int(motor_is_initialized[char]) for char, motor in motors.items()}
             server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
             camera.grabLiveViewFrame()
             next_frame = now + 0.20
@@ -573,11 +568,12 @@ def on_connection_close():
 
     # send motors to 0
     if motors is not None:
-        for motor in motors.values():
+        for char, motor in motors.items():
             motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
             if motor.fancy:
-                debug("sending motor " + repr(motor.name) + " to 0")
-                move_motor(motor, 0)
+                end_position = settings['MOTOR_%s_END_POSITION' % char]
+                debug("sending motor " + repr(motor.name) + " home to " + repr(end_position))
+                move_motor(motor, end_position)
 
     # clean up
     finished = True
@@ -596,16 +592,20 @@ def on_connection_close():
         message_thread.join()
 
     if motors is not None:
-        debug("waiting for motors to get to 0")
-        for motor in motors.values():
+        debug("shutting down motors")
+        motor_disposer_threads = []
+        def shutdown_motor(motor):
             while not motor.isReady():
-                debug("waiting for motor " + repr(motor.name))
+                debug("waiting for motor " + repr(motor.name) + " to stop moving")
                 time.sleep(1)
-
-    if motors is not None:
-        debug("disposing motors")
-        for motor in motors.values():
+            debug("disposing motor " + repr(motor.name))
             motor.dispose()
+        for motor in motors.values():
+            thread = threading.Thread(name="motor " + repr(motor.name) + " disposer", target=shutdown_motor, args=[motor])
+            thread.start()
+            motor_disposer_threads.append(thread)
+        for thread in motor_disposer_threads:
+            thread.join()
 
     set_power_switch(on=False)
 

@@ -4,6 +4,7 @@
 #include "ConnectionSettings.h"
 #include "Server.h"
 #include "Connector.h"
+#include "ShadowSlider.h"
 
 #include <QMainWindow>
 #include <QSharedPointer>
@@ -39,7 +40,6 @@ private:
     ConnectionSettings * m_connection_settings;
 
     QString m_quit_after_this_file;
-    QVector<qint64> m_target_motor_positions;
 
     QSharedPointer<Connector> m_connector;
 
@@ -52,7 +52,8 @@ private:
     void cleanup();
     void enableCorrectControls();
     void updateDirectoryList(QList<ServerTypes::DirectoryItem> items);
-    void updateShadowPositions(QVector<qint64> motor_positions);
+    void updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position);
+    void updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions);
     void saveFile(QByteArray blob, QString filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();

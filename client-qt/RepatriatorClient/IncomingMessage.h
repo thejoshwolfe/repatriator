@@ -57,6 +57,7 @@ public:
     struct MotorBoundaries {
         qint64 min;
         qint64 max;
+        qint64 init;
     };
 
     qint32 major_version;
@@ -72,6 +73,7 @@ public:
 class FullUpdateMessage : public IncomingMessage
 {
 public:
+    static const qint8 MotorIsInitialized;
     // always A, B, X, Y, Z
     QVector<qint8> motor_states;
     QVector<qint64> motor_positions;

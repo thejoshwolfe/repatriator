@@ -56,10 +56,13 @@ void ConnectionResultMessage::parse(QDataStream &stream)
             MotorBoundaries bounds;
             stream >> bounds.min;
             stream >> bounds.max;
+            stream >> bounds.init;
             motor_boundaries.append(bounds);
         }
     }
 }
+
+qint8 const FullUpdateMessage::MotorIsInitialized = 1 << 0;
 
 void FullUpdateMessage::parse(QDataStream &stream)
 {

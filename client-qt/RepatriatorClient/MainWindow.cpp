@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(new QProgressDialog(this, Qt::Dialog)),
-    m_target_motor_positions(5),
     m_next_download_number(1),
     m_quit_after_close(false)
 {
@@ -131,7 +130,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         {
             FullUpdateMessage * full_update_msg = (FullUpdateMessage *) msg.data();
             ui->displayWidget->prepareDisplayImage(full_update_msg->image);
-            updateShadowPositions(full_update_msg->motor_positions);
+            updateShadowPositions(full_update_msg->motor_states, full_update_msg->motor_positions);
             break;
         }
         case IncomingMessage::ErrorMessage:
@@ -167,12 +166,20 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
     enableCorrectControls();
 }
 
-void MainWindow::updateShadowPositions(QVector<qint64> motor_positions)
+void MainWindow::updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position)
 {
-    ui->orbitSliderA->setShadowPosition((int)motor_positions.at(0));
-    ui->orbitSliderB->setShadowPosition((int)motor_positions.at(1));
+    slider->setEnabled((bool)(motor_state & FullUpdateMessage::MotorIsInitialized));
+    slider->setShadowPosition((int)motor_position);
+}
+
+void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions)
+{
+    updateShadowPosition(ui->orbitSliderA, motor_states.at(0), motor_positions.at(0));
+    updateShadowPosition(ui->orbitSliderB, motor_states.at(1), motor_positions.at(1));
+    updateShadowPosition(ui->liftSliderZ, motor_states.at(4), motor_positions.at(4));
+
+    ui->shadowMinimap->setEnabled((bool)(motor_states.at(2) & FullUpdateMessage::MotorIsInitialized) && (bool)(motor_states.at(3) & FullUpdateMessage::MotorIsInitialized));
     ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
-    ui->liftSliderZ->setShadowPosition((int)motor_positions.at(4));
 }
 
 void MainWindow::saveFile(QByteArray blob, QString filename)
@@ -299,6 +306,7 @@ void MainWindow::on_shadowMinimap_positionChosen(QPoint)
 
 void MainWindow::sendTargetMotorPositions()
 {
+    QVector<qint64> m_target_motor_positions(5);
     m_target_motor_positions[0] = ui->orbitSliderA->value();
     m_target_motor_positions[1] = ui->orbitSliderB->value();
     m_target_motor_positions[2] = ui->shadowMinimap->position().x();
@@ -325,16 +333,26 @@ void MainWindow::on_orbitSliderA_valueChanged(int)
 
 void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> bounds)
 {
+    ui->orbitSliderA->blockSignals(true);
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
     ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
+    ui->orbitSliderA->setValue((int)bounds.at(0).init);
+    ui->orbitSliderA->blockSignals(false);
 
+    ui->orbitSliderB->blockSignals(true);
     ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
     ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
+    ui->orbitSliderB->setValue((int)bounds.at(1).init);
+    ui->orbitSliderB->blockSignals(false);
 
     ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
+    ui->shadowMinimap->setPosition(QPoint((int)bounds.at(2).init, (int)bounds.at(3).init));
 
+    ui->liftSliderZ->blockSignals(true);
     ui->liftSliderZ->setMinimum(bounds.at(4).min);
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
+    ui->liftSliderZ->setValue((int)bounds.at(4).init);
+    ui->liftSliderZ->blockSignals(false);
 }
 
 void MainWindow::showEvent(QShowEvent *)
