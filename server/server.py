@@ -592,16 +592,20 @@ def on_connection_close():
         message_thread.join()
 
     if motors is not None:
-        debug("waiting for motors to get to 0")
-        for motor in motors.values():
+        debug("shutting down motors")
+        motor_disposer_threads = []
+        def shutdown_motor(motor):
             while not motor.isReady():
-                debug("waiting for motor " + repr(motor.name))
+                debug("waiting for motor " + repr(motor.name) + " to stop moving")
                 time.sleep(1)
-
-    if motors is not None:
-        debug("disposing motors")
-        for motor in motors.values():
+            debug("disposing motor " + repr(motor.name))
             motor.dispose()
+        for motor in motors.values():
+            thread = threading.Thread(name="motor " + repr(motor.name) + " disposer", target=shutdown_motor)
+            thread.start()
+            motor_disposer_threads.append(thread)
+        for thread in motor_disposer_threads:
+            thread.join()
 
     set_power_switch(on=False)
 
