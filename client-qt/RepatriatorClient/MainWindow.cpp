@@ -175,7 +175,9 @@ void MainWindow::updateShadowPosition(ShadowSlider * slider, qint8 motor_state, 
         slider->setEnabled(true);
     } else {
         slider->setEnabled(false);
+        slider->blockSignals(true);
         slider->setValue(value);
+        slider->blockSignals(false);
     }
     slider->setShadowPosition(value);
 }
