@@ -568,11 +568,12 @@ def on_connection_close():
 
     # send motors to 0
     if motors is not None:
-        for motor in motors.values():
+        for char, motor in motors.items():
             motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
             if motor.fancy:
-                debug("sending motor " + repr(motor.name) + " to 0")
-                move_motor(motor, 0)
+                end_position = settings['MOTOR_%s_END_POSITION' % char]
+                debug("sending motor " + repr(motor.name) + " home to " + repr(end_position))
+                move_motor(motor, end_position)
 
     # clean up
     finished = True
