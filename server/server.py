@@ -601,7 +601,7 @@ def on_connection_close():
             debug("disposing motor " + repr(motor.name))
             motor.dispose()
         for motor in motors.values():
-            thread = threading.Thread(name="motor " + repr(motor.name) + " disposer", target=shutdown_motor)
+            thread = threading.Thread(name="motor " + repr(motor.name) + " disposer", target=shutdown_motor, args=[motor])
             thread.start()
             motor_disposer_threads.append(thread)
         for thread in motor_disposer_threads:
