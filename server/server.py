@@ -534,12 +534,7 @@ def run_camera():
                 motor_states = {char: 0 for char in motor_chars}
             else:
                 motor_positions = {char: motor.position() for char, motor in motors.items()}
-                motor_states = {
-                    char:
-                        (int(motor_is_initialized[char]) << 0) |
-                        (int(motor.isReady())            << 1)
-                    for char, motor in motors.items()
-                }
+                motor_states = {char: int(motor_is_initialized[char]) for char, motor in motors.items()}
             server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
             camera.grabLiveViewFrame()
             next_frame = now + 0.20

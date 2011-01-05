@@ -136,9 +136,9 @@ Messages:
             int64 - byte count for the following JPEG image. if it's 0, then server is unable to provide a frame.
             <jpeg format image>
 
-            motor states are these bits:
-                1 << 0: motor is initialized. attempts to move an uninitialized motor will likely be ignored.
-                1 << 1: motor is stopped. you might like to try and watch whether the Z has hit the limit switch with this one.
+            a motor state is one of the following:
+                0: motor is not initialized.
+                1: motor is initialized.
 
         DirectoryListingResult
             int8 - identifies this message as a DirectoryListingResult (enum value 3)
