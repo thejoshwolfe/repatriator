@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(new QProgressDialog(this, Qt::Dialog)),
-    m_target_motor_positions(5),
     m_next_download_number(1),
     m_quit_after_close(false)
 {
@@ -307,6 +306,7 @@ void MainWindow::on_shadowMinimap_positionChosen(QPoint)
 
 void MainWindow::sendTargetMotorPositions()
 {
+    QVector<qint64> m_target_motor_positions(5);
     m_target_motor_positions[0] = ui->orbitSliderA->value();
     m_target_motor_positions[1] = ui->orbitSliderB->value();
     m_target_motor_positions[2] = ui->shadowMinimap->position().x();
@@ -333,24 +333,24 @@ void MainWindow::on_orbitSliderA_valueChanged(int)
 
 void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> bounds)
 {
+    ui->orbitSliderA->blockSignals(true);
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
     ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
-    ui->orbitSliderA->blockSignals(true);
     ui->orbitSliderA->setValue((int)bounds.at(0).init);
     ui->orbitSliderA->blockSignals(false);
 
+    ui->orbitSliderB->blockSignals(true);
     ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
     ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
-    ui->orbitSliderB->blockSignals(true);
     ui->orbitSliderB->setValue((int)bounds.at(1).init);
     ui->orbitSliderB->blockSignals(false);
 
     ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
     ui->shadowMinimap->setPosition(QPoint((int)bounds.at(2).init, (int)bounds.at(3).init));
 
+    ui->liftSliderZ->blockSignals(true);
     ui->liftSliderZ->setMinimum(bounds.at(4).min);
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
-    ui->liftSliderZ->blockSignals(true);
     ui->liftSliderZ->setValue((int)bounds.at(4).init);
     ui->liftSliderZ->blockSignals(false);
 }

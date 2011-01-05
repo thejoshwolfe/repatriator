@@ -40,7 +40,6 @@ private:
     ConnectionSettings * m_connection_settings;
 
     QString m_quit_after_this_file;
-    QVector<qint64> m_target_motor_positions;
 
     QSharedPointer<Connector> m_connector;
 
