@@ -111,27 +111,32 @@ Messages:
             if the permissions included hardware access:
                 int64 - minimum boundary for motor A
                 int64 - maximum boundary for motor A
+                int64 - initial position for motor A
                 int64 - minimum boundary for motor B
                 int64 - maximum boundary for motor B
+                int64 - initial position for motor B
                 int64 - minimum boundary for motor X
                 int64 - maximum boundary for motor X
+                int64 - initial position for motor X
                 int64 - minimum boundary for motor Y
                 int64 - maximum boundary for motor Y
+                int64 - initial position for motor Y
                 int64 - minimum boundary for motor Z
                 int64 - maximum boundary for motor Z
+                int64 - initial position for motor Z
 
         FullUpdate - contains a live view frame and all motor positions
             int8 - identifies this message as a FullUpdate (enum value 2)
             int64 - byte count of the entire message including this field
-            int8 - state of motor A
+            int8 - boolean - indicates motor A is initialized
             int64 - position of motor A
-            int8 - state of motor B
+            int8 - boolean - indicates motor B is initialized
             int64 - position of motor B
-            int8 - state of motor X
+            int8 - boolean - indicates motor X is initialized
             int64 - position of motor X
-            int8 - state of motor Y
+            int8 - boolean - indicates motor Y is initialized
             int64 - position of motor Y
-            int8 - state of motor Z
+            int8 - boolean - indicates motor Z is initialized
             int64 - position of motor Z
             int64 - byte count for the following JPEG image. if it's 0, then server is unable to provide a frame.
             <jpeg format image>

@@ -169,17 +169,8 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
 
 void MainWindow::updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position)
 {
-    bool is_initialized = (bool)(motor_state & FullUpdateMessage::MotorIsInitialized);
-    int value = (int)motor_position;
-    if (is_initialized) {
-        slider->setEnabled(true);
-    } else {
-        slider->setEnabled(false);
-        slider->blockSignals(true);
-        slider->setValue(value);
-        slider->blockSignals(false);
-    }
-    slider->setShadowPosition(value);
+    slider->setEnabled((bool)(motor_state & FullUpdateMessage::MotorIsInitialized));
+    slider->setShadowPosition((int)motor_position);
 }
 
 void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions)
@@ -344,14 +335,24 @@ void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundar
 {
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
     ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
+    ui->orbitSliderA->blockSignals(true);
+    ui->orbitSliderA->setValue((int)bounds.at(0).init);
+    ui->orbitSliderA->blockSignals(false);
 
     ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
     ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
+    ui->orbitSliderB->blockSignals(true);
+    ui->orbitSliderB->setValue((int)bounds.at(1).init);
+    ui->orbitSliderB->blockSignals(false);
 
     ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
+    ui->shadowMinimap->setPosition(QPoint((int)bounds.at(2).init, (int)bounds.at(3).init));
 
     ui->liftSliderZ->setMinimum(bounds.at(4).min);
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
+    ui->liftSliderZ->blockSignals(true);
+    ui->liftSliderZ->setValue((int)bounds.at(4).init);
+    ui->liftSliderZ->blockSignals(false);
 }
 
 void MainWindow::showEvent(QShowEvent *)

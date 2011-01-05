@@ -184,7 +184,7 @@ def handle_ConnectionRequest(msg):
         return
 
     debug("Successful login for user " + msg.username)
-    motor_boundaries = [(settings['MOTOR_%s_MIN' % char], settings['MOTOR_%s_MAX' % char]) for char in motor_chars]
+    motor_boundaries = [[settings['MOTOR_%s_%s' % (char, setting_name)] for setting_name in ("MIN", "MAX", "START_POSITION")] for char in motor_chars]
     server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges(), motor_boundaries))
 
     if msg.hardware_flag:

@@ -56,6 +56,7 @@ void ConnectionResultMessage::parse(QDataStream &stream)
             MotorBoundaries bounds;
             stream >> bounds.min;
             stream >> bounds.max;
+            stream >> bounds.init;
             motor_boundaries.append(bounds);
         }
     }

@@ -57,6 +57,7 @@ public:
     struct MotorBoundaries {
         qint64 min;
         qint64 max;
+        qint64 init;
     };
 
     qint32 major_version;
