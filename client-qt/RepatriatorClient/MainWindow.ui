@@ -68,70 +68,57 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="ShadowSlider" name="liftSliderZ">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <spacer name="orbitVerticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>19</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="ShadowSlider" name="orbitSliderA">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="1">
+        <widget class="ShadowSlider" name="liftSliderZ">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
        </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="ShadowSlider" name="orbitSliderB">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Rotate3DWidget" name="orbit3D" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Zoom</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="ShadowSlider" name="orbitSliderB">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Tilt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="ShadowSlider" name="orbitSliderA">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Spin</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -175,7 +162,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -313,12 +300,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>Rotate3DWidget</class>
-   <extends>QWidget</extends>
-   <header>Rotate3DWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ImageDisplayWidget</class>
    <extends>QWidget</extends>
    <header>ImageDisplayWidget.h</header>
@@ -327,8 +308,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>snapshotButton</tabstop>
-  <tabstop>liftSliderZ</tabstop>
-  <tabstop>orbitSliderB</tabstop>
   <tabstop>picturesList</tabstop>
  </tabstops>
  <resources>

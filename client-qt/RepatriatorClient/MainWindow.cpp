@@ -26,9 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setCentralWidget(ui->displayWidget);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-    // adjust the vertical spacer to the slider's height that is next to it
-    ui->orbitVerticalSpacer->changeSize(ui->orbitVerticalSpacer->geometry().width(), ui->orbitSliderB->height(), QSizePolicy::Minimum, QSizePolicy::Fixed);
-
     m_pictures_context_menu = new QMenu(this);
     m_pictures_context_menu->addAction(ui->actionSelectAll);
     m_pictures_context_menu->addSeparator();
@@ -227,7 +224,6 @@ void MainWindow::enableCorrectControls()
     ui->snapshotButton->setEnabled(server_connected);
     ui->shadowMinimap->setEnabled(server_connected);
     ui->liftSliderZ->setEnabled(server_connected);
-    ui->orbit3D->setEnabled(server_connected);
     ui->orbitSliderA->setEnabled(server_connected);
     ui->orbitSliderB->setEnabled(server_connected);
 }
