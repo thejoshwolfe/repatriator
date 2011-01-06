@@ -90,9 +90,6 @@ void MainWindow::connected(QSharedPointer<Server> server)
     success = connect(m_server.data(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SLOT(showProgress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
 
-    ConnectionResultMessage * connection_result  = (ConnectionResultMessage *) server.data()->connectionResultMessage().data();
-    changeMotorBounds(connection_result->motor_boundaries);
-
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DirectoryListingRequestMessage()));
 
     enableCorrectControls();
@@ -147,6 +144,11 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
             FileDownloadResultMessage * file_download_msg = (FileDownloadResultMessage *) msg.data();
             saveFile(file_download_msg->file, getNextDownloadFilename());
             break;
+        }
+        case IncomingMessage::InitInfo:
+        {
+            InitInfoMessage * init_info_msg = (InitInfoMessage *) msg.data();
+            changeMotorBounds(init_info_msg->motor_boundaries);
         }
         default:
             qDebug() << "wtf got a message " << msg.data()->type;
@@ -327,7 +329,7 @@ void MainWindow::on_orbitSliderA_valueChanged(int)
     sendTargetMotorPositions();
 }
 
-void MainWindow::changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> bounds)
+void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bounds)
 {
     ui->orbitSliderA->blockSignals(true);
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);

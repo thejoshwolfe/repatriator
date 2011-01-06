@@ -51,15 +51,6 @@ void ConnectionResultMessage::parse(QDataStream &stream)
         stream >> permission;
         permissions.insert((ServerTypes::Permission) permission);
     }
-    if (permissions.contains(ServerTypes::OperateHardware)) {
-        for (int i = 0; i < 5; i++) {
-            MotorBoundaries bounds;
-            stream >> bounds.min;
-            stream >> bounds.max;
-            stream >> bounds.init;
-            motor_boundaries.append(bounds);
-        }
-    }
 }
 
 qint8 const FullUpdateMessage::MotorIsInitialized = 1 << 0;
@@ -121,3 +112,13 @@ void ListUserResultMessage::parse(QDataStream &stream)
     }
 }
 
+void InitInfoMessage::parse(QDataStream & stream)
+{
+    for (int i = 0; i < 5; i++) {
+        MotorBoundaries bounds;
+        stream >> bounds.min;
+        stream >> bounds.max;
+        stream >> bounds.init;
+        motor_boundaries.append(bounds);
+    }
+}

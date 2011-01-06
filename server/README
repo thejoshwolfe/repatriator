@@ -25,7 +25,7 @@ Configuration:
     
 Running:
     
-    run klugemeister.bat or ./klugemeister.sh to run the server forever.
+    ./run_server.bat or ./run_server.sh to run the server forever.
 
 How the server handles authentication:
     
@@ -108,22 +108,6 @@ Messages:
             int32 - number of permissions granted
             for each permission granted:
                 int32 permission enum value 
-            if the permissions included hardware access:
-                int64 - minimum boundary for motor A
-                int64 - maximum boundary for motor A
-                int64 - initial position for motor A
-                int64 - minimum boundary for motor B
-                int64 - maximum boundary for motor B
-                int64 - initial position for motor B
-                int64 - minimum boundary for motor X
-                int64 - maximum boundary for motor X
-                int64 - initial position for motor X
-                int64 - minimum boundary for motor Y
-                int64 - maximum boundary for motor Y
-                int64 - initial position for motor Y
-                int64 - minimum boundary for motor Z
-                int64 - maximum boundary for motor Z
-                int64 - initial position for motor Z
 
         FullUpdate - contains a live view frame and all motor positions
             int8 - identifies this message as a FullUpdate (enum value 2)
@@ -182,8 +166,28 @@ Messages:
                     int32 permission enum value 
 
         Ping - server is just checking if you're still there
-            int8 - identifies this message as a Ping (enum value 12)
+            int8 - identifies this message as a Ping (enum value 7)
             int64 - byte count of the entire message including this field
+
+        InitializationInformation
+            int8 - identifies this message as an Initialization (enum value 8)
+            int64 - byte count of the entire message including this field
+            int64 - minimum boundary for motor A
+            int64 - maximum boundary for motor A
+            int64 - initial position for motor A
+            int64 - minimum boundary for motor B
+            int64 - maximum boundary for motor B
+            int64 - initial position for motor B
+            int64 - minimum boundary for motor X
+            int64 - maximum boundary for motor X
+            int64 - initial position for motor X
+            int64 - minimum boundary for motor Y
+            int64 - maximum boundary for motor Y
+            int64 - initial position for motor Y
+            int64 - minimum boundary for motor Z
+            int64 - maximum boundary for motor Z
+            int64 - initial position for motor Z
+
 
     From the client to the server:
 
