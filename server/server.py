@@ -39,6 +39,18 @@ import pythoncom
 import edsdk
 import silverpak
 
+
+def camera_error_handler(level, msg):
+    full_msg = "EDSDK: %s" % msg
+    {
+        edsdk.ErrorLevel.Debug: debug,
+        edsdk.ErrorLevel.Warn: warning,
+        edsdk.ErrorLevel.Error: error,
+    }[level](full_msg)
+
+edsdk.setErrorLevel(edsdk.ErrorLevel.Debug)
+edsdk.setErrorMessageCallback(camera_error_handler)
+
 class Server:
     def _write_message(self, message):
         """
@@ -500,10 +512,10 @@ def run_camera():
     fakeCameraImagePath = settings['FAKE_CAMERA_IMAGE_PATH']
     global finished
     if fakeCameraImagePath != None:
-        debug("edsdk: using fake camera")
+        debug("using fake camera")
         camera = edsdk.getFakeCamera(fakeCameraImagePath)
     else:
-        debug("edsdk: getting first camera")
+        debug("getting first camera")
         tries = 0
         while tries < 15:
             tries += 1
@@ -526,7 +538,7 @@ def run_camera():
         send_directory_list()
     camera.setPictureCompleteCallback(takePictureCallback)
 
-    debug("edsdk: starting live view")
+    debug("starting live view")
     camera.startLiveView()
 
     next_frame = time.time()
