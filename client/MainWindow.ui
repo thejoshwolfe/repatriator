@@ -35,7 +35,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>Controls</string>
+    <string>C&amp;ontrols</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -53,8 +53,21 @@
       </widget>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="1">
+      <layout class="QFormLayout" name="formLayout">
+       <property name="labelAlignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>&amp;Zoom</string>
+         </property>
+         <property name="buddy">
+          <cstring>liftSliderZ</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
         <widget class="ShadowSlider" name="liftSliderZ">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -67,38 +80,37 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Zoom</string>
+          <string>&amp;Tilt</string>
+         </property>
+         <property name="buddy">
+          <cstring>orbitSliderB</cstring>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="1" column="1">
         <widget class="ShadowSlider" name="orbitSliderB">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Tilt</string>
+          <string>&amp;Spin</string>
+         </property>
+         <property name="buddy">
+          <cstring>orbitSliderA</cstring>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="2" column="1">
         <widget class="ShadowSlider" name="orbitSliderA">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Spin</string>
          </property>
         </widget>
        </item>
@@ -120,7 +132,7 @@
        <item>
         <widget class="QCheckBox" name="autoFocusEnabledCheckBox">
          <property name="text">
-          <string>AutoFocus</string>
+          <string>&amp;AutoFocus</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -137,7 +149,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>Downloadable Pictures</string>
+    <string>&amp;Downloadable Pictures</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -169,10 +181,10 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="fileMenu">
     <property name="title">
      <string>&amp;File</string>
     </property>
@@ -197,21 +209,19 @@
     </property>
     <addaction name="actionChangeDownloadFolder"/>
    </widget>
-   <widget class="QMenu" name="menu_View">
+   <widget class="QMenu" name="viewMenu">
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actionControls"/>
-    <addaction name="actionDownloadablePictures"/>
    </widget>
-   <addaction name="menu_File"/>
+   <addaction name="fileMenu"/>
    <addaction name="menuSe_ttings"/>
    <addaction name="menu_Camera"/>
-   <addaction name="menu_View"/>
+   <addaction name="viewMenu"/>
   </widget>
   <widget class="QDockWidget" name="bookmarksDock">
    <property name="windowTitle">
-    <string>Bookmarks</string>
+    <string>&amp;Bookmarks</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -347,34 +357,6 @@
     <string>Ctrl+A</string>
    </property>
   </action>
-  <action name="actionControls">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Controls</string>
-   </property>
-   <property name="toolTip">
-    <string>Show / hide the Controls dock.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
-   </property>
-  </action>
-  <action name="actionDownloadablePictures">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Downloadable Pictures</string>
-   </property>
-   <property name="toolTip">
-    <string>Show / hide the Downloadable Pictures dock.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+J</string>
-   </property>
-  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -417,70 +399,6 @@
     <hint type="destinationlabel">
      <x>322</x>
      <y>455</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionDownloadablePictures</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>filesDock</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>322</x>
-     <y>443</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionControls</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>controlsDock</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>561</x>
-     <y>174</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>filesDock</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>actionDownloadablePictures</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>322</x>
-     <y>443</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>controlsDock</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>actionControls</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>561</x>
-     <y>174</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
     </hint>
    </hints>
   </connection>
