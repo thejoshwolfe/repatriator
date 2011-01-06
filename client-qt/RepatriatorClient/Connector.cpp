@@ -4,6 +4,7 @@
 #include "IncomingMessage.h"
 
 #include <QMessageBox>
+#include <QApplication>
 
 Connector::Connector(ConnectionSettings * connection, bool need_hardware) :
     m_connection(connection),
@@ -52,6 +53,10 @@ void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
 {
     if (m_done)
         return;
+
+    // hack to prevent phantom progress dialog from appearing
+    QApplication::instance()->processEvents();
+
     switch(status) {
         case ServerTypes::Connecting:
             m_progressDialog.data()->setLabelText(tr("Connecting..."));
