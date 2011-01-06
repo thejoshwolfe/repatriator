@@ -200,15 +200,9 @@
     </property>
     <addaction name="actionChangeDownloadFolder"/>
    </widget>
-   <widget class="QMenu" name="menu_Positions">
-    <property name="title">
-     <string>&amp;Positions</string>
-    </property>
-   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuSe_ttings"/>
    <addaction name="menu_Camera"/>
-   <addaction name="menu_Positions"/>
   </widget>
   <action name="actionDownload">
    <property name="text">
