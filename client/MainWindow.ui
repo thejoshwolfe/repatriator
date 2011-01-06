@@ -394,5 +394,37 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>filesDock</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionDownloadablePictures</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>443</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>controlsDock</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionControls</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>561</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
