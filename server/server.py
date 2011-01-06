@@ -21,8 +21,8 @@ debug("\n\nServer starting\n")
 # now import our stuff
 from power import set_power_switch
 from messages import *
-import auth
-from auth import Privilege
+import admin
+from admin import Privilege
 from thumbnail import make_thumbnail
 
 # python stuff
@@ -177,8 +177,8 @@ def handle_ConnectionRequest(msg):
     debug("version: {0}".format(str(msg.version)))
 
     try:
-        user = auth.login(msg.username, msg.password)
-    except (auth.UserDoesNotExist, auth.BadPassword):
+        user = admin.login(msg.username, msg.password)
+    except (admin.UserDoesNotExist, admin.BadPassword):
         warning("Invalid login: " + msg.username + ", Password: <hidden>")
         server.send_message(ConnectionResult(ConnectionResult.InvalidLogin))
         server.close()
@@ -319,7 +319,7 @@ def handle_ChangePasswordRequest(msg):
     try:
         user.change_password(msg.old_password, msg.new_password)
         user.save()
-    except auth.BadPassword:
+    except admin.BadPassword:
         warning("user {0} tried to change password with invalid old password, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.BadPassword))
         return
@@ -330,9 +330,9 @@ def handle_AddUser(msg):
     debug("Got add user message")
 
     try:
-        auth.add_user(msg.username, msg.password, msg.privileges)
+        admin.add_user(msg.username, msg.password, msg.privileges)
         debug("created new user {0}".format(msg.username))
-    except auth.UserAlreadyExists:
+    except admin.UserAlreadyExists:
         warning("user {0} already exists, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserAlreadyExists))
         return
@@ -342,8 +342,9 @@ def handle_UpdateUser(msg):
     global server
     debug("Got update user message")
 
-    target_user = auth.get_user(msg.username)
-    if target_user is None:
+    try:
+        target_user = admin.get_user(msg.username)
+    except admin.UserDoesNotExist:
         warning("user {0} does not exist, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
@@ -360,9 +361,9 @@ def handle_DeleteUser(msg):
     debug("Got delete user message")
 
     try:
-        auth.delete_user(msg.username)
+        admin.delete_user(msg.username)
         debug("deleted {0}".format(msg.username))
-    except auth.UserDoesNotExist:
+    except admin.UserDoesNotExist:
         warning("user {0} does not exist, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
@@ -371,7 +372,7 @@ def handle_DeleteUser(msg):
 def handle_ListUserRequest(msg):
     global server
     debug("Got list user request message")
-    server.send_message(ListUserResult(auth.list_users()))
+    server.send_message(ListUserResult(admin.list_users()))
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_SetAutoFocusEnabled(msg):

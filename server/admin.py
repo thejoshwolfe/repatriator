@@ -32,8 +32,8 @@ def _build_path(dirname):
 def _save_json():
     _lock.acquire()
 
-    with open(_auth_file, "w") as out:
-        out.write(json.dumps(_auth_data))
+    with open(_users_file, "w") as out:
+        out.write(json.dumps(_users_data))
 
     _lock.release()
 
@@ -88,7 +88,7 @@ class User:
 
     def save(self):
         self.check_all_attrs_are_defined()
-        _auth_data[self.username] = self.attrs
+        _users_data[self.username] = self.attrs
         _save_json()
 
     def check_password(self, password):
@@ -108,7 +108,7 @@ def get_user(username):
     can raise UserDoesNotExist
     """
     try:
-        user = User(username, _auth_data[username])
+        user = User(username, _users_data[username])
         user.check_all_attrs_are_defined()
         return user
     except KeyError:
@@ -128,7 +128,7 @@ def add_user(username, password, privileges):
     """
     can raise UserAlreadyExists. returns nothing.
     """
-    if username in _auth_data:
+    if username in _users_data:
         raise UserAlreadyExists
     attrs = {
         'privileges': privileges,
@@ -148,24 +148,24 @@ def delete_user(username):
     user = get_user(username)
     if os.path.exists(user.picture_folder()):
         shutil.rmtree(user.picture_folder())
-    del _auth_data[username]
+    del _users_data[username]
     _save_json()
 
 def list_users():
-    return _auth_data
+    return _users_data
 
-_auth_file = os.path.join(settings['DATA_FOLDER'], "auth.json")
+_users_file = os.path.join(settings['DATA_FOLDER'], "users.json")
 _build_path(settings['DATA_FOLDER'])
 _lock = threading.Lock()
 
 try:
-    with open(_auth_file, "r") as f:
+    with open(_users_file, "r") as f:
         try:
-            _auth_data = json.loads(f.read())
+            _users_data = json.loads(f.read())
         except ValueError as ex:
-            error("Corrupt auth data, resetting auth database.")
+            error("Corrupt users data, resetting users database.")
             raise IOError
 except IOError as ex:
-    _auth_data = {}
+    _users_data = {}
     add_user("default_admin", "temp1234", [Privilege.ManageUsers])
 

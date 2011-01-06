@@ -40,7 +40,7 @@ How the server handles authentication:
             ...
         }
 
-    When it changes, it is converted to json and dumped to auth.json. This file
+    When it changes, it is converted to json and dumped to users.json. This file
     is parsed upon server load. There is a default admin account:
 
         user: default_admin
