@@ -181,7 +181,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -221,7 +221,7 @@
   </widget>
   <widget class="QDockWidget" name="bookmarksDock">
    <property name="windowTitle">
-    <string>Bookmarks</string>
+    <string>&amp;Bookmarks</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>

@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->viewMenu->addAction(ui->controlsDock->toggleViewAction());
     ui->viewMenu->addAction(ui->filesDock->toggleViewAction());
+    ui->viewMenu->addAction(ui->bookmarksDock->toggleViewAction());
 }
 
 MainWindow::~MainWindow()
