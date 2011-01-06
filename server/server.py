@@ -200,7 +200,7 @@ def handle_ConnectionRequest(msg):
     motor_boundaries = [[settings['MOTOR_%s_%s' % (char, setting_name)] for setting_name in ("MIN", "MAX", "START_POSITION")] for char in motor_chars]
     server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges()))
     if msg.hardware_flag:
-        server.send_message(InitializationInformation(motor_boundaries))
+        server.send_message(InitializationInformation(motor_boundaries, admin.static_bookmarks(), user.bookmarks()))
 
     if msg.hardware_flag:
         initialize_hardware()

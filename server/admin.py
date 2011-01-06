@@ -32,8 +32,8 @@ def _build_path(dirname):
 def _save_json():
     _lock.acquire()
 
-    with open(_users_file, "w") as out:
-        out.write(json.dumps(_users_data))
+    with open(_config_file, "w") as out:
+        out.write(json.dumps(_config_data))
 
     _lock.release()
 
@@ -102,7 +102,7 @@ class User:
 
     def save(self):
         self.check_all_attrs_are_defined()
-        _users_data[self.username] = self._attrs
+        list_users()[self.username] = self._attrs
         _save_json()
 
 def get_user(username):
@@ -110,17 +110,16 @@ def get_user(username):
     can raise UserDoesNotExist
     """
     try:
-        user = User(username, _users_data[username])
+        user = User(username, list_users()[username])
         user.check_all_attrs_are_defined()
         return user
     except KeyError:
         raise UserDoesNotExist
 
-
 def login(username, password):
     """
+    returns the User object.
     can raise UserDoesNotExist or BadPassword.
-    returns the User object if the authentication succeeded.
     """
     user = get_user(username)
     user.check_password(password)
@@ -130,7 +129,7 @@ def add_user(username, password, privileges):
     """
     can raise UserAlreadyExists. returns nothing.
     """
-    if username in _users_data:
+    if username in list_users():
         raise UserAlreadyExists
     attrs = {
         'privileges': privileges,
@@ -151,24 +150,37 @@ def delete_user(username):
     user = get_user(username)
     if os.path.exists(user.picture_folder()):
         shutil.rmtree(user.picture_folder())
-    del _users_data[username]
+    del list_users()[username]
     _save_json()
 
 def list_users():
-    return _users_data
+    return _config_data['users']
 
-_users_file = os.path.join(settings['DATA_FOLDER'], "users.json")
+def static_bookmarks():
+    return _config_data['static_bookmarks']
+
+_config_file = os.path.join(settings['DATA_FOLDER'], "config.json")
 _build_path(settings['DATA_FOLDER'])
 _lock = threading.Lock()
 
 try:
-    with open(_users_file, "r") as f:
+    with open(_config_file) as f:
         try:
-            _users_data = json.loads(f.read())
-        except ValueError as ex:
-            error("Corrupt users data, resetting users database.")
+            _config_data = json.loads(f.read())
+            # check roots
+            static_bookmarks()
+            users = list_users()
+            # make sure at least one user exists
+            if len(users) == 0:
+                raise ValueError
+        except (ValueError, KeyError):
+            error("Corrupt config data, resetting config database.")
             raise IOError
 except IOError as ex:
-    _users_data = {}
+    # initialize brand new database
+    _config_data = {
+        'staic_bookmarks': [],
+        'users': {},
+    }
     add_user("default_admin", "temp1234", [Privilege.ManageUsers])
 

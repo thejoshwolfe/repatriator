@@ -40,7 +40,7 @@ How the server handles authentication:
             ...
         }
 
-    When it changes, it is converted to json and dumped to users.json. This file
+    When it changes, it is converted to json and dumped to config.json. This file
     is parsed upon server load. There is a default admin account:
 
         user: default_admin
@@ -125,10 +125,6 @@ Messages:
             int64 - byte count for the following JPEG image. if it's 0, then server is unable to provide a frame.
             <jpeg format image>
 
-            a motor state is one of the following:
-                0: motor is not initialized.
-                1: motor is initialized.
-
         DirectoryListingResult
             int8 - identifies this message as a DirectoryListingResult (enum value 3)
             int64 - byte count of the entire message including this field
@@ -170,24 +166,37 @@ Messages:
             int64 - byte count of the entire message including this field
 
         InitializationInformation
-            int8 - identifies this message as an Initialization (enum value 8)
+            int8 - identifies this message as an InitializationInformation (enum value 8)
             int64 - byte count of the entire message including this field
             int64 - minimum boundary for motor A
             int64 - maximum boundary for motor A
-            int64 - initial position for motor A
             int64 - minimum boundary for motor B
             int64 - maximum boundary for motor B
-            int64 - initial position for motor B
             int64 - minimum boundary for motor X
             int64 - maximum boundary for motor X
-            int64 - initial position for motor X
             int64 - minimum boundary for motor Y
             int64 - maximum boundary for motor Y
-            int64 - initial position for motor Y
             int64 - minimum boundary for motor Z
             int64 - maximum boundary for motor Z
-            int64 - initial position for motor Z
+            int32 - number of static bookmarks
+            for each static bookmark:
+                Bookmark
+            int32 - number of user bookmarks
+            for each user bookmark:
+                Bookmark
 
+        Bookmark:
+            String - name of bookmark
+            for each char in "ABXYZ":
+                int64 - motor $char position or -2^63 meaning not specified
+            int8 - auto focus setting:
+                0: not specified
+                1: set auto focus on
+                2: set auto focus off
+
+        String:
+            int32 - length of utf8 string
+            <utf8 string>
 
     From the client to the server:
 

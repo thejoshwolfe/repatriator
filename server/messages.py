@@ -210,6 +210,10 @@ class ServerMessage:
         out.extend(buf)
         return out
 
+    def _serialize_string(self, buf, string):
+        buf.extend(struct.pack(">i", len(string)))
+        buf.extend(string.encode('utf8'))
+
 __all__.append('DummyCloseConnection')
 class DummyCloseConnection:
     message_type = ServerMessage.DummyCloseConnection
@@ -237,17 +241,13 @@ class ConnectionResult(ServerMessage):
     InsufficientPrivileges = 1 
     Success = 2
 
-    def __init__(self, status, privileges=None, motor_boundaries=None):
-        """
-        motor_boundaries is a 5-tuple of 3-tuples - min, max, init for each motor.
-        """
+    def __init__(self, status, privileges=None):
         if privileges is None:
             privileges = []
 
         self.message_type = ServerMessage.ConnectionResult
         self.privileges = privileges
         self.status = status
-        self.motor_boundaries = motor_boundaries
 
     def _serialize(self):
         major, minor, revision = version
@@ -260,28 +260,28 @@ class ConnectionResult(ServerMessage):
         buf.extend(struct.pack(">i", len(self.privileges)))
         for privilege in self.privileges:
             buf.extend(struct.pack(">i", privilege))
-        if self.motor_boundaries is not None:
-            for min_value, max_value, init_value in self.motor_boundaries:
-                buf.extend(struct.pack(">q", min_value))
-                buf.extend(struct.pack(">q", max_value))
-                buf.extend(struct.pack(">q", init_value))
         return buf
 
 __all__.append('InitializationInformation')
 class InitializationInformation(ServerMessage):
-    def __init__(self, motor_boundaries):
-        """
-        motor_boundaries is a 5-tuple of 3-tuples - min, max, init for each motor.
-        """
+    def __init__(self, motor_boundaries, static_bookmarks, user_bookmarks):
         self.message_type = ServerMessage.InitializationInformation
         self.motor_boundaries = motor_boundaries
+        self.static_bookmarks = static_bookmarks
+        self.user_bookmarks = user_bookmarks
 
     def _serialize(self):
         buf = bytearray()
-        for min_value, max_value, init_value in self.motor_boundaries:
+        for min_value, max_value in self.motor_boundaries:
             buf.extend(struct.pack(">q", min_value))
             buf.extend(struct.pack(">q", max_value))
-            buf.extend(struct.pack(">q", init_value))
+        for bookmark_list in (self.static_bookmarks, self.user_bookmarks):
+            buf.extend(struct.pack(">i", len(bookmark_list)))
+            for name, motor_positions, auto_focus in bookmark_list:
+                self._serialize_string(buf, name)
+                for motor_position in motor_positions:
+                    buf.extend(struct.pack(">q", motor_position))
+                buf.extend(struct.pack(">b", auto_focus))
         return buf
 
 __all__.append('FullUpdate')
