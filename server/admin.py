@@ -179,7 +179,7 @@ try:
 except IOError as ex:
     # initialize brand new database
     _config_data = {
-        'staic_bookmarks': [],
+        'static_bookmarks': [],
         'users': {},
     }
     add_user("default_admin", "temp1234", [Privilege.ManageUsers])
