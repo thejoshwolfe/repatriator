@@ -380,3 +380,8 @@ void MainWindow::on_picturesList_customContextMenuRequested(QPoint pos)
 {
     m_pictures_context_menu->popup(ui->picturesList->mapToGlobal(pos));
 }
+
+void MainWindow::on_autoFocusEnabledCheckBox_clicked(bool checked)
+{
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetAutoFocusEnabledMessage(checked)));
+}

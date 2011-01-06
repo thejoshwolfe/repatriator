@@ -359,10 +359,12 @@ def handle_ListUserRequest(msg):
     debug("Got list user request message")
     server.send_message(ListUserResult(auth.list_users()))
 
+@must_have_privilege(Privilege.OperateHardware)
 def handle_SetAutoFocusEnabled(msg):
     global auto_focus_enabled
-    auto_focus_enabled = False
+    auto_focus_enabled = msg.value
 
+@must_have_privilege(Privilege.OperateHardware)
 def motorStoppedMovingHandler(reason):
     if reason != silverpak.StoppedMovingReason.Normal:
         return

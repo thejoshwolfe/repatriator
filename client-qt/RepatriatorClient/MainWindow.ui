@@ -56,21 +56,6 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="snapshotButton">
-         <property name="icon">
-          <iconset resource="repatriator.qrc">
-           <normaloff>:/general/resource/camera.png</normaloff>:/general/resource/camera.png</iconset>
-         </property>
-         <property name="shortcut">
-          <string>Ctrl+T</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
       <layout class="QGridLayout" name="gridLayout">
        <item row="2" column="1">
         <widget class="ShadowSlider" name="liftSliderZ">
@@ -117,6 +102,31 @@
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Spin</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="snapshotButton">
+         <property name="icon">
+          <iconset resource="repatriator.qrc">
+           <normaloff>:/general/resource/camera.png</normaloff>:/general/resource/camera.png</iconset>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+T</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="autoFocusEnabledCheckBox">
+         <property name="text">
+          <string>AutoFocus</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

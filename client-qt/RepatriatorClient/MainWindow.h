@@ -61,6 +61,7 @@ private:
     QString getNextDownloadFilename();
 
 private slots:
+    void on_autoFocusEnabledCheckBox_clicked(bool checked);
     void on_picturesList_customContextMenuRequested(QPoint pos);
     void on_orbitSliderA_valueChanged(int value);
     void on_orbitSliderB_valueChanged(int value);
