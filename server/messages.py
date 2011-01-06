@@ -326,27 +326,35 @@ class FullUpdate(ServerMessage):
 
 __all__.append('DirectoryListingResult')
 class DirectoryListingResult(ServerMessage):
-    def __init__(self, file_list):
+    def __init__(self, folder_path):
         self.message_type = ServerMessage.DirectoryListingResult
-        self.file_list = file_list
+        self.folder_path = folder_path
 
     def _serialize(self):
+        file_list = [os.path.join(self.folder_path, f) for f in os.listdir(self.folder_path) if f.endswith('.jpg')]
         buf = bytearray()
-        buf.extend(struct.pack(">i", len(self.file_list)))
-        for file_path in self.file_list:
-            path, filename = os.path.split(file_path)
-            buf.extend(struct.pack(">i", len(filename)))
-            buf.extend(filename.encode('utf8'))
-
+        buf.extend(struct.pack(">i", len(file_list)))
+        for file_path in file_list:
             try:
-                thumb_path = file_path + ".thumb"
-                thumb_size = os.path.getsize(thumb_path)
-                with open(thumb_path, "rb") as f:
-                    buf.extend(struct.pack(">q", thumb_size))
-                    buf.extend(f.read())
+                file_size = os.path.getsize(file_path)
+                path, filename = os.path.split(file_path)
+                buf.extend(struct.pack(">q", file_size))
+                buf.extend(struct.pack(">i", len(filename)))
+                buf.extend(filename.encode('utf8'))
+
+                try:
+                    thumb_path = file_path + ".thumb"
+                    thumb_size = os.path.getsize(thumb_path)
+                    with open(thumb_path, "rb") as f:
+                        buf.extend(struct.pack(">q", thumb_size))
+                        buf.extend(f.read())
+                except (OSError, IOError):
+                    buf.extend(struct.pack(">q", 0))
+                    error("error accessing thumbnail for {0}".format(file_path))
             except (OSError, IOError):
                 buf.extend(struct.pack(">q", 0))
-                error("error accessing thumbnail for {0}".format(file_path))
+                buf.extend(struct.pack(">i", 0))
+                error("error getting file size for {0}".format(file_path))
             
         return buf
 

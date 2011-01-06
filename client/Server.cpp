@@ -106,9 +106,11 @@ void Server::handleConnected()
     success = connect(m_parser, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processIncomingMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
 
+    success = connect(m_parser, SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SIGNAL(progress(qint64,qint64,IncomingMessage*)));
+    Q_ASSERT(success);
+
     changeLoginState(ServerTypes::WaitingForMagicalResponse);
     sendMessage(QSharedPointer<OutgoingMessage>(new MagicalRequestMessage()));
-
 }
 
 void Server::cleanUpAfterDisconnect()

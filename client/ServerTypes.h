@@ -44,6 +44,7 @@ namespace ServerTypes {
     class DirectoryItem
     {
     public:
+        qint64 byte_count;
         QString filename;
         QImage thumbnail;
     };

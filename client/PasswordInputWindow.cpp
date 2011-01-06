@@ -12,7 +12,7 @@ PasswordInputWindow::PasswordInputWindow(QWidget *parent) :
     bool success;
     success = connect(this, SIGNAL(accepted()), this, SLOT(handleAccepted()));
     Q_ASSERT(success);
-    success = connect(this, SIGNAL(rejected()), this, SLOT(handhandleRejected()));
+    success = connect(this, SIGNAL(rejected()), this, SLOT(handleRejected()));
     Q_ASSERT(success);
 }
 

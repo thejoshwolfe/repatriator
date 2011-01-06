@@ -74,9 +74,13 @@ void DirectoryListingResultMessage::parse(QDataStream &stream)
     stream >> file_count;
     for (qint32 i = 0; i < file_count; i++) {
         ServerTypes::DirectoryItem directory_item;
+        stream >> directory_item.byte_count;
         directory_item.filename = readString(stream);
         directory_item.thumbnail = readImage(stream);
-        directory_list.append(directory_item);
+        if (directory_item.byte_count > 0 && directory_item.filename.size() > 0 && ! directory_item.thumbnail.isNull())
+            directory_list.append(directory_item);
+        else
+            qDebug() << "Skipping a directory list item, it's missing information.";
     }
 }
 
