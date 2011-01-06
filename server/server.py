@@ -219,6 +219,17 @@ def must_have_privilege(privilege):
         return wraps(function)(_wrapped)
     return decorated
 
+def catch_exceptions():
+    def decorated(function):
+        def _wrapped(*args, **kwargs):
+            try:
+                return function(*args, **kwargs)
+            except:
+                error("Fatal exception, killing myself:\n" + traceback.format_exc())
+                os._exit(0)
+        return wraps(function)(_wrapped)
+    return decorated
+
 @must_have_privilege(Privilege.OperateHardware)
 def handle_TakePicture(msg):
     global camera, user
@@ -461,6 +472,7 @@ def start_server():
     start_message_loop()
     debug("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
+@catch_exceptions()
 def run_message_loop():
     global message_handlers, message_queue, camera_thread, finished
 
@@ -480,6 +492,7 @@ def run_message_loop():
             # handle directly
             message_handlers[msg.message_type](msg)
 
+@catch_exceptions()
 def run_ping():
     global finished
 
@@ -493,6 +506,7 @@ def run_ping():
             server.send_message(Ping())
             next_frame = now + 1.00
 
+@catch_exceptions()
 def run_camera():
     global camera, message_handlers, message_queue, finished
 
