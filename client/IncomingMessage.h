@@ -67,7 +67,6 @@ public:
 class FullUpdateMessage : public IncomingMessage
 {
 public:
-    static const qint8 MotorIsInitialized;
     // always A, B, X, Y, Z
     QVector<qint8> motor_states;
     QVector<qint64> motor_positions;
@@ -122,12 +121,15 @@ public:
     struct MotorBoundaries {
         qint64 min;
         qint64 max;
-        qint64 init;
     };
 
     QVector<MotorBoundaries> motor_boundaries;
+    QVector<ServerTypes::Bookmark> static_bookmarks;
+    QVector<ServerTypes::Bookmark> user_bookmarks;
 
     virtual void parse(QDataStream &);
+
+    static void readBookmarkList(QDataStream & stream, QVector<ServerTypes::Bookmark> & bookmark_list);
 };
 
 

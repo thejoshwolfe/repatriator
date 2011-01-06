@@ -48,6 +48,20 @@ namespace ServerTypes {
         QString filename;
         QImage thumbnail;
     };
+
+    enum AutoFocusSetting
+    {
+        NotSpecified = 0,
+        SetOn = 1,
+        SetOff = 2,
+    };
+
+    struct Bookmark
+    {
+        QString name;
+        QVector<qint64> motor_positions;
+        AutoFocusSetting auto_focus;
+    };
 }
 
 #endif // SERVERTYPES_H
