@@ -335,22 +335,18 @@ void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bou
     ui->orbitSliderA->blockSignals(true);
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
     ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
-    ui->orbitSliderA->setValue((int)bounds.at(0).init);
     ui->orbitSliderA->blockSignals(false);
 
     ui->orbitSliderB->blockSignals(true);
     ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
     ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
-    ui->orbitSliderB->setValue((int)bounds.at(1).init);
     ui->orbitSliderB->blockSignals(false);
 
     ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
-    ui->shadowMinimap->setPosition(QPoint((int)bounds.at(2).init, (int)bounds.at(3).init));
 
     ui->liftSliderZ->blockSignals(true);
     ui->liftSliderZ->setMinimum(bounds.at(4).min);
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
-    ui->liftSliderZ->setValue((int)bounds.at(4).init);
     ui->liftSliderZ->blockSignals(false);
 }
 

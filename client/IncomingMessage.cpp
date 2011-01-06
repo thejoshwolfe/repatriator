@@ -118,7 +118,26 @@ void InitInfoMessage::parse(QDataStream & stream)
         MotorBoundaries bounds;
         stream >> bounds.min;
         stream >> bounds.max;
-        stream >> bounds.init;
         motor_boundaries.append(bounds);
+    }
+    readBookmarkList(stream, static_bookmarks);
+    readBookmarkList(stream, user_bookmarks);
+}
+void InitInfoMessage::readBookmarkList(QDataStream & stream, QVector<ServerTypes::Bookmark> & bookmark_list)
+{
+    qint32 bookmark_list_len;
+    stream >> bookmark_list_len;
+    for (int i = 0; i < bookmark_list_len; i++) {
+        ServerTypes::Bookmark bookmark;
+        bookmark.name = readString(stream);
+        for (int i = 0; i < 5; i++) {
+            qint64 position;
+            stream >> position;
+            bookmark.motor_positions.append(position);
+        }
+        qint8 auto_focus;
+        stream >> auto_focus;
+        bookmark.auto_focus = (ServerTypes::AutoFocusSetting)auto_focus;
+        bookmark_list.append(bookmark);
     }
 }

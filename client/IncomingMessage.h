@@ -122,12 +122,15 @@ public:
     struct MotorBoundaries {
         qint64 min;
         qint64 max;
-        qint64 init;
     };
 
     QVector<MotorBoundaries> motor_boundaries;
+    QVector<ServerTypes::Bookmark> static_bookmarks;
+    QVector<ServerTypes::Bookmark> user_bookmarks;
 
     virtual void parse(QDataStream &);
+
+    static void readBookmarkList(QDataStream & stream, QVector<ServerTypes::Bookmark> & bookmark_list);
 };
 
 
