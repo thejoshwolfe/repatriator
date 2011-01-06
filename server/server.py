@@ -363,6 +363,7 @@ def handle_ListUserRequest(msg):
 def handle_SetAutoFocusEnabled(msg):
     global auto_focus_enabled
     auto_focus_enabled = msg.value
+    maybe_trigger_auto_focus()
 
 @must_have_privilege(Privilege.OperateHardware)
 def motorStoppedMovingHandler(reason):
@@ -391,8 +392,9 @@ message_handlers = {
 
 need_camera_thread = {
     ClientMessage.TakePicture: True,
-    ClientMessage.MotorMovement: True,
+    ClientMessage.SetAutoFocusEnabled: True,
 
+    ClientMessage.MotorMovement: False,
     ClientMessage.MagicalRequest: False,
     ClientMessage.ConnectionRequest: False,
     ClientMessage.DirectoryListingRequest: False,
@@ -403,7 +405,6 @@ need_camera_thread = {
     ClientMessage.FileDeleteRequest: False,
     ClientMessage.ChangePasswordRequest: False,
     ClientMessage.ListUserRequest: False,
-    ClientMessage.SetAutoFocusEnabled: False,
 }
 
 def init_state():
@@ -489,7 +490,7 @@ def run_ping():
             next_frame = now + 1.00
 
 def run_camera():
-    global camera, message_handlers, message_queue, finished, need_to_auto_focus
+    global camera, message_handlers, message_queue, finished
 
     debug("running camera")
 
@@ -551,10 +552,7 @@ def run_camera():
         try:
             msg = camera_thread_queue.get(block=False)
             if msg.message_type == ClientMessage.DummyAutoFocus:
-                if auto_focus_enabled and need_to_auto_focus:
-                    debug("Telling camera to auto focus")
-                    camera.autoFocus()
-                    need_to_auto_focus = False
+                maybe_trigger_auto_focus()
             else:
                 message_handlers[msg.message_type](msg)
         except queue.Empty:
@@ -566,6 +564,14 @@ def run_camera():
     camera = None
     edsdk.terminate()
 
+def maybe_trigger_auto_focus():
+    if not (auto_focus_enabled and need_to_auto_focus):
+        return
+    debug("Telling camera to auto focus")
+    camera.autoFocus()
+    global need_to_auto_focus
+    need_to_auto_focus = False
+
 def on_connection_open():
     debug("connection opening")
 
@@ -574,7 +580,7 @@ def on_connection_close():
 
     debug("connection closing")
 
-    # send motors to 0
+    # send motors home
     if motors is not None:
         for char, motor in motors.items():
             motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
