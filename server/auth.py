@@ -29,24 +29,12 @@ def _build_path(dirname):
     except WindowsError as ex:
         pass
 
-def _sets_to_lists():
-    "convert the sets in auth data to lists"
-    for account in _auth_data.values():
-        account['privileges'] = list(account['privileges'])
-
-def _lists_to_sets():
-    "convert the lists in auth data to sets"
-    for account in _auth_data.values():
-        account['privileges'] = set(account['privileges'])
-
 def _save_json():
     _lock.acquire()
-    _sets_to_lists()
 
     with open(_auth_file, "w") as out:
         out.write(json.dumps(_auth_data))
 
-    _lists_to_sets()
     _lock.release()
 
 class Privilege:
@@ -68,12 +56,10 @@ class User:
         creates a new user and returns it, or raises UserAlreadyExists.
         """
         if privileges is None:
-            privileges = set()
+            privileges = []
 
-        self.attrs = {}
         self.username = username
-
-        self._picture_folder = None
+        self.attrs = {}
 
         if username is not None or password is not None:
             if username in _auth_data:
@@ -83,7 +69,7 @@ class User:
                 self.attrs['password_hash'] = _hash_password(self.attrs['salt'], password)
                 self.attrs['privileges'] = privileges
                 _build_path(self.picture_folder())
-    
+
     def picture_folder(self):
         if self._picture_folder is None:
             self._picture_folder = os.path.join(
@@ -93,7 +79,9 @@ class User:
         return self._picture_folder
 
     def grant_privilege(self, privilege):
-        self.attrs['privileges'].add(privilege)
+        privileges = self.attrs['privileges']
+        if privileges.find(privilege) == -1:
+            privilege.append(privilege)
 
     def revoke_privilege(self, privilege):
         self.attrs['privileges'].remove(privilege)
@@ -120,7 +108,7 @@ def get_user(username):
         user.username = username
         user.attrs = _auth_data[username]
         return user
-    
+
     return None
 
 def login(username, password):
@@ -154,13 +142,11 @@ try:
     with open(_auth_file, "r") as f:
         try:
             _auth_data = json.loads(f.read())
-            # need to convert the lists in json to sets
-            _lists_to_sets()
         except ValueError as ex:
             error("Corrupt auth data, resetting auth database.")
             raise IOError
 except IOError as ex:
     _auth_data = {}
-    default_user = User(username="default_admin", password="temp1234", privileges={Privilege.ManageUsers})
+    default_user = User(username="default_admin", password="temp1234", privileges=[Privilege.ManageUsers])
     default_user.save()
 
