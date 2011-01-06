@@ -11,6 +11,7 @@
 #include <QProgressDialog>
 #include <QVector>
 #include <QMenu>
+#include <QHash>
 
 namespace Ui {
     class MainWindow;
@@ -48,17 +49,25 @@ private:
     bool m_quit_after_close;
     QMenu * m_pictures_context_menu;
 
+    // for batch download
+    qint64 m_bytes_done;
+    qint64 m_bytes_total;
+    int m_expected_download_count;
+
+    QHash<QString, ServerTypes::DirectoryItem> m_file_info;
+
 private:
     void cleanup();
     void enableCorrectControls();
     void updateDirectoryList(QList<ServerTypes::DirectoryItem> items);
     void updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position);
     void updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions);
-    void saveFile(QByteArray blob, QString filename);
+    void saveFile(QByteArray blob, QString remote_filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries);
     QString getNextDownloadFilename();
+    void requestDownloadFile(QString remote_filename);
 
 private slots:
     void on_autoFocusEnabledCheckBox_clicked(bool checked);

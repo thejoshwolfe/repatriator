@@ -130,7 +130,8 @@ Messages:
             int64 - byte count of the entire message including this field
             int32 - number of files returned
             for each file returned:
-                int32 - length of utf8 string filename (starts with '/' and uses '/' for path separator)
+                int64 - byte count for the actual file (not the thumbnail below)
+                int32 - length of utf8 string filename
                 <utf8 string filename>
                 int64 - byte count for the following JPEG image
                 <jpeg format image> - thumbnail

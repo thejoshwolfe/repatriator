@@ -263,9 +263,7 @@ def handle_DirectoryListingRequest(msg):
     send_directory_list()
 
 def send_directory_list():
-    files = [os.path.join(user.picture_folder(), f) for f in os.listdir(user.picture_folder()) if f.endswith('.jpg')]
-    server.send_message(DirectoryListingResult(files))
-
+    server.send_message(DirectoryListingResult(user.picture_folder()))
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_FileDownloadRequest(msg):

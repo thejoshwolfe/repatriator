@@ -16,11 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     m_progressDialog(new QProgressDialog(this, Qt::Dialog)),
     m_next_download_number(1),
-    m_quit_after_close(false)
+    m_quit_after_close(false),
+    m_bytes_done(0),
+    m_bytes_total(0),
+    m_expected_download_count(0)
 {
     m_progressDialog->setWindowModality(Qt::NonModal);
     m_progressDialog->setWindowTitle(tr("Receiving data"));
-    m_progressDialog->setMinimumDuration(2000);
+    m_progressDialog->setMinimumDuration(3000);
     ui->setupUi(this);
 
     this->setCentralWidget(ui->displayWidget);
@@ -142,7 +145,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         case IncomingMessage::FileDownloadResult:
         {
             FileDownloadResultMessage * file_download_msg = (FileDownloadResultMessage *) msg.data();
-            saveFile(file_download_msg->file, getNextDownloadFilename());
+            saveFile(file_download_msg->file, file_download_msg->filename);
             break;
         }
         case IncomingMessage::InitInfo:
@@ -162,6 +165,7 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
     ui->picturesList->clear();
     foreach (ServerTypes::DirectoryItem item, items) {
         ui->picturesList->addItem(new QListWidgetItem(QIcon(QPixmap::fromImage(item.thumbnail)), item.filename));
+        m_file_info.insert(item.filename, item);
     }
     enableCorrectControls();
 }
@@ -182,21 +186,33 @@ void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint
     ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
 }
 
-void MainWindow::saveFile(QByteArray blob, QString filename)
+void MainWindow::saveFile(QByteArray blob, QString remote_filename)
 {
+    m_expected_download_count--;
+    m_bytes_done += blob.size();
+    if (m_expected_download_count <= 0) {
+        m_expected_download_count = 0;
+        m_bytes_done = 0;
+        m_bytes_total = 0;
+        m_progressDialog->reset();
+    }
+
     QDir downloadDir(m_connection_settings->download_directory);
     if (! downloadDir.exists())
         return;
-    QFile downloadFile(downloadDir.absoluteFilePath(filename));
+    QString local_filename = getNextDownloadFilename();
+    QFile downloadFile(downloadDir.absoluteFilePath(local_filename));
     downloadFile.open(QFile::WriteOnly);
     downloadFile.write(blob);
     downloadFile.close();
 
     // successful download, discard server copy
-    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new FileDeleteRequestMessage(filename)));
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new FileDeleteRequestMessage(remote_filename)));
 
-    if (filename == m_quit_after_this_file)
+    if (remote_filename == m_quit_after_this_file) {
+        m_quit_after_close = true;
         m_server.data()->finishWritingAndDisconnect();
+    }
 }
 
 void MainWindow::cleanup()
@@ -206,10 +222,9 @@ void MainWindow::cleanup()
 
 void MainWindow::showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMessage *msg)
 {
-    Q_UNUSED(msg);
-    m_progressDialog->setMinimum(0);
-    m_progressDialog->setMaximum((int)bytes_total);
-    m_progressDialog->setValue((int)bytes_done);
+    Q_UNUSED(bytes_total);
+    if (msg->type == IncomingMessage::FileDownloadResult)
+        m_progressDialog->setValue((int)(m_bytes_done + bytes_done));
 }
 
 void MainWindow::enableCorrectControls()
@@ -270,7 +285,7 @@ void MainWindow::on_actionDownload_triggered()
     // send download file messages for each file
     for (int i = 0; i < ui->picturesList->selectedItems().count(); i++) {
         QString filename = ui->picturesList->selectedItems().at(i)->text();
-        m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new FileDownloadRequestMessage(filename)));
+        requestDownloadFile(filename);
     }
 }
 
@@ -278,10 +293,18 @@ void MainWindow::on_actionDownloadAllAndQuit_triggered()
 {
     // send download file messages for each file
     for (int i = 0; i < ui->picturesList->count(); i++) {
-        QString filename = ui->picturesList->item(i)->text();
-        m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new FileDownloadRequestMessage(filename)));
-        m_quit_after_this_file = filename;
+        QString remote_filename = ui->picturesList->item(i)->text();
+        requestDownloadFile(remote_filename);
+        m_quit_after_this_file = remote_filename;
     }
+}
+
+void MainWindow::requestDownloadFile(QString remote_filename)
+{
+    m_bytes_total += m_file_info.value(remote_filename).byte_count;
+    m_progressDialog->setRange(0, (int)m_bytes_total);
+    m_expected_download_count += 1;
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new FileDownloadRequestMessage(remote_filename)));
 }
 
 void MainWindow::on_actionDiscardSelectedFiles_triggered()
