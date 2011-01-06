@@ -222,6 +222,7 @@ void MainWindow::cleanup()
 
 void MainWindow::showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMessage *msg)
 {
+    Q_UNUSED(bytes_total);
     if (msg->type == IncomingMessage::FileDownloadResult)
         m_progressDialog->setValue((int)(m_bytes_done + bytes_done));
 }

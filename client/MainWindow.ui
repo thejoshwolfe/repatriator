@@ -30,12 +30,9 @@
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="verticalDock">
+  <widget class="QDockWidget" name="controlsDock">
    <property name="features">
-    <set>QDockWidget::NoDockWidgetFeatures</set>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::RightDockWidgetArea</set>
+    <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Controls</string>
@@ -135,9 +132,9 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="horizontalDock">
+  <widget class="QDockWidget" name="filesDock">
    <property name="features">
-    <set>QDockWidget::NoDockWidgetFeatures</set>
+    <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Downloadable Pictures</string>
@@ -172,7 +169,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -200,9 +197,17 @@
     </property>
     <addaction name="actionChangeDownloadFolder"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionControls"/>
+    <addaction name="actionDownloadablePictures"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuSe_ttings"/>
    <addaction name="menu_Camera"/>
+   <addaction name="menu_View"/>
   </widget>
   <action name="actionDownload">
    <property name="text">
@@ -239,7 +244,7 @@
     <string>Downloads all the pictures from the server to your chosen download directory and then deletes them from the server and then shuts down the application.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+J</string>
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -284,6 +289,34 @@
     <string>Ctrl+A</string>
    </property>
   </action>
+  <action name="actionControls">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Controls</string>
+   </property>
+   <property name="toolTip">
+    <string>Show / hide the Controls dock.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionDownloadablePictures">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Downloadable Pictures</string>
+   </property>
+   <property name="toolTip">
+    <string>Show / hide the Downloadable Pictures dock.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -326,6 +359,38 @@
     <hint type="destinationlabel">
      <x>322</x>
      <y>455</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDownloadablePictures</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filesDock</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>322</x>
+     <y>443</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionControls</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>controlsDock</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>561</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
