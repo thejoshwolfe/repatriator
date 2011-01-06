@@ -311,11 +311,9 @@ def handle_FileDeleteRequest(msg):
     # notify change
     send_directory_list()
 
+# any permissions will do for changing your own password
 def handle_ChangePasswordRequest(msg):
-    global server
     debug("Got change password message")
-
-    global user
     try:
         user.change_password(msg.old_password, msg.new_password)
         user.save()
@@ -323,54 +321,47 @@ def handle_ChangePasswordRequest(msg):
         warning("user {0} tried to change password with invalid old password, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.BadPassword))
         return
+    debug("changed password for user {0}".format(msg.username))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_AddUser(msg):
-    global server
     debug("Got add user message")
-
     try:
         admin.add_user(msg.username, msg.password, msg.privileges)
-        debug("created new user {0}".format(msg.username))
     except admin.UserAlreadyExists:
         warning("user {0} already exists, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserAlreadyExists))
         return
+    debug("created new user {0}".format(msg.username))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_UpdateUser(msg):
-    global server
     debug("Got update user message")
-
     try:
         target_user = admin.get_user(msg.username)
     except admin.UserDoesNotExist:
         warning("user {0} does not exist, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
-
-    debug("updating user {0} and saving to disk".format(msg.username))
     if len(msg.password) > 0:
-        target_user.attrs['password'] = msg.password
-    target_user.attrs['privileges'] = msg.privileges
+        target_user.set_password(msg.password)
+    target_user.set_privileges(msg.privileges)
     target_user.save()
+    debug("updated user {0}".format(msg.username))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_DeleteUser(msg):
-    global server
     debug("Got delete user message")
-
     try:
         admin.delete_user(msg.username)
-        debug("deleted {0}".format(msg.username))
     except admin.UserDoesNotExist:
         warning("user {0} does not exist, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.UserDoesNotExist))
         return
+    debug("deleted user {0}".format(msg.username))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_ListUserRequest(msg):
-    global server
     debug("Got list user request message")
     server.send_message(ListUserResult(admin.list_users()))
 

@@ -56,43 +56,27 @@ class User:
         'password_hash',
         'privileges',
         'picture_folder',
+        'bookmarks',
     ]
     def __init__(self, username, attrs):
         self.username = username
-        self.attrs = attrs
+        self._attrs = attrs
         _build_path(self.picture_folder())
 
     def picture_folder(self):
-        return self.attrs['picture_folder']
-
-    def grant_privilege(self, privilege):
-        privileges = self.attrs['privileges']
-        if privileges.find(privilege) == -1:
-            privilege.append(privilege)
-
-    def revoke_privilege(self, privilege):
-        self.attrs['privileges'].remove(privilege)
+        return self._attrs['picture_folder']
 
     def privileges(self):
-        return self.attrs['privileges']
+        return self._attrs['privileges']
+
+    def set_privileges(self, privileges):
+        self._attrs['privileges'] = privileges
 
     def has_privilege(self, privilege):
-        return privilege in self.attrs['privileges']
-
-    def check_all_attrs_are_defined(self):
-        """
-        can raise KeyError
-        """
-        for key in User.make_sure_these_keys_are_defined:
-            self.attrs[key]
-
-    def save(self):
-        self.check_all_attrs_are_defined()
-        _users_data[self.username] = self.attrs
-        _save_json()
+        return privilege in self._attrs['privileges']
 
     def check_password(self, password):
-        if _hash_password(self.attrs['salt'], password) != self.attrs['password_hash']:
+        if _hash_password(self._attrs['salt'], password) != self._attrs['password_hash']:
             raise BadPassword
 
     def change_password(self, old_password, new_password):
@@ -100,8 +84,26 @@ class User:
         self.set_password(new_password)
 
     def set_password(self, new_password):
-        self.attrs['salt'] = _random_string(32)
-        self.attrs['password_hash'] = _hash_password(self.attrs['salt'], new_password)
+        self._attrs['salt'] = _random_string(32)
+        self._attrs['password_hash'] = _hash_password(self._attrs['salt'], new_password)
+
+    def bookmarks(self):
+        return self._attrs['bookmarks']
+
+    def set_bookmarks(self, bookmarks):
+        self._attrs['bookmarks'] = bookmarks
+
+    def check_all_attrs_are_defined(self):
+        """
+        can raise KeyError
+        """
+        for key in User.make_sure_these_keys_are_defined:
+            self._attrs[key]
+
+    def save(self):
+        self.check_all_attrs_are_defined()
+        _users_data[self.username] = self._attrs
+        _save_json()
 
 def get_user(username):
     """
@@ -134,8 +136,9 @@ def add_user(username, password, privileges):
         'privileges': privileges,
         'picture_folder': os.path.join(
             settings['DATA_FOLDER'],
-            hashlib.md5(username.encode('utf8')).hexdigest()
-        )
+            hashlib.md5(username.encode('utf8')).hexdigest(),
+        ),
+        'bookmarks': [],
     }
     user = User(username, attrs)
     user.set_password(password)
