@@ -172,7 +172,7 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
 
 void MainWindow::updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position)
 {
-    slider->setEnabled((bool)(motor_state & FullUpdateMessage::MotorIsInitialized));
+    slider->setEnabled((bool)motor_state);
     slider->setShadowPosition((int)motor_position);
 }
 
@@ -182,7 +182,7 @@ void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint
     updateShadowPosition(ui->orbitSliderB, motor_states.at(1), motor_positions.at(1));
     updateShadowPosition(ui->liftSliderZ, motor_states.at(4), motor_positions.at(4));
 
-    ui->shadowMinimap->setEnabled((bool)(motor_states.at(2) & FullUpdateMessage::MotorIsInitialized) && (bool)(motor_states.at(3) & FullUpdateMessage::MotorIsInitialized));
+    ui->shadowMinimap->setEnabled((bool)motor_states.at(2) && (bool)(motor_states.at(3)));
     ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
 }
 
