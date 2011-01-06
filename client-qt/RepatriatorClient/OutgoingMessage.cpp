@@ -74,6 +74,11 @@ void ChangePasswordRequestMessage::writeMessageBody(QDataStream &stream)
     writeString(stream, new_password);
 }
 
+void SetAutoFocusEnabledMessage::writeMessageBody(QDataStream &stream)
+{
+    stream << this->value;
+}
+
 void MotorMovementMessage::writeMessageBody(QDataStream &stream)
 {
     for (int i = 0; i < positions.count(); i++)

@@ -359,6 +359,9 @@ def handle_ListUserRequest(msg):
     debug("Got list user request message")
     server.send_message(ListUserResult(auth.list_users()))
 
+def handle_SetAutoFocusEnabled(msg):
+    global auto_focus_enabled
+    auto_focus_enabled = False
 
 def motorStoppedMovingHandler(reason):
     if reason != silverpak.StoppedMovingReason.Normal:
@@ -381,6 +384,7 @@ message_handlers = {
     ClientMessage.FileDeleteRequest: handle_FileDeleteRequest,
     ClientMessage.ChangePasswordRequest: handle_ChangePasswordRequest,
     ClientMessage.ListUserRequest: handle_ListUserRequest,
+    ClientMessage.SetAutoFocusEnabled: handle_SetAutoFocusEnabled,
 }
 
 need_camera_thread = {
@@ -397,10 +401,11 @@ need_camera_thread = {
     ClientMessage.FileDeleteRequest: False,
     ClientMessage.ChangePasswordRequest: False,
     ClientMessage.ListUserRequest: False,
+    ClientMessage.SetAutoFocusEnabled: False,
 }
 
 def init_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motor_chars, motors, motor_is_initialized, ping_thread, need_to_auto_focus
+    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motor_chars, motors, motor_is_initialized, ping_thread, auto_focus_enabled, need_to_auto_focus
 
     # initialize variables
     finished = False
@@ -413,6 +418,7 @@ def init_state():
     camera_thread_queue = queue.Queue()
     message_queue = queue.Queue()
     ping_thread = None
+    auto_focus_enabled = True
     need_to_auto_focus = False
 
 
@@ -543,7 +549,7 @@ def run_camera():
         try:
             msg = camera_thread_queue.get(block=False)
             if msg.message_type == ClientMessage.DummyAutoFocus:
-                if need_to_auto_focus:
+                if auto_focus_enabled and need_to_auto_focus:
                     debug("Telling camera to auto focus")
                     camera.autoFocus()
                     need_to_auto_focus = False

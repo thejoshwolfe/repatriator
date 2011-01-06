@@ -273,3 +273,8 @@ Messages:
             int8 - identifies this message as a ListUserRequest (enum value 11)
             int64 - byte count of the entire message including this field
 
+        SetAutoFocusEnabled
+            int8 - identifies this message as a SetAutoFocusEnabled (enum value 12)
+            int64 - byte count of the entire message including this field
+            int8 - boolean - the value
+

@@ -30,6 +30,7 @@ protected:
         FileDeleteRequest = 9,
         ChangePasswordRequest = 10,
         ListUserRequest = 11,
+        SetAutoFocusEnabled = 12,
     };
 
     // serialize
@@ -86,7 +87,6 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return ConnectionRequest; }
-
 };
 
 class TakePictureMessage : public OutgoingMessage
@@ -96,7 +96,6 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & ) {}
     virtual MessageCode type() const { return TakePicture; }
-
 };
 
 class MotorMovementMessage : public OutgoingMessage
@@ -117,7 +116,6 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & ) {}
     virtual MessageCode type() const { return DirectoryListingRequest; }
-
 };
 
 class FileDownloadRequestMessage : public OutgoingMessage
@@ -128,7 +126,6 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return FileDownloadRequest; }
-
 };
 
 class UpdateUserMessage : public OutgoingMessage
@@ -139,11 +136,10 @@ public:
     QSet<ServerTypes::Permission> permissions;
     UpdateUserMessage(QString username, QString password, QSet<ServerTypes::Permission> permissions) :
         username(username), password(password), permissions(permissions) {}
-    virtual~UpdateUserMessage() {}
+    virtual ~UpdateUserMessage() {}
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return UpdateUser; }
-
 };
 
 class AddUserMessage : public UpdateUserMessage
@@ -153,7 +149,6 @@ public:
             UpdateUserMessage(username, password, permissions) {}
 protected:
     virtual MessageCode type() const { return AddUser; }
-
 };
 
 class DeleteUserMessage : public OutgoingMessage
@@ -187,7 +182,6 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return ChangePasswordRequest; }
-
 };
 
 class ListUserRequestMessage : public OutgoingMessage
@@ -197,6 +191,16 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & ) {}
     virtual MessageCode type() const { return ListUserRequest; }
-
 };
+
+class SetAutoFocusEnabledMessage : public OutgoingMessage
+{
+public:
+    bool value;
+    SetAutoFocusEnabledMessage(bool value) : value(value) {}
+protected:
+    virtual void writeMessageBody(QDataStream & stream);
+    virtual MessageCode type() const { return SetAutoFocusEnabled; }
+};
+
 #endif // OUTGOING_MESSAGE_H

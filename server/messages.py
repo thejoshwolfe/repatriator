@@ -22,6 +22,7 @@ class ClientMessage:
     FileDeleteRequest = 9
     ChangePasswordRequest = 10
     ListUserRequest = 11
+    SetAutoFocusEnabled = 12
 
     class ParseError(Exception):
         pass
@@ -181,6 +182,11 @@ class ListUserRequest(ClientMessage):
     def parse(self):
         # nothing to do
         pass
+
+__all__.append('SetAutoFocusEnabled')
+class SetAutoFocusEnabled(ClientMessage):
+    def parse(self):
+        self.value = self._parse_bool()
 
 __all__.append('ServerMessage')
 class ServerMessage:
@@ -422,5 +428,6 @@ ClientMessage.TypeForId = {
     ClientMessage.FileDeleteRequest: FileDeleteRequest,
     ClientMessage.ChangePasswordRequest: ChangePasswordRequest,
     ClientMessage.ListUserRequest: ListUserRequest,
+    ClientMessage.SetAutoFocusEnabled: SetAutoFocusEnabled,
 }
 
