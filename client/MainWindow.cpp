@@ -149,6 +149,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         {
             InitInfoMessage * init_info_msg = (InitInfoMessage *) msg.data();
             changeMotorBounds(init_info_msg->motor_boundaries);
+            break;
         }
         default:
             qDebug() << "wtf got a message " << msg.data()->type;
