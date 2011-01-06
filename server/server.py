@@ -565,11 +565,11 @@ def run_camera():
     edsdk.terminate()
 
 def maybe_trigger_auto_focus():
+    global need_to_auto_focus
     if not (auto_focus_enabled and need_to_auto_focus):
         return
     debug("Telling camera to auto focus")
     camera.autoFocus()
-    global need_to_auto_focus
     need_to_auto_focus = False
 
 def on_connection_open():
