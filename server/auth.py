@@ -51,32 +51,19 @@ class BadPassword(Exception):
     pass
 
 class User:
-    def __init__(self, username=None, password=None, privileges=None):
-        """
-        creates a new user and returns it, or raises UserAlreadyExists.
-        """
-        if privileges is None:
-            privileges = []
-
+    make_sure_these_keys_are_defined = [
+        'salt',
+        'password_hash',
+        'privileges',
+        'picture_folder',
+    ]
+    def __init__(self, username, attrs):
         self.username = username
-        self.attrs = {}
-
-        if username is not None or password is not None:
-            if username in _auth_data:
-                raise UserAlreadyExists
-            else:
-                self.attrs['salt'] = _random_string(32)
-                self.attrs['password_hash'] = _hash_password(self.attrs['salt'], password)
-                self.attrs['privileges'] = privileges
-                _build_path(self.picture_folder())
+        self.attrs = attrs
+        _build_path(self.picture_folder())
 
     def picture_folder(self):
-        if self._picture_folder is None:
-            self._picture_folder = os.path.join(
-                settings['DATA_FOLDER'],
-                hashlib.md5(self.username.encode('utf8')).hexdigest()
-            )
-        return self._picture_folder
+        return self.attrs['picture_folder']
 
     def grant_privilege(self, privilege):
         privileges = self.attrs['privileges']
@@ -92,40 +79,73 @@ class User:
     def has_privilege(self, privilege):
         return privilege in self.attrs['privileges']
 
+    def check_all_attrs_are_defined(self):
+        """
+        can raise KeyError
+        """
+        for key in User.make_sure_these_keys_are_defined:
+            self.attrs[key]
+
     def save(self):
+        self.check_all_attrs_are_defined()
         _auth_data[self.username] = self.attrs
         _save_json()
 
-    def change_password(self, old_password, new_password):
-        if _hash_password(self.attrs['salt'], old_password) != self.attrs['password_hash']:
+    def check_password(self, password):
+        if _hash_password(self.attrs['salt'], password) != self.attrs['password_hash']:
             raise BadPassword
+
+    def change_password(self, old_password, new_password):
+        self.check_password(old_password)
+        self.set_password(new_password)
+
+    def set_password(self, new_password):
         self.attrs['salt'] = _random_string(32)
         self.attrs['password_hash'] = _hash_password(self.attrs['salt'], new_password)
 
 def get_user(username):
-    if username in _auth_data:
-        user = User()
-        user.username = username
-        user.attrs = _auth_data[username]
+    """
+    can raise UserDoesNotExist
+    """
+    try:
+        user = User(username, _auth_data[username])
+        user.check_all_attrs_are_defined()
         return user
+    except KeyError:
+        raise UserDoesNotExist
 
-    return None
 
 def login(username, password):
     """
-    Returns the User object if the authentication succeeded, else None
+    can raise UserDoesNotExist or BadPassword.
+    returns the User object if the authentication succeeded.
     """
     user = get_user(username)
-    if user is not None and _hash_password(user.attrs['salt'], password) == user.attrs['password_hash']:
-        return user
-    
-    return None
+    user.check_password(password)
+    return user
+
+def add_user(username, password, privileges):
+    """
+    can raise UserAlreadyExists. returns nothing.
+    """
+    if username in _auth_data:
+        raise UserAlreadyExists
+    attrs = {
+        'privileges': privileges,
+        'picture_folder': os.path.join(
+            settings['DATA_FOLDER'],
+            hashlib.md5(username.encode('utf8')).hexdigest()
+        )
+    }
+    user = User(username, attrs)
+    user.set_password(password)
+    user.save()
 
 def delete_user(username):
+    """
+    can raise UserDoesNotExist
+    """
     user = get_user(username)
-    if user is None:
-        raise UserDoesNotExist
-
     if os.path.exists(user.picture_folder()):
         shutil.rmtree(user.picture_folder())
     del _auth_data[username]
@@ -147,6 +167,5 @@ try:
             raise IOError
 except IOError as ex:
     _auth_data = {}
-    default_user = User(username="default_admin", password="temp1234", privileges=[Privilege.ManageUsers])
-    default_user.save()
+    add_user("default_admin", "temp1234", [Privilege.ManageUsers])
 

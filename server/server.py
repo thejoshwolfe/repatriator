@@ -176,8 +176,9 @@ def handle_ConnectionRequest(msg):
     debug("Got connection request message")
     debug("version: {0}".format(str(msg.version)))
 
-    user = auth.login(msg.username, msg.password)
-    if user is None:
+    try:
+        user = auth.login(msg.username, msg.password)
+    except (auth.UserDoesNotExist, auth.BadPassword):
         warning("Invalid login: " + msg.username + ", Password: <hidden>")
         server.send_message(ConnectionResult(ConnectionResult.InvalidLogin))
         server.close()
@@ -327,8 +328,7 @@ def handle_AddUser(msg):
     debug("Got add user message")
 
     try:
-        new_user = auth.User(msg.username, msg.password, msg.privileges)
-        new_user.save()
+        auth.add_user(msg.username, msg.password, msg.privileges)
         debug("created new user {0}".format(msg.username))
     except auth.UserAlreadyExists:
         warning("user {0} already exists, sending error message".format(msg.username))

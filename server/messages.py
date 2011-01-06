@@ -152,9 +152,9 @@ class AddUser(ClientMessage):
         self.password = self._parse_string()
 
         privilege_count = self._parse_int32()
-        self.privileges = set()
+        self.privileges = []
         for _ in range(privilege_count):
-            self.privileges.add(self._parse_int32())
+            self.privileges.append(self._parse_int32())
 
 __all__.append('UpdateUser')
 class UpdateUser(ClientMessage):
@@ -163,9 +163,9 @@ class UpdateUser(ClientMessage):
         self.password = self._parse_string()
 
         privilege_count = self._parse_int32()
-        self.privileges = set()
+        self.privileges = []
         for _ in range(privilege_count):
-            self.privileges.add(self._parse_int32())
+            self.privileges.append(self._parse_int32())
 
 __all__.append('DeleteUser')
 class DeleteUser(ClientMessage):
@@ -241,7 +241,7 @@ class ConnectionResult(ServerMessage):
         motor_boundaries is a 5-tuple of 3-tuples - min, max, init for each motor.
         """
         if privileges is None:
-            privileges = set()
+            privileges = []
 
         self.message_type = ServerMessage.ConnectionResult
         self.privileges = privileges
