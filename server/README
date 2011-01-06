@@ -186,19 +186,6 @@ Messages:
             for each user bookmark:
                 Bookmark
 
-        Bookmark:
-            String - name of bookmark
-            for each char in "ABXYZ":
-                int64 - motor $char position or -2^63 meaning not specified
-            int8 - auto focus setting:
-                0: not specified
-                1: set auto focus on
-                2: set auto focus off
-
-        String:
-            int32 - length of utf8 string
-            <utf8 string>
-
     From the client to the server:
 
         MagicalRequest
@@ -291,4 +278,33 @@ Messages:
             int8 - identifies this message as a SetAutoFocusEnabled (enum value 12)
             int64 - byte count of the entire message including this field
             int8 - boolean - the value
+
+        SetStaticBookmarks
+            int8 - the type of this message (enum value 13)
+            int64 - byte count of the entire message including this field
+            int32 - number of bookmarks
+            for each bookmark:
+                Bookmark
+
+        SetUserBookmarks - sets the bookmarks for the current user
+            int8 - the type of this message (enum value 14)
+            int64 - byte count of the entire message including this field
+            int32 - number of bookmarks
+            for each bookmark:
+                Bookmark
+
+    Common:
+
+        Bookmark:
+            String - name of bookmark
+            for each char in "ABXYZ":
+                int64 - motor $char position or -2^63 meaning not specified
+            int8 - auto focus setting:
+                0: not specified
+                1: set auto focus on
+                2: set auto focus off
+
+        String:
+            int32 - length of utf8 string
+            <utf8 string>
 
