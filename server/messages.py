@@ -194,6 +194,7 @@ class ServerMessage:
     ErrorMessage = 5
     ListUserResult = 6
     Ping = 7
+    InitializationInformation = 8
 
     def serialize(self):
         """
@@ -264,6 +265,23 @@ class ConnectionResult(ServerMessage):
                 buf.extend(struct.pack(">q", min_value))
                 buf.extend(struct.pack(">q", max_value))
                 buf.extend(struct.pack(">q", init_value))
+        return buf
+
+__all__.append('InitializationInformation')
+class InitializationInformation(ServerMessage):
+    def __init__(self, motor_boundaries):
+        """
+        motor_boundaries is a 5-tuple of 3-tuples - min, max, init for each motor.
+        """
+        self.message_type = ServerMessage.InitializationInformation
+        self.motor_boundaries = motor_boundaries
+
+    def _serialize(self):
+        buf = bytearray()
+        for min_value, max_value, init_value in self.motor_boundaries:
+            buf.extend(struct.pack(">q", min_value))
+            buf.extend(struct.pack(">q", max_value))
+            buf.extend(struct.pack(">q", init_value))
         return buf
 
 __all__.append('FullUpdate')

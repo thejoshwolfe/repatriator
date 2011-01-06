@@ -57,7 +57,7 @@ private:
     void saveFile(QByteArray blob, QString filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
-    void changeMotorBounds(QVector<ConnectionResultMessage::MotorBoundaries> motor_boundaries);
+    void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries);
     QString getNextDownloadFilename();
 
 private slots:

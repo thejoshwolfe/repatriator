@@ -18,6 +18,7 @@ public:
         ErrorMessage = 5,
         ListUserResult = 6,
         Ping = 7,
+        InitInfo = 8,
     };
 
     MessageCode type;
@@ -54,18 +55,11 @@ public:
         Success = 2,
     };
 
-    struct MotorBoundaries {
-        qint64 min;
-        qint64 max;
-        qint64 init;
-    };
-
     qint32 major_version;
     qint32 minor_version;
     qint32 revision_version;
     ConnectionResultStatus connection_status;
     QSet<ServerTypes::Permission> permissions;
-    QVector<MotorBoundaries> motor_boundaries;
 
     virtual void parse(QDataStream & stream);
 };
@@ -120,6 +114,20 @@ class PingMessage : public IncomingMessage
 {
 public:
     virtual void parse(QDataStream &) {}
+};
+
+class InitInfoMessage : public IncomingMessage
+{
+public:
+    struct MotorBoundaries {
+        qint64 min;
+        qint64 max;
+        qint64 init;
+    };
+
+    QVector<MotorBoundaries> motor_boundaries;
+
+    virtual void parse(QDataStream &);
 };
 
 
