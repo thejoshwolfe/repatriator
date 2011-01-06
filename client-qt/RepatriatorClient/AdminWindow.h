@@ -62,9 +62,13 @@ private:
 
     QHash<QString, QSharedPointer<DetailedUserInfo> > m_users;
 
+    // whether we've received the user list from the server yet
+    bool m_got_users;
+
 private:
     void cleanup();
     void updateUserList(QList<ServerTypes::UserInfo> users);
+    void enableCorrectControls();
 
 private slots:
     void on_newButton_clicked();

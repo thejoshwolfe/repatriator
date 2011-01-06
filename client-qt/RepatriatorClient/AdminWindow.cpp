@@ -5,11 +5,14 @@
 #include "PasswordInputWindow.h"
 #include "EditUserAccountWindow.h"
 
+#include <QDialogButtonBox>
+
 AdminWindow * AdminWindow::s_instance = NULL;
 
 AdminWindow::AdminWindow(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::AdminWindow)
+    ui(new Ui::AdminWindow),
+    m_got_users(false)
 {
     ui->setupUi(this);
 
@@ -19,6 +22,7 @@ AdminWindow::AdminWindow(QWidget *parent) :
     success = connect(this, SIGNAL(rejected()), this, SLOT(handleRejected()));
     Q_ASSERT(success);
 
+    enableCorrectControls();
 }
 
 AdminWindow::~AdminWindow()
@@ -77,8 +81,8 @@ void AdminWindow::updateUserList(QList<ServerTypes::UserInfo> users)
         m_users.insert(user.username, QSharedPointer<DetailedUserInfo>(new DetailedUserInfo(user)));
     }
 
-    ui->usersList->setEnabled(true);
-    ui->newButton->setEnabled(true);
+    m_got_users = true;
+    enableCorrectControls();
 }
 
 void AdminWindow::on_buttonBox_rejected()
@@ -192,13 +196,12 @@ void AdminWindow::on_changePasswordButton_clicked()
 
 void AdminWindow::on_usersList_itemSelectionChanged()
 {
-    bool userIsSelected = ui->usersList->selectedItems().count() == 1;
+    if (! ui->usersList->isEnabled())
+        return;
 
-    ui->changePasswordButton->setEnabled(userIsSelected);
-    ui->deleteButton->setEnabled(userIsSelected);
-    ui->adminPrivilegesCheckBox->setEnabled(userIsSelected);
+    enableCorrectControls();
 
-    if (userIsSelected) {
+    if (ui->usersList->selectedItems().count() == 1) {
         QString username = ui->usersList->selectedItems().at(0)->text();
         QSharedPointer<DetailedUserInfo> user = m_users.value(username);
         ui->adminPrivilegesCheckBox->setChecked(user.data()->permissions.contains(ServerTypes::ManageUsers));
@@ -206,6 +209,24 @@ void AdminWindow::on_usersList_itemSelectionChanged()
         // no selection
         ui->adminPrivilegesCheckBox->setChecked(false);
     }
+}
+
+void AdminWindow::enableCorrectControls()
+{
+    ui->usersList->setEnabled(m_got_users);
+    ui->newButton->setEnabled(m_got_users);
+    // the ok button from the button box
+    foreach (QAbstractButton * button, ui->buttonBox->buttons()) {
+        if (ui->buttonBox->buttonRole(button) == QDialogButtonBox::AcceptRole)
+            button->setEnabled(m_got_users);
+    }
+
+    bool user_is_selected = ui->usersList->selectedItems().count() == 1;
+
+    ui->changePasswordButton->setEnabled(m_got_users && user_is_selected);
+    ui->deleteButton->setEnabled(m_got_users && user_is_selected);
+    ui->adminPrivilegesCheckBox->setEnabled(m_got_users && user_is_selected);
+
 }
 
 void AdminWindow::on_deleteButton_clicked()
