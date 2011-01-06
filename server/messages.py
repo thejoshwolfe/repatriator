@@ -61,11 +61,6 @@ class ClientMessage:
         raw_data is a byte array
         returns a subclass of ClientMessage with the relevant data.
         """
-        debug("Incoming client message. raw data:")
-        debug("----------------------------------")
-        debug(raw_data)
-        debug("----------------------------------")
-
         if len(raw_data) < 9:
             warning("Client message is missing header data")
             raise ClientMessage.ParseError("Message is missing header data.")
