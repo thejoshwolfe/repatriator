@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_pictures_context_menu->addAction(ui->actionDiscardSelectedFiles);
     m_pictures_context_menu->addSeparator();
     m_pictures_context_menu->addAction(ui->actionDownloadAllAndQuit);
+
+    ui->viewMenu->addAction(ui->controlsDock->toggleViewAction());
+    ui->viewMenu->addAction(ui->filesDock->toggleViewAction());
 }
 
 MainWindow::~MainWindow()
