@@ -196,13 +196,19 @@
    </widget>
    <widget class="QMenu" name="menuSe_ttings">
     <property name="title">
-     <string>Se&amp;ttings</string>
+     <string>&amp;Settings</string>
     </property>
     <addaction name="actionChangeDownloadFolder"/>
    </widget>
+   <widget class="QMenu" name="menu_Positions">
+    <property name="title">
+     <string>&amp;Positions</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
-   <addaction name="menu_Camera"/>
    <addaction name="menuSe_ttings"/>
+   <addaction name="menu_Camera"/>
+   <addaction name="menu_Positions"/>
   </widget>
   <action name="actionDownload">
    <property name="text">
@@ -263,17 +269,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
-   </property>
-  </action>
-  <action name="actionGoHome">
-   <property name="text">
-    <string>Go &amp;Home</string>
-   </property>
-   <property name="toolTip">
-    <string>Sends all motors to their home positions.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+H</string>
    </property>
   </action>
   <action name="actionChangeDownloadFolder">
