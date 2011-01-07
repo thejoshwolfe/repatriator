@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i <= ui->sensitivitySlider->maximum(); i++)
         m_sensitivities.replace(i, 1.0f - i * percent_delta);
     ui->sensitivitySlider->setValue(0);
+
 }
 
 MainWindow::~MainWindow()
@@ -109,6 +110,13 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
     m_connector.data()->go();
 
     this->show();
+
+    this->restoreGeometry(Settings::main_window_geometry);
+    this->restoreState(Settings::main_window_state);
+    ui->controlsDock->restoreGeometry(Settings::dock_controls_geometry);
+    ui->filesDock->restoreGeometry(Settings::dock_files_geometry);
+    ui->bookmarksDock->restoreGeometry(Settings::dock_bookmarks_geometry);
+    ui->locationsDock->restoreGeometry(Settings::dock_locations_geometry);
 }
 
 void MainWindow::connected()
@@ -486,15 +494,13 @@ ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QVector<Serve
     return home_location;
 }
 
-void MainWindow::showEvent(QShowEvent *)
-{
-    // ignore failure
-    this->restoreGeometry(Settings::main_window_geometry);
-    this->restoreState(Settings::main_window_state);
-}
-
 void MainWindow::closeEvent(QCloseEvent *)
 {
+    Settings::dock_controls_geometry = ui->controlsDock->saveGeometry();
+    Settings::dock_files_geometry = ui->filesDock->saveGeometry();
+    Settings::dock_bookmarks_geometry = ui->bookmarksDock->saveGeometry();
+    Settings::dock_locations_geometry = ui->locationsDock->saveGeometry();
+
     Settings::main_window_geometry = this->saveGeometry();
     Settings::main_window_state = this->saveState();
     Settings::save();

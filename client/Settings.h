@@ -19,6 +19,11 @@ public:
     static QByteArray main_window_geometry;
     static QByteArray main_window_state;
 
+    static QByteArray dock_controls_geometry;
+    static QByteArray dock_files_geometry;
+    static QByteArray dock_bookmarks_geometry;
+    static QByteArray dock_locations_geometry;
+
     // read the settings on disk into this class
     static void load();
 
