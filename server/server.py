@@ -380,6 +380,15 @@ def handle_SetAutoFocusEnabled(msg):
     auto_focus_enabled = msg.value
     maybe_trigger_auto_focus()
 
+@must_have_privilege(Privilege.ManageUsers)
+def handle_SetStaticBookmarks(msg):
+    admin.set_static_bookmarks(msg.bookmarks)
+
+@must_have_privilege(Privilege.OperateHardware)
+def handle_SetUserBookmarks(msg):
+    user.set_bookmarks(msg.bookmarks)
+    user.save()
+
 def motorStoppedMovingHandler(reason):
     if reason != silverpak.StoppedMovingReason.Normal:
         return
@@ -406,6 +415,8 @@ message_handlers = {
     ClientMessage.ListUserRequest: handle_ListUserRequest,
     ClientMessage.SetAutoFocusEnabled: handle_SetAutoFocusEnabled,
     ClientMessage.Ping: handle_Ping,
+    ClientMessage.SetStaticBookmarks: handle_SetStaticBookmarks,
+    ClientMessage.SetUserBookmarks: handle_SetUserBookmarks,
 }
 
 need_camera_thread = {
@@ -424,6 +435,8 @@ need_camera_thread = {
     ClientMessage.ChangePasswordRequest: False,
     ClientMessage.ListUserRequest: False,
     ClientMessage.Ping: False,
+    ClientMessage.SetStaticBookmarks: False,
+    ClientMessage.SetUserBookmarks: False,
 }
 
 def init_state():

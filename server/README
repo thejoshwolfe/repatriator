@@ -280,26 +280,26 @@ Messages:
             int64 - byte count of the entire message including this field
             int8 - boolean - the value
 
-        SetStaticBookmarks
-            int8 - the type of this message (enum value 13)
+        Ping - if the server doesn't get a message from the client for 5
+               seconds, the connection is dropped. Use Ping to keep the
+               connection alive.
+            int8 - identifies this message as a Ping (enum value 13)
             int64 - byte count of the entire message including this field
-            int32 - number of bookmarks
-            for each bookmark:
-                Bookmark
+            int32 - id of the ping
 
-        SetUserBookmarks - sets the bookmarks for the current user
+        SetStaticBookmarks
             int8 - the type of this message (enum value 14)
             int64 - byte count of the entire message including this field
             int32 - number of bookmarks
             for each bookmark:
                 Bookmark
 
-        Ping - if the server doesn't get a message from the client for 5
-               seconds, the connection is dropped. Use Ping to keep the
-               connection alive.
-            int8 - identifies this message as a Ping (enum value 15)
+        SetUserBookmarks - sets the bookmarks for the current user
+            int8 - the type of this message (enum value 15)
             int64 - byte count of the entire message including this field
-            int32 - id of the ping
+            int32 - number of bookmarks
+            for each bookmark:
+                Bookmark
 
     Common:
 

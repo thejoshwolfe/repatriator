@@ -24,6 +24,8 @@ class ClientMessage:
     ListUserRequest = 11
     SetAutoFocusEnabled = 12
     Ping = 13
+    SetStaticBookmarks = 14
+    SetUserBookmarks = 15
 
     class ParseError(Exception):
         pass
@@ -47,14 +49,17 @@ class ClientMessage:
         self._move_pointer(byte_count)
         return n
 
+    def _parse_bool(self):
+        return bool(self._parse_int8())
+
+    def _parse_int8(self):
+        return self._parse_int(1, '>b')
+
     def _parse_int32(self):
         return self._parse_int(4, '>i')
 
     def _parse_int64(self):
         return self._parse_int(8, '>q')
-
-    def _parse_bool(self):
-        return bool(self._parse_int(1, '>b'))
 
     @staticmethod
     def parse(raw_data):
@@ -188,6 +193,25 @@ __all__.append('Ping')
 class Ping(ClientMessage):
     def parse(self):
         self.ping_id = self._parse_int32()
+
+__all__.append('SetStaticBookmarks')
+class SetStaticBookmarks(ClientMessage):
+    def parse(self):
+        self.bookmarks = []
+        bookmarks_len = self._parse_int32()
+        for _ in range(bookmarks_len):
+            name = self._parse_string()
+            motors = []
+            for _ in range(5):
+                motors.append(self._parse_int64())
+            auto_focus = self._parse_int8()
+            bookmark = [name, motors, auto_focus]
+            self.bookmarks.append(bookmark)
+
+__all__.append('SetUserBookmarks')
+class SetUserBookmarks(SetStaticBookmarks):
+    # same as static bookmarks
+    pass
 
 __all__.append('ServerMessage')
 class ServerMessage:
@@ -460,5 +484,7 @@ ClientMessage.TypeForId = {
     ClientMessage.ListUserRequest: ListUserRequest,
     ClientMessage.SetAutoFocusEnabled: SetAutoFocusEnabled,
     ClientMessage.Ping: Ping,
+    ClientMessage.SetStaticBookmarks: SetStaticBookmarks,
+    ClientMessage.SetUserBookmarks: SetUserBookmarks,
 }
 
