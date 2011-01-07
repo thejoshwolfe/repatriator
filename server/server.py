@@ -16,7 +16,7 @@ def set_up_logging():
     logging.basicConfig(filename=log_file, level=log_level, format=log_format)
 set_up_logging()
 from logging import debug, warning, error
-debug("\n\nServer starting\n")
+error("\n\nServer starting\n")
 
 # now import our stuff
 from power import set_power_switch
@@ -134,6 +134,9 @@ class Server:
         self.writer_thread = threading.Thread(target=self._run_writer, name="message writer")
         self.reader_thread = threading.Thread(target=self._run_reader, name="message reader")
 
+        global graceful_shutdown
+        graceful_shutdown = self.close
+
     def open(self):
         self.writer_thread.start()
         self.reader_thread.start()
@@ -166,7 +169,6 @@ def valid_filename(filename):
 
 # message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
-    global server
     debug("got a magical request, sending a magical response")
     server.send_message(MagicalResponse())
 
@@ -204,8 +206,6 @@ def handle_ConnectionRequest(msg):
 
     if msg.hardware_flag:
         initialize_hardware()
-    else:
-        init_ping_thread()
 
 def must_have_privilege(privilege):
     def decorated(function):
@@ -380,7 +380,6 @@ def handle_SetAutoFocusEnabled(msg):
     auto_focus_enabled = msg.value
     maybe_trigger_auto_focus()
 
-@must_have_privilege(Privilege.OperateHardware)
 def motorStoppedMovingHandler(reason):
     if reason != silverpak.StoppedMovingReason.Normal:
         return
@@ -388,6 +387,9 @@ def motorStoppedMovingHandler(reason):
     need_to_auto_focus = True
     debug("a motor stopped moving. setting auto focus flag.")
     camera_thread_queue.put(DummyAutoFocus())
+
+def handle_Ping(msg):
+    server.send_message(Pong(msg.ping_id))
 
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,
@@ -403,6 +405,7 @@ message_handlers = {
     ClientMessage.ChangePasswordRequest: handle_ChangePasswordRequest,
     ClientMessage.ListUserRequest: handle_ListUserRequest,
     ClientMessage.SetAutoFocusEnabled: handle_SetAutoFocusEnabled,
+    ClientMessage.Ping: handle_Ping,
 }
 
 need_camera_thread = {
@@ -420,23 +423,48 @@ need_camera_thread = {
     ClientMessage.FileDeleteRequest: False,
     ClientMessage.ChangePasswordRequest: False,
     ClientMessage.ListUserRequest: False,
+    ClientMessage.Ping: False,
 }
 
 def init_state():
-    global user, message_thread, message_queue, camera_thread, camera_thread_queue, finished, motor_chars, motors, motor_is_initialized, ping_thread, auto_focus_enabled, need_to_auto_focus
-
     # initialize variables
+    global finished
     finished = False
+
+    global user
     user = None
+
+    global camera_thread
     camera_thread = None
+
+    global message_thread
     message_thread = None
+
+    global init_motors_thread
+    init_motors_thread = None
+
+    global motor_chars
     motor_chars = ['A', 'B', 'X', 'Y', 'Z']
+
+    global motors
     motors = None
+
+    global motor_is_initialized
     motor_is_initialized = {char: False for char in motor_chars}
+    
+    global camera_thread_queue
     camera_thread_queue = queue.Queue()
+
+    global message_queue
     message_queue = queue.Queue()
+
+    global ping_thread
     ping_thread = None
+
+    global auto_focus_enabled
     auto_focus_enabled = True
+
+    global need_to_auto_focus
     need_to_auto_focus = False
 
 
@@ -449,15 +477,20 @@ def start_server():
     init_state()
     set_power_switch(False)
 
+    def handle_message(msg):
+        global last_client_message_time
+        last_client_message_time = time.time()
+        message_queue.put(msg)
+
     # wait for a connection
     class _Server(socketserver.StreamRequestHandler):
         def handle(self):
             debug("_Server.handle called")
-            self.server = Server(message_queue.put, on_connection_open, on_connection_close)
+            global server
+            server = Server(handle_message, on_connection_open, on_connection_close)
+            self.server = server
             self.server.request = self.request
             self.server.open()
-            global server
-            server = self.server
 
             self.server.wait()
         def finish(self):
@@ -465,6 +498,7 @@ def start_server():
                 on_connection_close()
 
     _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
+
     global server_thread
     server_thread = threading.Thread(target=_server.serve_forever, name="socket server")
     server_thread.start()
@@ -493,18 +527,20 @@ def run_message_loop():
             message_handlers[msg.message_type](msg)
 
 @catch_exceptions()
-def run_ping():
+def run_connection_monitor():
+    global last_client_message_time
     global finished
+    debug("running connection monitor thread")
 
-    debug("running ping thread")
-
-    next_frame = time.time()
+    last_client_message_time = time.time()
     while not finished:
-        # if it's time, send a ping
         now = time.time()
-        if now > next_frame:
-            server.send_message(Ping())
-            next_frame = now + 1.00
+        if now - last_client_message_time > settings['CLIENT_IDLE_TIMEOUT'] / 1000:
+            warning("Haven't heard from the client in CLIENT_IDLE_TIMEOUT time. Killing connection.")
+            finished = True
+            graceful_shutdown()
+            return
+        time.sleep(1)
 
 @catch_exceptions()
 def run_camera():
@@ -592,6 +628,9 @@ def maybe_trigger_auto_focus():
 
 def on_connection_open():
     debug("connection opening")
+    global finished
+    finished = False
+    init_monitor_thread()
 
 def on_connection_close():
     global finished, camera_thread, server_thread, ping_thread
@@ -614,9 +653,9 @@ def on_connection_close():
         debug("waiting for camera thread to join")
         camera_thread.join()
 
-    if ping_thread is not None:
-        debug("waiting for ping thread to join")
-        ping_thread.join()
+    if monitor_thread is not None:
+        debug("waiting for monitor thread to join")
+        monitor_thread.join()
 
     if message_thread is not None:
         debug("waiting for message thread to join")
@@ -644,21 +683,24 @@ def on_connection_close():
     debug("done with life. comitting seppuku")
     os._exit(0)
 
-def init_ping_thread():
-    global ping_thread, finished
+def init_monitor_thread():
+    global monitor_thread
 
-    finished = False
-    ping_thread = threading.Thread(target=run_ping, name="ping")
-    ping_thread.start()
+    monitor_thread = threading.Thread(target=run_connection_monitor, name="monitor")
+    monitor_thread.start()
 
 def initialize_hardware():
-    global finished, camera_thread
     set_power_switch(on=True)
 
-    finished = False
+    global camera_thread
     camera_thread = threading.Thread(target=run_camera, name="camera")
     camera_thread.start()
 
+    global init_motors_thread
+    init_motors_thread = threading.Thread(target=run_init_motors, name="init_motors")
+    init_motors_thread.start()
+
+def run_init_motors():
     def create_motor(char):
         motor = silverpak.Silverpak()
         motor.baudRate = settings['MOTOR_%s_BAUD_RATE' % char]

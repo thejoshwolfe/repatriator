@@ -84,3 +84,8 @@ void MotorMovementMessage::writeMessageBody(QDataStream &stream)
     for (int i = 0; i < positions.count(); i++)
         stream << (qint64) positions.at(i);
 }
+
+void PingMessage::writeMessageBody(QDataStream &stream)
+{
+    stream << this->ping_id;
+}

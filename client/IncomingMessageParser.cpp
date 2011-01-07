@@ -72,8 +72,8 @@ IncomingMessage * IncomingMessageParser::createMessageOfType(IncomingMessage::Me
             return new ErrorMessage;
         case IncomingMessage::ListUserResult:
             return new ListUserResultMessage;
-        case IncomingMessage::Ping:
-            return new PingMessage;
+        case IncomingMessage::Pong:
+            return new PongMessage;
         case IncomingMessage::InitInfo:
             return new InitInfoMessage;
     }

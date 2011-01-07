@@ -70,6 +70,10 @@ settings = {
     'MOTOR_Z_DRIVER_ADDRESS': 4,
     'MOTOR_Z_FANCY': True,
     'MOTOR_Z_FAKE': False,
+    
+    # how many milliseconds to wait for a message from the client
+    # before giving up and closing the connection
+    'CLIENT_IDLE_TIMEOUT': 5000,
 }
 try:
     import config

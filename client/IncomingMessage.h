@@ -17,7 +17,7 @@ public:
         FileDownloadResult = 4,
         ErrorMessage = 5,
         ListUserResult = 6,
-        Ping = 7,
+        Pong = 7,
         InitInfo = 8,
     };
 
@@ -109,10 +109,12 @@ public:
     virtual void parse(QDataStream & stream);
 };
 
-class PingMessage : public IncomingMessage
+class PongMessage : public IncomingMessage
 {
 public:
-    virtual void parse(QDataStream &) {}
+    qint32 ping_id;
+
+    virtual void parse(QDataStream &);
 };
 
 class InitInfoMessage : public IncomingMessage

@@ -23,6 +23,7 @@ class ClientMessage:
     ChangePasswordRequest = 10
     ListUserRequest = 11
     SetAutoFocusEnabled = 12
+    Ping = 13
 
     class ParseError(Exception):
         pass
@@ -183,6 +184,11 @@ class SetAutoFocusEnabled(ClientMessage):
     def parse(self):
         self.value = self._parse_bool()
 
+__all__.append('Ping')
+class Ping(ClientMessage):
+    def parse(self):
+        self.ping_id = self._parse_int32()
+
 __all__.append('ServerMessage')
 class ServerMessage:
     DummyCloseConnection = -1
@@ -193,7 +199,7 @@ class ServerMessage:
     FileDownloadResult = 4
     ErrorMessage = 5
     ListUserResult = 6
-    Ping = 7
+    Pong = 7
     InitializationInformation = 8
 
     def serialize(self):
@@ -218,13 +224,16 @@ __all__.append('DummyCloseConnection')
 class DummyCloseConnection:
     message_type = ServerMessage.DummyCloseConnection
 
-__all__.append('Ping')
-class Ping(ServerMessage):
-    def __init__(self):
-        self.message_type = ServerMessage.Ping
+__all__.append('Pong')
+class Pong(ServerMessage):
+    def __init__(self, ping_id):
+        self.message_type = ServerMessage.Pong
+        self.ping_id = ping_id
 
     def _serialize(self):
-        return bytes()
+        buf = bytearray()
+        buf.extend(struct.pack(">i", self.ping_id))
+        return buf
 
 __all__.append('MagicalResponse')
 class MagicalResponse(ServerMessage):
@@ -450,5 +459,6 @@ ClientMessage.TypeForId = {
     ClientMessage.ChangePasswordRequest: ChangePasswordRequest,
     ClientMessage.ListUserRequest: ListUserRequest,
     ClientMessage.SetAutoFocusEnabled: SetAutoFocusEnabled,
+    ClientMessage.Ping: Ping,
 }
 

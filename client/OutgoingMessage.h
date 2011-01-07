@@ -31,6 +31,7 @@ protected:
         ChangePasswordRequest = 10,
         ListUserRequest = 11,
         SetAutoFocusEnabled = 12,
+        Ping = 13,
     };
 
     // serialize
@@ -201,6 +202,16 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return SetAutoFocusEnabled; }
+};
+
+class PingMessage : public OutgoingMessage
+{
+public:
+    qint32 ping_id;
+    PingMessage(qint32 ping_id) : ping_id(ping_id) {}
+protected:
+    virtual void writeMessageBody(QDataStream &stream);
+    virtual MessageCode type() const { return Ping; }
 };
 
 #endif // OUTGOING_MESSAGE_H
