@@ -142,11 +142,13 @@ void ShadowMinimap::paintEvent(QPaintEvent *)
 
     // shadow
     QPoint shadow_center = valueToPoint(m_shadow_position);
-    p.fillRect(shadow_center.x() - c_thumb_size.x() / 2, shadow_center.y() - c_thumb_size.y() / 2, c_thumb_size.x(), c_thumb_size.y(), Qt::darkGray);
+    Qt::GlobalColor shadow_color = this->isEnabled() ? Qt::darkGray : Qt::lightGray;
+    p.fillRect(shadow_center.x() - c_thumb_size.x() / 2, shadow_center.y() - c_thumb_size.y() / 2, c_thumb_size.x(), c_thumb_size.y(), shadow_color);
 
     // thumb
     QPoint position_center = valueToPoint(m_position);
-    p.fillRect(position_center.x() - c_thumb_size.x() / 2, position_center.y() - c_thumb_size.y() / 2, c_thumb_size.x(), c_thumb_size.y(), Qt::black);
+    Qt::GlobalColor thumb_color = this->isEnabled() ? Qt::black : Qt::darkGray;
+    p.fillRect(position_center.x() - c_thumb_size.x() / 2, position_center.y() - c_thumb_size.y() / 2, c_thumb_size.x(), c_thumb_size.y(), thumb_color);
 }
 
 void ShadowMinimap::setSensitivity(float sensitivity)
