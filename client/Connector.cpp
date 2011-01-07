@@ -6,8 +6,7 @@
 #include <QMessageBox>
 
 Connector::Connector(QSharedPointer<Server> server) :
-    m_server(server),
-    m_done(false)
+    m_server(server)
 {}
 
 Connector::~Connector()
@@ -49,48 +48,40 @@ void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
 {
     switch(status) {
         case ServerTypes::Connecting:
-            m_progressDialog.data()->setLabelText(tr("Connecting..."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Connecting...")));
             m_progressDialog.data()->setValue(1);
             return;
         case ServerTypes::WaitingForMagicalResponse:
-            m_progressDialog.data()->setLabelText(tr("Waiting for server validation..."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Waiting for server validation...")));
             m_progressDialog.data()->setValue(2);
             return;
         case ServerTypes::WaitingForConnectionResult:
-            m_progressDialog.data()->setLabelText(tr("Waiting for connection result..."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Waiting for connection result...")));
             m_progressDialog.data()->setValue(3);
             return;
         case ServerTypes::ServerIsBogus:
-            m_progressDialog.data()->setLabelText(tr("Server is bogus."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Server is bogus.")));
             m_progressDialog.data()->setValue(4);
             fail(ServerIsBogus);
             return;
         case ServerTypes::LoginIsInvalid:
-            m_progressDialog.data()->setLabelText(tr("Login is invalid."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Login is invalid.")));
             m_progressDialog.data()->setValue(4);
             fail(LoginIsInvalid);
             return;
         case ServerTypes::InsufficientPrivileges:
-            m_progressDialog.data()->setLabelText(tr("Insufficient privileges."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Insufficient privileges.")));
             m_progressDialog.data()->setValue(4);
             fail(InsufficientPrivileges);
             return;
         case ServerTypes::Success:
-            m_progressDialog.data()->setLabelText(tr("Success."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Success.")));
             m_progressDialog.data()->setValue(4);
             cleanup(false);
             emit success();
             return;
         case ServerTypes::SocketError:
-            m_progressDialog.data()->setLabelText(tr("Socket error."));
-            if (m_done) return;
+            QMetaObject::invokeMethod(m_progressDialog.data(), SLOT(setLabelText(QString)), Qt::QueuedConnection, Q_ARG(QString, tr("Socket error.")));
             m_progressDialog.data()->setValue(4);
             fail(UnableToConnect);
             return;
@@ -115,7 +106,6 @@ void Connector::fail(FailureReason reason)
 
 void Connector::cleanup(bool kill_connection)
 {
-    m_done = true;
     disconnect(this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)));
     if (kill_connection)
         m_server.data()->socketDisconnect();

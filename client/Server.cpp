@@ -28,7 +28,7 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
     this->moveToThread(m_socket_thread);
 
     bool success;
-    success = QMetaObject::invokeMethod(this, "initialize", Qt::QueuedConnection);
+    success = QMetaObject::invokeMethod(this, SLOT(initialize()), Qt::QueuedConnection);
     Q_ASSERT(success);
 }
 
@@ -59,7 +59,7 @@ void Server::initialize()
 void Server::socketConnect()
 {
     if (QThread::currentThread() != m_socket_thread) {
-        bool success = QMetaObject::invokeMethod(this, "socketConnect", Qt::QueuedConnection);
+        bool success = QMetaObject::invokeMethod(this, SLOT(socketConnect()), Qt::QueuedConnection);
         Q_ASSERT(success);
         return;
     }
@@ -72,7 +72,7 @@ void Server::socketConnect()
 void Server::socketDisconnect()
 {
     if (QThread::currentThread() != m_socket_thread) {
-        bool success = QMetaObject::invokeMethod(this, "socketDisconnect", Qt::QueuedConnection);
+        bool success = QMetaObject::invokeMethod(this, SLOT(socketDisconnect()), Qt::QueuedConnection);
         Q_ASSERT(success);
         return;
     }
@@ -84,7 +84,7 @@ void Server::socketDisconnect()
 void Server::sendMessage(QSharedPointer<OutgoingMessage> msg)
 {
     if (QThread::currentThread() != m_socket_thread) {
-        bool success = QMetaObject::invokeMethod(this, "sendMessage", Qt::QueuedConnection, QGenericReturnArgument(), Q_ARG(QSharedPointer<OutgoingMessage>, msg));
+        bool success = QMetaObject::invokeMethod(this, SLOT(sendMessage(QSharedPointer<OutgoingMessage>)), Qt::QueuedConnection, QGenericReturnArgument(), Q_ARG(QSharedPointer<OutgoingMessage>, msg));
         Q_ASSERT(success);
         return;
     }
@@ -132,7 +132,7 @@ void Server::cleanUpAfterDisconnect()
     m_socket_thread->exit();
     this->moveToThread(QCoreApplication::instance()->thread());
     bool success;
-    success = QMetaObject::invokeMethod(this, "terminate", Qt::QueuedConnection);
+    success = QMetaObject::invokeMethod(this, SLOT(terminate()), Qt::QueuedConnection);
     Q_ASSERT(success);
 }
 
