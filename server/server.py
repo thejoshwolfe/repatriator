@@ -131,8 +131,8 @@ class Server:
         self._current_full_update_lock = threading.RLock()
         self._current_full_update = None
 
-        self.writer_thread = threading.Thread(target=self._run_writer, name="message writer")
-        self.reader_thread = threading.Thread(target=self._run_reader, name="message reader")
+        self.writer_thread = make_tread(self._run_writer, "message writer")
+        self.reader_thread = make_tread(self._run_reader, "message reader")
 
         global graceful_shutdown
         graceful_shutdown = self.close
@@ -225,16 +225,14 @@ def must_have_privilege(privilege):
         return wraps(function)(_wrapped)
     return decorated
 
-def catch_exceptions():
-    def decorated(function):
-        def _wrapped(*args, **kwargs):
-            try:
-                return function(*args, **kwargs)
-            except:
-                error("Fatal exception, killing myself:\n" + traceback.format_exc())
-                os._exit(0)
-        return wraps(function)(_wrapped)
-    return decorated
+def make_thread(target, name, args=[]):
+    def exception_catcher():
+        try:
+            target(*args)
+        except:
+            error("Fatal exception, killing myself:\n" + traceback.format_exc())
+            os._exit(0)
+    return threading.Thread(target=exception_catcher, name=name)
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_TakePicture(msg):
@@ -256,11 +254,8 @@ def handle_MotorMovement(msg):
     global motors
     debug("Got motor movement message")
 
-    if motors is None:
-        warning("Can't move motors yet. they haven't been found")
-        return
-    for char, motor in motors.items():
-        move_motor(motor, msg.motor_pos[char])
+    motor_movement_queue.put(msg.motor_pos)
+
 
 def move_motor(motor, intended_position):
     if motor.position() == intended_position:
@@ -459,8 +454,8 @@ def init_state():
     global message_thread
     message_thread = None
 
-    global init_motors_thread
-    init_motors_thread = None
+    global motors_thread
+    motors_thread = None
 
     global motor_chars
     motor_chars = ['A', 'B', 'X', 'Y', 'Z']
@@ -489,7 +484,7 @@ def init_state():
 
 def start_message_loop():
     global message_thread
-    message_thread = threading.Thread(target=run_message_loop, name="message handler")
+    message_thread = make_thread(run_message_loop, "message handler")
     message_thread.start()
 
 def start_server():
@@ -519,15 +514,14 @@ def start_server():
     _server = socketserver.TCPServer((settings['HOST'], settings['PORT']), _Server)
 
     global server_thread
-    server_thread = threading.Thread(target=_server.serve_forever, name="socket server")
+    server_thread = make_thread(_server.serve_forever, "socket server")
     server_thread.start()
 
     start_message_loop()
     debug("serving on {0} {1}".format(settings['HOST'], settings['PORT']))
 
-@catch_exceptions()
 def run_message_loop():
-    global message_handlers, message_queue, camera_thread, finished
+    global message_handlers, message_queue, finished
 
     debug("entering message loop")
     while not finished:
@@ -545,7 +539,6 @@ def run_message_loop():
             # handle directly
             message_handlers[msg.message_type](msg)
 
-@catch_exceptions()
 def run_connection_monitor():
     global last_client_message_time
     global finished
@@ -561,7 +554,6 @@ def run_connection_monitor():
             return
         time.sleep(1)
 
-@catch_exceptions()
 def run_camera():
     global camera, message_handlers, message_queue, finished
 
@@ -672,6 +664,11 @@ def on_connection_close():
         debug("waiting for camera thread to join")
         camera_thread.join()
 
+    if motors_thread is not None:
+        debug("waiting for motors thread to join")
+        motor_movement_queue.put({})
+        motors_thread.join()
+
     if monitor_thread is not None:
         debug("waiting for monitor thread to join")
         monitor_thread.join()
@@ -691,7 +688,7 @@ def on_connection_close():
             debug("disposing motor " + repr(motor.name))
             motor.dispose()
         for motor in motors.values():
-            thread = threading.Thread(name="motor " + repr(motor.name) + " disposer", target=shutdown_motor, args=[motor])
+            thread = make_tread(shutdown_motor, "motor " + repr(motor.name) + " disposer", args=[motor])
             thread.start()
             motor_disposer_threads.append(thread)
         for thread in motor_disposer_threads:
@@ -705,21 +702,21 @@ def on_connection_close():
 def init_monitor_thread():
     global monitor_thread
 
-    monitor_thread = threading.Thread(target=run_connection_monitor, name="monitor")
+    monitor_thread = make_tread(run_connection_monitor, "monitor")
     monitor_thread.start()
 
 def initialize_hardware():
     set_power_switch(on=True)
 
     global camera_thread
-    camera_thread = threading.Thread(target=run_camera, name="camera")
+    camera_thread = make_thread(run_camera, "camera")
     camera_thread.start()
 
-    global init_motors_thread
-    init_motors_thread = threading.Thread(target=run_init_motors, name="init_motors")
-    init_motors_thread.start()
+    global motors_thread
+    motors_thread = make_tread(run_motors, "motors")
+    motors_thread.start()
 
-def run_init_motors():
+def run_motors():
     def create_motor(char):
         motor = silverpak.Silverpak()
         motor.baudRate = settings['MOTOR_%s_BAUD_RATE' % char]
@@ -743,36 +740,49 @@ def run_init_motors():
         def find_motor(char, motor):
             for _ in range(15):
                 found[char] = motor.findAndConnect()
-                if not found[char]:
-                    warning("Unable to find and connect to silverpak motor '{0}', waiting a sec and trying again".format(char))
-                    time.sleep(1)
-                    if finished:
-                        # never mind
-                        return
-                    # try again
-                    continue
-                # success
-                debug("found motor " + repr(char))
-                def done_initializing_handler(*args):
-                    motor.stoppedMovingHandlers.remove(done_initializing_handler)
-                    motor_is_initialized[char] = True
-                motor.stoppedMovingHandlers.append(done_initializing_handler)
-                motor.fullInit()
-                # wait for initialization
-                while not motor_is_initialized[char]:
-                    debug("waiting for motor " + repr(char) + " to initialize")
-                    time.sleep(1)
-                debug("motor " + repr(char) + " is done initializing")
+                if found[char]:
+                    break
+                warning("Unable to find and connect to silverpak motor '{0}', waiting a sec and trying again".format(char))
+                time.sleep(1)
+                if finished:
+                    # never mind
+                    return
+            else:
+                error("Unable to find and connect to silverpak motor " + repr(char))
                 return
-        thread = threading.Thread(target=find_motor, name="motor " + repr(char) + " finder", args=[char, motor])
+            # success
+            debug("found motor " + repr(char))
+            def done_initializing_handler(*args):
+                motor.stoppedMovingHandlers.remove(done_initializing_handler)
+                motor_is_initialized[char] = True
+            motor.stoppedMovingHandlers.append(done_initializing_handler)
+            motor.fullInit()
+            # wait for initialization
+            debug("waiting for motor " + repr(char) + " to initialize")
+            for _ in range(settings['MOTOR_MOVEMENT_TIMEOUT']):
+                if motor_is_initialized[char]:
+                    break
+                time.sleep(1)
+            else:
+                error("timed out waiting for motor " + repr(char) + " to initialize")
+                return
+            debug("motor " + repr(char) + " is done initializing")
+        thread = make_tread(find_motor, "motor " + repr(char) + " finder", args=[char, motor])
         thread.start()
         threads.append(thread)
     for thread in threads:
         thread.join()
     if not all(found.values()):
         error("Unable to find and connect to all motors.")
-        # leave motors None
         return
+
+    # success
+    debug("entering motor movement queue loop")
+    while not finished:
+        motor_positions = motor_movement_queue.get()
+        debug("moving {0} motors".format(len(motor_positions)))
+        for char, position in motor_positions.items():
+            move_motor(motors[char], position)
 
 if __name__ == "__main__":
     start_server()

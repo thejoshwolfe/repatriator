@@ -15,6 +15,7 @@ settings = {
     'LOG_LEVEL': 'ERROR',
     # set to a jpeg image path to turn on fake camera
     'FAKE_CAMERA_IMAGE_PATH': None,
+
     # motor config. You'll need to set these in config.py
     'MOTOR_A_MIN': 0,
     'MOTOR_A_MAX': 242000 * 2,
@@ -74,6 +75,8 @@ settings = {
     # how many milliseconds to wait for a message from the client
     # before giving up and closing the connection
     'CLIENT_IDLE_TIMEOUT': 5000,
+    # motors never take longer than this number of seconds to make one motion
+    'MOTOR_MOVEMENT_TIMEOUT': 60,
 }
 try:
     import config
