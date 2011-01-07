@@ -10,7 +10,7 @@
 #include <QMessageBox>
 
 MainWindow * MainWindow::s_instance = NULL;
-const float MainWindow::c_lowest_sensitivity = 0.05f;
+const float MainWindow::c_lowest_sensitivity = 0.01f;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -542,8 +542,8 @@ void MainWindow::on_sensitivitySlider_valueChanged(int value)
 
 void MainWindow::updateControlSensitivities()
 {
-    //ui->orbitSliderA->setSensitivity(m_current_sensitivity);
-    //ui->orbitSliderB->setSensitivity(m_current_sensitivity);
+    ui->orbitSliderA->setSensitivity(m_current_sensitivity);
+    ui->orbitSliderB->setSensitivity(m_current_sensitivity);
     ui->shadowMinimap->setSensitivity(m_current_sensitivity);
-    //ui->liftSliderZ->setSensitivity(m_current_sensitivity);
+    ui->liftSliderZ->setSensitivity(m_current_sensitivity);
 }
