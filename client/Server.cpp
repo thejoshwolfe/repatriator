@@ -156,7 +156,6 @@ void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
         return;
     } else if (msg.data()->type == IncomingMessage::Pong) {
         PongMessage * pong_msg = (PongMessage *) msg.data();
-        qDebug() << "Pong number:" << pong_msg->ping_id << ", recent ping: " << m_recent_ping;
         if (m_recent_ping == pong_msg->ping_id)
             emit pingComputed(m_ping_time.elapsed());
         return;
@@ -222,4 +221,14 @@ void Server::sendPingMessage()
     m_recent_ping = m_next_ping++;
     m_ping_time.start();
     sendMessage(QSharedPointer<OutgoingMessage>(new PingMessage(m_recent_ping)));
+}
+
+void Server::setPassword(QString password)
+{
+    m_password = password;
+}
+
+void Server::setNeedHardware(bool need_hardware)
+{
+    m_hardware = need_hardware;
 }

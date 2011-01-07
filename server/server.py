@@ -206,7 +206,7 @@ def handle_ConnectionRequest(msg):
 
     debug("Successful login for user " + msg.username)
     motor_boundaries = [[settings['MOTOR_%s_%s' % (char, setting_name)] for setting_name in ("MIN", "MAX")] for char in motor_chars]
-    server.send_message(ConnectionResult(ConnectionResult.Success, user.privileges()))
+    server.send_message(ConnectionResult(ConnectionResult.Success, this_protocol_version, user.privileges()))
     if msg.hardware_flag:
         server.send_message(InitializationInformation(motor_boundaries, admin.static_bookmarks(), user.bookmarks()))
 

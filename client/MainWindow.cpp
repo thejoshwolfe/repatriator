@@ -73,24 +73,15 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
 
     enableCorrectControls();
 
-    m_connector = QSharedPointer<Connector>(new Connector(connection, true));
+    m_server = QSharedPointer<Server>(new Server(*connection));
+    m_server.data()->setNeedHardware(true);
+    m_connector = QSharedPointer<Connector>(new Connector(m_server));
 
     bool success;
     success = connect(m_connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
     Q_ASSERT(success);
-    success = connect(m_connector.data(), SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
+    success = connect(m_connector.data(), SIGNAL(success()), this, SLOT(connected()));
     Q_ASSERT(success);
-
-    m_connector.data()->go();
-
-    this->show();
-}
-
-void MainWindow::connected(QSharedPointer<Server> server)
-{
-    m_server = server;
-
-    bool success;
     success = connect(m_server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
     success = connect(m_server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
@@ -100,6 +91,14 @@ void MainWindow::connected(QSharedPointer<Server> server)
     success = connect(m_server.data(), SIGNAL(pingComputed(int)), this, SLOT(showPing(int)));
     Q_ASSERT(success);
 
+    m_connector.data()->go();
+
+    this->show();
+}
+
+void MainWindow::connected()
+{
+    m_connector.clear();
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DirectoryListingRequestMessage()));
 
     enableCorrectControls();
@@ -108,6 +107,8 @@ void MainWindow::connected(QSharedPointer<Server> server)
 void MainWindow::connectionFailure(Connector::FailureReason reason)
 {
     Q_UNUSED(reason);
+
+    m_connector.clear();
     ConnectionWindow::instance()->show();
     this->hide();
 }
@@ -232,7 +233,7 @@ void MainWindow::cleanup()
 void MainWindow::showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMessage *msg)
 {
     Q_UNUSED(bytes_total);
-    if (msg->type == IncomingMessage::FileDownloadResult)
+    if (msg->type == IncomingMessage::FileDownloadResult && m_expected_download_count > 0)
         m_progressDialog->setValue((int)(m_bytes_done + bytes_done));
 }
 

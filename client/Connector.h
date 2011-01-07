@@ -6,6 +6,7 @@
 
 #include <QObject>
 #include <QProgressDialog>
+#include <QSharedPointer>
 
 // Connector will display a progress dialog and status and try to connect
 // to a ConnectionSettings.
@@ -25,26 +26,23 @@ public:
     };
 
 public:
-    explicit Connector(ConnectionSettings * connection, bool need_hardware);
+    explicit Connector(QSharedPointer<Server> server);
     virtual ~Connector();
 
 public slots:
-    // after you hook up your slots, call go. you will either get success
-    // or failure.
+    // after you hook up your slots, call go. you will either get the
+    // success or failure signal
     void go();
 
 signals:
     // be careful because the object no longer exists when these signals are emitted.
     // success comes with a server pointer that is connected and authenticated.
-    void success(QSharedPointer<Server> server);
+    void success();
     void failure(Connector::FailureReason reason);
 
 private:
-    ConnectionSettings * m_connection;
-    bool m_need_hardware;
     QSharedPointer<QProgressDialog> m_progressDialog;
     QSharedPointer<Server> m_server;
-    bool m_done;
 
 private:
     void fail(FailureReason reason);
