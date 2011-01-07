@@ -56,7 +56,7 @@ private:
 
     QHash<QString, ServerTypes::DirectoryItem> m_file_info;
 
-    QVector<QPushButton *> m_location_buttons;
+    QVector<ServerTypes::Bookmark> m_static_bookmarks;
 
 private:
     void cleanup();
@@ -89,6 +89,7 @@ private slots:
     void on_actionTakeSnapshot_triggered();
     void on_snapshotButton_clicked();
     void on_shadowMinimap_positionChosen(QPoint);
+    void on_location_button_clicked();
 
 
     void connected();

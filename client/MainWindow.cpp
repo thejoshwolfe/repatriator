@@ -408,6 +408,7 @@ void MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
 
 void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
 {
+    m_static_bookmarks = bookmarks;
     for (int i = 0; i < bookmarks.size(); i++) {
         ServerTypes::Bookmark bookmark = bookmarks.at(i);
         int readable_index = i + 1;
@@ -416,8 +417,20 @@ void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
             text = "&";
         text += QString::number(readable_index) + ". " + bookmark.name;
         QPushButton * location_button = new QPushButton(text);
+        bool success = connect(location_button, SIGNAL(clicked()), this, SLOT(on_location_button_clicked()));
+        Q_ASSERT(success);
         ui->locationsLayout->addWidget(location_button);
     }
+}
+void MainWindow::on_location_button_clicked()
+{
+    QPushButton * location_button = (QPushButton *) sender();
+    QString button_text = location_button->text();
+    int dot_index = button_text.indexOf('.');
+    QString one_based_index_string = button_text.mid(0, dot_index);
+    int one_based_index = one_based_index_string.toInt();
+    ServerTypes::Bookmark bookmark = m_static_bookmarks.at(one_based_index - 1);
+    goToBookmark(bookmark);
 }
 
 ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QVector<ServerTypes::Bookmark> bookmarks)
