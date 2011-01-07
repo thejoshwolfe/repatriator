@@ -131,8 +131,8 @@ class Server:
         self._current_full_update_lock = threading.RLock()
         self._current_full_update = None
 
-        self.writer_thread = make_tread(self._run_writer, "message writer")
-        self.reader_thread = make_tread(self._run_reader, "message reader")
+        self.writer_thread = make_thread(self._run_writer, "message writer")
+        self.reader_thread = make_thread(self._run_reader, "message reader")
 
         global graceful_shutdown
         graceful_shutdown = self.close
@@ -688,7 +688,7 @@ def on_connection_close():
             debug("disposing motor " + repr(motor.name))
             motor.dispose()
         for motor in motors.values():
-            thread = make_tread(shutdown_motor, "motor " + repr(motor.name) + " disposer", args=[motor])
+            thread = make_thread(shutdown_motor, "motor " + repr(motor.name) + " disposer", args=[motor])
             thread.start()
             motor_disposer_threads.append(thread)
         for thread in motor_disposer_threads:
@@ -702,7 +702,7 @@ def on_connection_close():
 def init_monitor_thread():
     global monitor_thread
 
-    monitor_thread = make_tread(run_connection_monitor, "monitor")
+    monitor_thread = make_thread(run_connection_monitor, "monitor")
     monitor_thread.start()
 
 def initialize_hardware():
@@ -713,7 +713,7 @@ def initialize_hardware():
     camera_thread.start()
 
     global motors_thread
-    motors_thread = make_tread(run_motors, "motors")
+    motors_thread = make_thread(run_motors, "motors")
     motors_thread.start()
 
 def run_motors():
@@ -767,7 +767,7 @@ def run_motors():
                 error("timed out waiting for motor " + repr(char) + " to initialize")
                 return
             debug("motor " + repr(char) + " is done initializing")
-        thread = make_tread(find_motor, "motor " + repr(char) + " finder", args=[char, motor])
+        thread = make_thread(find_motor, "motor " + repr(char) + " finder", args=[char, motor])
         thread.start()
         threads.append(thread)
     for thread in threads:
