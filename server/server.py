@@ -176,7 +176,13 @@ def handle_ConnectionRequest(msg):
     global user, server, motor_chars
 
     debug("Got connection request message")
-    debug("version: {0}".format(str(msg.version)))
+    debug("protocol supported: {0}".format(str(msg.newest_protocol_supported)))
+
+    this_protocol_version = 0
+    if msg.newest_protocol_supported < this_protocol_version:
+        server.send_message(ConnectionResult(ConnectionResult.UnsupportedProtocol))
+        server.close()
+        return
 
     try:
         user = admin.login(msg.username, msg.password)

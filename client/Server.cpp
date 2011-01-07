@@ -164,7 +164,7 @@ void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
         MagicalResponseMessage * magic_msg = (MagicalResponseMessage *) msg.data();
         if (magic_msg->is_valid) {
             changeLoginState(ServerTypes::WaitingForConnectionResult);
-            sendMessage(QSharedPointer<OutgoingMessage>(new ConnectionRequestMessage(c_client_major_version, c_client_minor_version, c_client_build_version, m_connection_info.username, m_password, m_hardware)));
+            sendMessage(QSharedPointer<OutgoingMessage>(new ConnectionRequestMessage(0, m_connection_info.username, m_password, m_hardware)));
             return;
         } else {
             changeLoginState(ServerTypes::ServerIsBogus);

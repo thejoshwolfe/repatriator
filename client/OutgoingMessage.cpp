@@ -36,9 +36,7 @@ void MagicalRequestMessage::writeMessageBody(QDataStream &stream)
 
 void ConnectionRequestMessage::writeMessageBody(QDataStream &stream)
 {
-    stream << (qint32) client_major_version;
-    stream << (qint32) client_minor_version;
-    stream << (qint32) client_revision_number;
+    stream << (qint32) newest_protocol_supported;
     writeString(stream, username);
     writeString(stream, password);
     stream << (qint8) (hardware_access ? 1 : 0);
@@ -87,7 +85,7 @@ void MotorMovementMessage::writeMessageBody(QDataStream &stream)
 
 void PingMessage::writeMessageBody(QDataStream &stream)
 {
-    stream << this->ping_id;
+    stream << (qint32) ping_id;
 }
 
 void SetStaticBookmarksMessage::writeMessageBody(QDataStream &stream)

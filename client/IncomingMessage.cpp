@@ -36,9 +36,9 @@ void MagicalResponseMessage::parse(QDataStream &stream)
 
 void ConnectionResultMessage::parse(QDataStream &stream)
 {
-    stream >> major_version;
-    stream >> minor_version;
-    stream >> revision_version;
+    stream >> protocol;
+
+    server_description = readString(stream);
 
     qint32 _connection_status;
     stream >> _connection_status;

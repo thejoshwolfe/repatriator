@@ -66,23 +66,17 @@ private:
 class ConnectionRequestMessage : public OutgoingMessage
 {
 public:
-    int client_major_version;
-    int client_minor_version;
-    int client_revision_number;
+    int newest_protocol_supported;
     QString username;
     QString password;
     bool hardware_access;
 
     ConnectionRequestMessage(
-        int client_major_version,
-        int client_minor_version,
-        int client_revision_number,
+        int newest_protocol_supported,
         QString username,
         QString password,
         bool hardware_access) :
-            client_major_version(client_major_version),
-            client_minor_version(client_minor_version),
-            client_revision_number(client_revision_number),
+            newest_protocol_supported(newest_protocol_supported),
             username(username),
             password(password),
             hardware_access(hardware_access) {}
@@ -210,8 +204,8 @@ protected:
 class PingMessage : public OutgoingMessage
 {
 public:
-    qint32 ping_id;
-    PingMessage(qint32 ping_id) : ping_id(ping_id) {}
+    int ping_id;
+    PingMessage(int ping_id) : ping_id(ping_id) {}
 protected:
     virtual void writeMessageBody(QDataStream &stream);
     virtual MessageCode type() const { return Ping; }
