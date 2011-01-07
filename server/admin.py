@@ -51,6 +51,9 @@ class BadPassword(Exception):
     pass
 
 class User:
+    """
+    when you call a setter, you must call save() to write to file.
+    """
     make_sure_these_keys_are_defined = [
         'salt',
         'password_hash',
@@ -158,6 +161,12 @@ def list_users():
 
 def static_bookmarks():
     return _config_data['static_bookmarks']
+def set_static_bookmarks(bookmarks):
+    """
+    saves to file
+    """
+    _config_data['static_bookmarks'] = bookmarks
+    _save_json()
 
 _config_file = os.path.join(settings['DATA_FOLDER'], "config.json")
 _build_path(settings['DATA_FOLDER'])
