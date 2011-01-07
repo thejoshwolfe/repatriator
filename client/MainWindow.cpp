@@ -158,8 +158,9 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         case IncomingMessage::InitInfo:
         {
             InitInfoMessage * init_info_msg = (InitInfoMessage *) msg.data();
-            changeMotorBounds(init_info_msg->motor_boundaries);
             setLocations(init_info_msg->static_bookmarks);
+            ServerTypes::Bookmark home_location = get_home_location_from_bookmarks(init_info_msg->static_bookmarks);
+            changeMotorBounds(init_info_msg->motor_boundaries, home_location);
             break;
         }
         default:
@@ -361,36 +362,75 @@ void MainWindow::on_orbitSliderA_valueChanged(int)
     sendTargetMotorPositions();
 }
 
-void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bounds)
+void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bounds, ServerTypes::Bookmark home_location)
 {
     ui->orbitSliderA->blockSignals(true);
-    ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
-    ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
-    ui->orbitSliderA->blockSignals(false);
-
     ui->orbitSliderB->blockSignals(true);
-    ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
-    ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
-    ui->orbitSliderB->blockSignals(false);
-
-    ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
-
     ui->liftSliderZ->blockSignals(true);
+
+    ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
+    ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
     ui->liftSliderZ->setMinimum(bounds.at(4).min);
+
+    ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
+    ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
+    ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
+
+    goToBookmark(home_location);
+
+    ui->orbitSliderA->blockSignals(false);
+    ui->orbitSliderB->blockSignals(false);
     ui->liftSliderZ->blockSignals(false);
+}
+
+void MainWindow::goToBookmark(ServerTypes::Bookmark bookmark)
+{
+    maybeSetSlider(ui->orbitSliderA, bookmark.motor_positions.at(0));
+    maybeSetSlider(ui->orbitSliderB, bookmark.motor_positions.at(1));
+
+    QPoint xy = ui->shadowMinimap->position();
+    if (bookmark.motor_positions.at(2) != ServerTypes::MotorPositionNotSpecified)
+        xy.setX(bookmark.motor_positions.at(2));
+    if (bookmark.motor_positions.at(3) != ServerTypes::MotorPositionNotSpecified)
+        xy.setY(bookmark.motor_positions.at(3));
+    ui->shadowMinimap->setPosition(xy);
+
+    maybeSetSlider(ui->liftSliderZ, bookmark.motor_positions.at(4));
+}
+
+void MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
+{
+    if (motor_position != ServerTypes::MotorPositionNotSpecified)
+        slider->setValue(motor_position);
 }
 
 void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
 {
-    for (int i = 0; i < bookmarks.size(); i++)
-    {
+    for (int i = 0; i < bookmarks.size(); i++) {
         ServerTypes::Bookmark bookmark = bookmarks.at(i);
-        QPushButton * location_button = new QPushButton(bookmark.name);
+        int readable_index = i + 1;
+        QString text = "";
+        if (readable_index <= 9)
+            text = "&";
+        text += QString::number(readable_index) + ". " + bookmark.name;
+        QPushButton * location_button = new QPushButton(text);
         ui->locationsLayout->addWidget(location_button);
     }
 }
 
+ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QVector<ServerTypes::Bookmark> bookmarks)
+{
+    if (bookmarks.size() > 0)
+        return bookmarks.at(0);
+    // make up a home location
+    ServerTypes::Bookmark home_location;
+    home_location.name = "Home";
+    for (int i = 0; i < 5; i++)
+        home_location.motor_positions.append(0);
+    home_location.auto_focus = ServerTypes::NotSpecified;
+    return home_location;
+}
 
 void MainWindow::showEvent(QShowEvent *)
 {
@@ -413,7 +453,7 @@ QString MainWindow::getNextDownloadFilename()
         QString filename = folder.absoluteFilePath(QString("img_") + QString::number(m_next_download_number) + QString(".jpg"));
         if (! QFileInfo(filename).exists())
             return filename;
-        m_next_download_number += 1;
+        m_next_download_number++;
     }
 }
 

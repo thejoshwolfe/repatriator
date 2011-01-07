@@ -56,6 +56,7 @@ namespace ServerTypes {
         SetOff = 2,
     };
 
+    const qint64 MotorPositionNotSpecified = -0x8000000000000000;
     struct Bookmark
     {
         QString name;

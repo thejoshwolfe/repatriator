@@ -67,8 +67,11 @@ private:
     void saveFile(QByteArray blob, QString remote_filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
-    void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries);
+    void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
     void setLocations(QVector<ServerTypes::Bookmark> bookmarks);
+    ServerTypes::Bookmark get_home_location_from_bookmarks(QVector<ServerTypes::Bookmark> bookmarks);
+    void maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
+    void goToBookmark(ServerTypes::Bookmark bookmark);
     QString getNextDownloadFilename();
     void requestDownloadFile(QString remote_filename);
 
