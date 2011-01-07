@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->viewMenu->addAction(ui->controlsDock->toggleViewAction());
     ui->viewMenu->addAction(ui->filesDock->toggleViewAction());
     ui->viewMenu->addAction(ui->bookmarksDock->toggleViewAction());
+    ui->viewMenu->addAction(ui->locationsDock->toggleViewAction());
 }
 
 MainWindow::~MainWindow()
@@ -158,6 +159,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         {
             InitInfoMessage * init_info_msg = (InitInfoMessage *) msg.data();
             changeMotorBounds(init_info_msg->motor_boundaries);
+            setLocations(init_info_msg->static_bookmarks);
             break;
         }
         default:
@@ -378,6 +380,17 @@ void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bou
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
     ui->liftSliderZ->blockSignals(false);
 }
+
+void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
+{
+    for (int i = 0; i < bookmarks.size(); i++)
+    {
+        ServerTypes::Bookmark bookmark = bookmarks.at(i);
+        QPushButton * location_button = new QPushButton(bookmark.name);
+        ui->locationsLayout->addWidget(location_button);
+    }
+}
+
 
 void MainWindow::showEvent(QShowEvent *)
 {

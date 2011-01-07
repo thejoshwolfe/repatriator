@@ -56,6 +56,8 @@ private:
 
     QHash<QString, ServerTypes::DirectoryItem> m_file_info;
 
+    QVector<QPushButton *> m_location_buttons;
+
 private:
     void cleanup();
     void enableCorrectControls();
@@ -66,6 +68,7 @@ private:
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries);
+    void setLocations(QVector<ServerTypes::Bookmark> bookmarks);
     QString getNextDownloadFilename();
     void requestDownloadFile(QString remote_filename);
 
