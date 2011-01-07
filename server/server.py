@@ -463,6 +463,9 @@ def init_state():
     global motors
     motors = None
 
+    global motor_movement_queue
+    motor_movement_queue = queue.Queue()
+
     global motor_is_initialized
     motor_is_initialized = {char: False for char in motor_chars}
     
