@@ -12,6 +12,7 @@
 #include <QVector>
 #include <QMenu>
 #include <QHash>
+#include <QListWidgetItem>
 
 namespace Ui {
     class MainWindow;
@@ -56,6 +57,7 @@ private:
     QHash<QString, ServerTypes::DirectoryItem> m_file_info;
 
     QList<ServerTypes::Bookmark> m_static_bookmarks;
+    QHash<QString, ServerTypes::Bookmark> m_user_bookmarks;
 
     static const float c_lowest_sensitivity;
     QVector<float> m_sensitivities;
@@ -72,6 +74,7 @@ private:
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
     void setLocations(QList<ServerTypes::Bookmark> bookmarks);
+    void setBookmarks(QList<ServerTypes::Bookmark> bookmarks);
     ServerTypes::Bookmark get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks);
     bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
     void blockSliderSignals(bool value);
@@ -79,9 +82,13 @@ private:
     QString getNextDownloadFilename();
     void requestDownloadFile(QString remote_filename);
     void updateControlSensitivities();
+    ServerTypes::Bookmark selected_bookmark();
+    void enableBookmarkButtons();
 
 private slots:
+    void on_bookmarksList_currentItemChanged(QListWidgetItem*, QListWidgetItem*);
     void on_sensitivitySlider_valueChanged(int value);
+    void on_goToBookmarkButton_clicked();
     void on_autoFocusEnabledCheckBox_clicked(bool checked);
     void on_picturesList_customContextMenuRequested(QPoint pos);
     void on_orbitSliderA_valueChanged(int value);

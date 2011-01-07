@@ -222,7 +222,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -277,37 +277,37 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QPushButton" name="goToButton">
+          <widget class="QPushButton" name="goToBookmarkButton">
            <property name="text">
-            <string>Go To</string>
+            <string>&amp;Go To</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="editBookmarkButton">
            <property name="text">
-            <string>Edit</string>
+            <string>&amp;Edit</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_3">
+          <widget class="QPushButton" name="deleteBookmarkButton">
            <property name="text">
-            <string>Delete</string>
+            <string>&amp;Delete</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_5">
+          <widget class="QPushButton" name="bookmarkHereButton">
            <property name="text">
-            <string>Bookmark Here</string>
+            <string>&amp;Bookmark Here</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_4">
+          <widget class="QPushButton" name="newBookmarkButton">
            <property name="text">
-            <string>New Bookmark...</string>
+            <string>&amp;New Bookmark...</string>
            </property>
           </widget>
          </item>
@@ -461,7 +461,7 @@
   <connection>
    <sender>bookmarksList</sender>
    <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>goToButton</receiver>
+   <receiver>goToBookmarkButton</receiver>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">

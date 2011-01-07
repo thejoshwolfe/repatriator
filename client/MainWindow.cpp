@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
         m_sensitivities.replace(i, 1.0f - i * percent_delta);
     ui->sensitivitySlider->setValue(0);
 
+    enableBookmarkButtons();
 }
 
 MainWindow::~MainWindow()
@@ -68,11 +69,11 @@ void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
     switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+        default:
+            break;
     }
 }
 
@@ -183,6 +184,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         {
             InitInfoMessage * init_info_msg = (InitInfoMessage *) msg.data();
             setLocations(init_info_msg->static_bookmarks);
+            setBookmarks(init_info_msg->user_bookmarks);
             ServerTypes::Bookmark home_location = get_home_location_from_bookmarks(init_info_msg->static_bookmarks);
             changeMotorBounds(init_info_msg->motor_boundaries, home_location);
             break;
@@ -480,6 +482,16 @@ void MainWindow::location_button_clicked()
     ServerTypes::Bookmark bookmark = m_static_bookmarks.at(one_based_index - 1);
     goToBookmark(bookmark);
 }
+void MainWindow::setBookmarks(QList<ServerTypes::Bookmark> bookmarks)
+{
+    m_user_bookmarks.clear();
+    ui->bookmarksList->clear();
+    foreach (ServerTypes::Bookmark bookmark, bookmarks) {
+        m_user_bookmarks.insert(bookmark.name, bookmark);
+        ui->bookmarksList->addItem(bookmark.name);
+    }
+    enableBookmarkButtons();
+}
 
 ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks)
 {
@@ -546,4 +558,33 @@ void MainWindow::updateControlSensitivities()
     //ui->orbitSliderB->setSensitivity(m_current_sensitivity);
     ui->shadowMinimap->setSensitivity(m_current_sensitivity);
     //ui->liftSliderZ->setSensitivity(m_current_sensitivity);
+}
+
+void MainWindow::on_goToBookmarkButton_clicked()
+{
+    ServerTypes::Bookmark bookmark = selected_bookmark();
+    if (bookmark.name.isEmpty())
+        return;
+}
+
+ServerTypes::Bookmark MainWindow::selected_bookmark()
+{
+    if (ui->bookmarksList->selectedItems().isEmpty())
+        return ServerTypes::Bookmark();
+    QString name = ui->bookmarksList->selectedItems().at(0)->text();
+    return m_user_bookmarks[name];
+}
+
+void MainWindow::on_bookmarksList_currentItemChanged(QListWidgetItem*, QListWidgetItem*)
+{
+    enableBookmarkButtons();
+}
+
+void MainWindow::enableBookmarkButtons()
+{
+    QString selected_name = selected_bookmark().name;
+    bool any_selection = !selected_name.isEmpty();
+    ui->goToBookmarkButton->setEnabled(any_selection);
+    ui->editBookmarkButton->setEnabled(any_selection);
+    ui->deleteBookmarkButton->setEnabled(any_selection);
 }
