@@ -37,12 +37,12 @@ private:
     Ui::MainWindow *ui;
     static MainWindow * s_instance;
     QSharedPointer<Server> m_server;
+    QSharedPointer<Connector> m_connector;
     QProgressDialog * m_progressDialog;
     ConnectionSettings * m_connection_settings;
 
     QString m_quit_after_this_file;
 
-    QSharedPointer<Connector> m_connector;
 
     int m_next_download_number;
     // set this to true if we are expecting the server to close the connection
@@ -85,7 +85,7 @@ private slots:
     void on_shadowMinimap_positionChosen(QPoint);
 
 
-    void connected(QSharedPointer<Server> server);
+    void connected();
     void connectionFailure(Connector::FailureReason reason);
 
     void processMessage(QSharedPointer<IncomingMessage> msg);

@@ -6,6 +6,7 @@
 #include "EditUserAccountWindow.h"
 
 #include <QDialogButtonBox>
+#include <QMessageBox>
 
 AdminWindow * AdminWindow::s_instance = NULL;
 
@@ -57,16 +58,20 @@ void AdminWindow::showAdmin(ConnectionSettings *connection)
     ui->usersList->setFocus(Qt::OtherFocusReason);
 
     // establish connection
-
-    QScopedPointer<Connector> connector(new Connector(connection, false));
+    m_server = QSharedPointer<Server>(new Server(*connection));
+    m_connector = QSharedPointer<Connector>(new Connector(m_server));
 
     bool success;
-    success = connect(connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
+    success = connect(m_connector.data(), SIGNAL(failure(Connector::FailureReason)), this, SLOT(connectionFailure(Connector::FailureReason)), Qt::QueuedConnection);
     Q_ASSERT(success);
-    success = connect(connector.data(), SIGNAL(success(QSharedPointer<Server>)), this, SLOT(connected(QSharedPointer<Server>)));
+    success = connect(m_connector.data(), SIGNAL(success()), this, SLOT(connected()));
+    Q_ASSERT(success);
+    success = connect(m_server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
+    Q_ASSERT(success);
+    success = connect(m_server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
     Q_ASSERT(success);
 
-    connector.data()->go();
+    m_connector.data()->go();
 
     // show modal
     this->exec();
@@ -95,16 +100,8 @@ void AdminWindow::handleRejected()
     cleanup();
 }
 
-void AdminWindow::connected(QSharedPointer<Server> server)
+void AdminWindow::connected()
 {
-    m_server = server;
-
-    bool success;
-    success = connect(server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
-    Q_ASSERT(success);
-    success = connect(server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
-    Q_ASSERT(success);
-
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ListUserRequestMessage()));
 }
 
@@ -167,6 +164,7 @@ void AdminWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         case IncomingMessage::ErrorMessage:
         {
             ErrorMessage * err_msg = (ErrorMessage *) msg.data();
+            QMessageBox::warning(this, tr("Message from Server"), err_msg->message, QMessageBox::Ok);
             qDebug() << "Error message: " << err_msg->message;
             break;
         }

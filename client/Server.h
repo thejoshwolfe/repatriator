@@ -23,11 +23,16 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(ConnectionSettings connection_info, QString password, bool hardware);
+    explicit Server(ConnectionSettings connection_info, QString password = QString(), bool hardware = false);
     ~Server();
+
+    void setPassword(QString password);
+    void setNeedHardware(bool need_hardware);
 
     // returns the ConnectionResultMessage that the server gave upon connection
     QSharedPointer<IncomingMessage> connectionResultMessage() const { return m_connection_result; }
+
+    const ConnectionSettings * connectionSettings() const { return &m_connection_info; }
 
 signals:
     // use this signal to listen for incoming messages

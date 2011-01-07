@@ -35,6 +35,7 @@ private:
     static AdminWindow * s_instance;
 
     QSharedPointer<Server> m_server;
+    QSharedPointer<Connector> m_connector;
 
     class DetailedUserInfo : public ServerTypes::UserInfo {
     public:
@@ -81,7 +82,7 @@ private slots:
     void handleAccepted();
     void handleRejected();
 
-    void connected(QSharedPointer<Server> server);
+    void connected();
     void connectionFailure(Connector::FailureReason reason);
     void processMessage(QSharedPointer<IncomingMessage> msg);
     void connectionEnded();
