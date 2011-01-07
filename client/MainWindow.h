@@ -58,6 +58,10 @@ private:
 
     QVector<ServerTypes::Bookmark> m_static_bookmarks;
 
+    static const float c_lowest_sensitivity;
+    QVector<float> m_sensitivities;
+    float m_current_sensitivity;
+
 private:
     void cleanup();
     void enableCorrectControls();
@@ -75,8 +79,10 @@ private:
     void goToBookmark(ServerTypes::Bookmark bookmark);
     QString getNextDownloadFilename();
     void requestDownloadFile(QString remote_filename);
+    void updateControlSensitivities();
 
 private slots:
+    void on_sensitivitySlider_valueChanged(int value);
     void on_autoFocusEnabledCheckBox_clicked(bool checked);
     void on_picturesList_customContextMenuRequested(QPoint pos);
     void on_orbitSliderA_valueChanged(int value);
@@ -91,7 +97,6 @@ private slots:
     void on_snapshotButton_clicked();
     void on_shadowMinimap_positionChosen(QPoint);
     void location_button_clicked();
-
 
     void connected();
     void connectionFailure(Connector::FailureReason reason);

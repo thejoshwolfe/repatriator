@@ -10,6 +10,7 @@
 #include <QMessageBox>
 
 MainWindow * MainWindow::s_instance = NULL;
+const float MainWindow::c_lowest_sensitivity = 0.05f;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,16 +20,16 @@ MainWindow::MainWindow(QWidget *parent) :
     m_quit_after_close(false),
     m_bytes_done(0),
     m_bytes_total(0),
-    m_expected_download_count(0)
+    m_expected_download_count(0),
+    m_current_sensitivity(1.0f)
 {
-    m_progressDialog->setWindowModality(Qt::NonModal);
-    m_progressDialog->setWindowTitle(tr("Receiving data"));
-    m_progressDialog->setMinimumDuration(3000);
     ui->setupUi(this);
 
     this->setCentralWidget(ui->displayWidget);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+    this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
 
+    // create the context menu for file download box
     m_pictures_context_menu = new QMenu(this);
     m_pictures_context_menu->addAction(ui->actionSelectAll);
     m_pictures_context_menu->addSeparator();
@@ -37,10 +38,24 @@ MainWindow::MainWindow(QWidget *parent) :
     m_pictures_context_menu->addSeparator();
     m_pictures_context_menu->addAction(ui->actionDownloadAllAndQuit);
 
+    // create the show/hide dock menu items in View
     ui->viewMenu->addAction(ui->controlsDock->toggleViewAction());
     ui->viewMenu->addAction(ui->filesDock->toggleViewAction());
     ui->viewMenu->addAction(ui->bookmarksDock->toggleViewAction());
     ui->viewMenu->addAction(ui->locationsDock->toggleViewAction());
+
+    m_progressDialog->setWindowModality(Qt::NonModal);
+    m_progressDialog->setWindowTitle(tr("Receiving data"));
+    m_progressDialog->setMinimumDuration(3000);
+
+    // configure the mapping between sensitivity slider values and percentage
+    Q_ASSERT(ui->sensitivitySlider->minimum() == 0);
+    float percent_range = (1.0f - c_lowest_sensitivity);
+    float percent_delta = percent_range / (float) ui->sensitivitySlider->maximum();
+    m_sensitivities.resize(ui->sensitivitySlider->maximum()+1);
+    for (int i = 0; i <= ui->sensitivitySlider->maximum(); i++)
+        m_sensitivities.replace(i, 1.0f - i * percent_delta);
+    ui->sensitivitySlider->setValue(0);
 }
 
 MainWindow::~MainWindow()
@@ -368,12 +383,15 @@ void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bou
     blockSliderSignals(true);
 
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
-    ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
-    ui->liftSliderZ->setMinimum(bounds.at(4).min);
-
     ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
+
+    ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
     ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
+
+    ui->shadowMinimap->setMinPosition(QPoint((int)bounds.at(2).min, (int)bounds.at(3).min));
     ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
+
+    ui->liftSliderZ->setMinimum(bounds.at(4).min);
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
 
     blockSliderSignals(false);
@@ -412,6 +430,7 @@ void MainWindow::blockSliderSignals(bool value)
 {
     ui->orbitSliderA->blockSignals(value);
     ui->orbitSliderB->blockSignals(value);
+    ui->shadowMinimap->blockSignals(value);
     ui->liftSliderZ->blockSignals(value);
 }
 
@@ -505,4 +524,20 @@ void MainWindow::on_autoFocusEnabledCheckBox_clicked(bool checked)
 void MainWindow::showPing(int ms)
 {
     ui->statusBar->showMessage(tr("Ping: ") + QString::number(ms));
+}
+
+void MainWindow::on_sensitivitySlider_valueChanged(int value)
+{
+    float new_sensitivity = m_sensitivities.value(value);
+    m_current_sensitivity = new_sensitivity;
+    ui->sensitivityLabel->setText(tr("S&ensitivity: %1%").arg(QString::number(qRound(new_sensitivity * 100))));
+    updateControlSensitivities();
+}
+
+void MainWindow::updateControlSensitivities()
+{
+    //ui->orbitSliderA->setSensitivity(m_current_sensitivity);
+    //ui->orbitSliderB->setSensitivity(m_current_sensitivity);
+    ui->shadowMinimap->setSensitivity(m_current_sensitivity);
+    //ui->liftSliderZ->setSensitivity(m_current_sensitivity);
 }
