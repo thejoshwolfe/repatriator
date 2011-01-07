@@ -84,3 +84,15 @@ void MotorMovementMessage::writeMessageBody(QDataStream &stream)
     for (int i = 0; i < positions.count(); i++)
         stream << (qint64) positions.at(i);
 }
+
+void SetStaticBookmarksMessage::writeMessageBody(QDataStream &stream)
+{
+    stream << (qint32)bookmarks.size();
+    foreach (ServerTypes::Bookmark bookmark, bookmarks)
+    {
+        writeString(stream, bookmark.name);
+        foreach (qint64 motor_position, bookmark.motor_positions)
+            stream << motor_position;
+        stream << (qint8)bookmark.auto_focus;
+    }
+}

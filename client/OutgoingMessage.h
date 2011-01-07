@@ -31,6 +31,8 @@ protected:
         ChangePasswordRequest = 10,
         ListUserRequest = 11,
         SetAutoFocusEnabled = 12,
+        SetStaticBookmarks = 13,
+        SetUserBookmarks = 14,
     };
 
     // serialize
@@ -201,6 +203,26 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return SetAutoFocusEnabled; }
+};
+
+class SetStaticBookmarksMessage : public OutgoingMessage
+{
+public:
+    QVector<ServerTypes::Bookmark> bookmarks;
+    SetStaticBookmarksMessage(QVector<ServerTypes::Bookmark> bookmarks)
+        : bookmarks(bookmarks) {}
+protected:
+    virtual void writeMessageBody(QDataStream & stream);
+    virtual MessageCode type() const { return SetStaticBookmarks; }
+};
+
+class SetUserBookmarksMessage : public SetStaticBookmarksMessage
+{
+public:
+    SetUserBookmarksMessage(QVector<ServerTypes::Bookmark> bookmarks)
+        : SetStaticBookmarksMessage(bookmarks) {}
+protected:
+    virtual MessageCode type() const { return SetUserBookmarks; }
 };
 
 #endif // OUTGOING_MESSAGE_H
