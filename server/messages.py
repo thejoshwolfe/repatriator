@@ -272,13 +272,14 @@ class ConnectionResult(ServerMessage):
     Success = 2
     UnsupportedProtocol = 3
 
-    def __init__(self, status, privileges=None):
+    def __init__(self, status, protocol=0, privileges=None):
         if privileges is None:
             privileges = []
 
         self.message_type = ServerMessage.ConnectionResult
         self.privileges = privileges
         self.status = status
+        self.protocol = protocol
 
     def _serialize(self):
         server_name = "SuperWolfe RepatriatorServer 0.0.0"
