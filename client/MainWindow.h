@@ -70,7 +70,8 @@ private:
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
     void setLocations(QVector<ServerTypes::Bookmark> bookmarks);
     ServerTypes::Bookmark get_home_location_from_bookmarks(QVector<ServerTypes::Bookmark> bookmarks);
-    void maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
+    bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
+    void blockSliderSignals(bool value);
     void goToBookmark(ServerTypes::Bookmark bookmark);
     QString getNextDownloadFilename();
     void requestDownloadFile(QString remote_filename);
@@ -89,7 +90,7 @@ private slots:
     void on_actionTakeSnapshot_triggered();
     void on_snapshotButton_clicked();
     void on_shadowMinimap_positionChosen(QPoint);
-    void on_location_button_clicked();
+    void location_button_clicked();
 
 
     void connected();

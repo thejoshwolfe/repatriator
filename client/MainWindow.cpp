@@ -365,9 +365,7 @@ void MainWindow::on_orbitSliderA_valueChanged(int)
 
 void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bounds, ServerTypes::Bookmark home_location)
 {
-    ui->orbitSliderA->blockSignals(true);
-    ui->orbitSliderB->blockSignals(true);
-    ui->liftSliderZ->blockSignals(true);
+    blockSliderSignals(true);
 
     ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
     ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
@@ -378,32 +376,53 @@ void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bou
     ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
     ui->liftSliderZ->setMaximum(bounds.at(4).max);
 
-    goToBookmark(home_location);
+    blockSliderSignals(false);
 
-    ui->orbitSliderA->blockSignals(false);
-    ui->orbitSliderB->blockSignals(false);
-    ui->liftSliderZ->blockSignals(false);
+    goToBookmark(home_location);
 }
 
 void MainWindow::goToBookmark(ServerTypes::Bookmark bookmark)
 {
-    maybeSetSlider(ui->orbitSliderA, bookmark.motor_positions.at(0));
-    maybeSetSlider(ui->orbitSliderB, bookmark.motor_positions.at(1));
+    blockSliderSignals(true);
+    bool moved = false;
+
+    moved |= maybeSetSlider(ui->orbitSliderA, bookmark.motor_positions.at(0));
+    moved |= maybeSetSlider(ui->orbitSliderB, bookmark.motor_positions.at(1));
 
     QPoint xy = ui->shadowMinimap->position();
-    if (bookmark.motor_positions.at(2) != ServerTypes::MotorPositionNotSpecified)
+    if (bookmark.motor_positions.at(2) != ServerTypes::MotorPositionNotSpecified) {
         xy.setX(bookmark.motor_positions.at(2));
-    if (bookmark.motor_positions.at(3) != ServerTypes::MotorPositionNotSpecified)
+        moved = true;
+    }
+    if (bookmark.motor_positions.at(3) != ServerTypes::MotorPositionNotSpecified) {
         xy.setY(bookmark.motor_positions.at(3));
+        moved = true;
+    }
     ui->shadowMinimap->setPosition(xy);
 
-    maybeSetSlider(ui->liftSliderZ, bookmark.motor_positions.at(4));
+    moved |= maybeSetSlider(ui->liftSliderZ, bookmark.motor_positions.at(4));
+
+    blockSliderSignals(false);
+
+    if (moved)
+        sendTargetMotorPositions();
 }
 
-void MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
+void MainWindow::blockSliderSignals(bool value)
 {
-    if (motor_position != ServerTypes::MotorPositionNotSpecified)
-        slider->setValue(motor_position);
+    ui->orbitSliderA->blockSignals(value);
+    ui->orbitSliderB->blockSignals(value);
+    ui->liftSliderZ->blockSignals(value);
+}
+
+bool MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
+{
+    if (motor_position == ServerTypes::MotorPositionNotSpecified)
+        return false;
+    if (motor_position == slider->value())
+        return false;
+    slider->setValue(motor_position);
+    return true;
 }
 
 void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
@@ -417,15 +436,17 @@ void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
             text = "&";
         text += QString::number(readable_index) + ". " + bookmark.name;
         QPushButton * location_button = new QPushButton(text);
-        bool success = connect(location_button, SIGNAL(clicked()), this, SLOT(on_location_button_clicked()));
+        bool success = connect(location_button, SIGNAL(clicked()), this, SLOT(location_button_clicked()));
         Q_ASSERT(success);
         ui->locationsLayout->addWidget(location_button);
     }
 }
-void MainWindow::on_location_button_clicked()
+void MainWindow::location_button_clicked()
 {
     QPushButton * location_button = (QPushButton *) sender();
     QString button_text = location_button->text();
+    if (button_text.startsWith("&"))
+        button_text = button_text.mid(1);
     int dot_index = button_text.indexOf('.');
     QString one_based_index_string = button_text.mid(0, dot_index);
     int one_based_index = one_based_index_string.toInt();
