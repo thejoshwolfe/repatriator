@@ -1,39 +1,52 @@
 #include "ShadowMinimap.h"
 
 #include <QPainter>
+#include <QCursor>
+#include <QApplication>
+#include <QDebug>
+#include <QToolTip>
 
 ShadowMinimap::ShadowMinimap(QWidget *parent) :
     QWidget(parent),
     m_shadow_position(0, 0),
     m_position(0, 0),
     m_max_position(100, 100),
+    m_min_position(0, 0),
     m_mouse_down(false),
     c_thumb_size(20, 16),
-    c_margin(10, 8)
+    c_margin(10, 8),
+    m_sensitivity(1.0f)
 {
     this->setMouseTracking(true);
+    this->setFocusPolicy(Qt::StrongFocus);
 }
 
 void ShadowMinimap::setShadowPosition(QPoint pt)
 {
-    m_shadow_position.setX(qMin(qMax(pt.x(), 0), m_max_position.x()));
-    m_shadow_position.setY(qMin(qMax(pt.y(), 0), m_max_position.y()));
+    m_shadow_position.setX(qMin(qMax(pt.x(), m_min_position.x()), m_max_position.x()));
+    m_shadow_position.setY(qMin(qMax(pt.y(), m_min_position.y()), m_max_position.y()));
 
     this->update();
 }
 
 void ShadowMinimap::setPosition(QPoint pt)
 {
-    m_position.setX(qMin(qMax(pt.x(), 0), m_max_position.x()));
-    m_position.setY(qMin(qMax(pt.y(), 0), m_max_position.y()));
+    m_position.setX(qMin(qMax(pt.x(), m_min_position.x()), m_max_position.x()));
+    m_position.setY(qMin(qMax(pt.y(), m_min_position.y()), m_max_position.y()));
 
     this->update();
 }
 
 void ShadowMinimap::setMaxPosition(QPoint pt)
 {
-    m_max_position.setX(qMax(pt.x(), 0));
-    m_max_position.setY(qMax(pt.y(), 0));
+    m_max_position = pt;
+
+    this->update();
+}
+
+void ShadowMinimap::setMinPosition(QPoint pt)
+{
+    m_min_position = pt;
 
     this->update();
 }
@@ -43,9 +56,11 @@ void ShadowMinimap::mousePressEvent(QMouseEvent * e)
     if (e->button() != Qt::LeftButton)
         return;
 
-    m_mouse_origin = e->pos();
+    m_mouse_origin = QCursor::pos();
     m_position_origin = m_position;
+    m_total_pixels_moved = QPoint(0,0);
     m_mouse_down = true;
+    this->setCursor(Qt::BlankCursor);
 
     e->accept();
 }
@@ -55,10 +70,15 @@ void ShadowMinimap::mouseMoveEvent(QMouseEvent * e)
     if (! m_mouse_down || ! (e->buttons() & Qt::LeftButton))
         return;
 
-    QPoint pixel_delta = e->pos() - m_mouse_origin;
+    m_total_pixels_moved += QCursor::pos() - m_mouse_origin;
+    QCursor::setPos(m_mouse_origin);
     QPointF ppp = pixelsPerPosition();
+    QPoint pixel_delta = m_total_pixels_moved * m_sensitivity;
     QPoint position_delta = QPoint(pixel_delta.x() / ppp.x(), pixel_delta.y() / ppp.y());
-    setPosition(m_position_origin + position_delta);
+    QPoint new_position = m_position_origin + position_delta;
+    setPosition(new_position);
+    QToolTip::showText(m_mouse_origin,
+        QString::number(m_position.x()) + QString(", ") + QString::number(m_position.y()));
 
     e->accept();
 }
@@ -68,11 +88,28 @@ void ShadowMinimap::mouseReleaseEvent(QMouseEvent * e)
     if (! m_mouse_down || e->button() != Qt::LeftButton)
         return;
 
+    this->setCursor(Qt::ArrowCursor);
+    QToolTip::hideText();
+
     m_mouse_down = false;
     if (m_position_origin != m_position)
         emit positionChosen(m_position);
 
     e->accept();
+}
+
+void ShadowMinimap::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key()) {
+    case Qt::Key_Left:
+        break;
+    case Qt::Key_Right:
+        break;
+    case Qt::Key_Up:
+        break;
+    case Qt::Key_Down:
+        break;
+    }
 }
 
 QSize ShadowMinimap::fieldSize() const
@@ -83,7 +120,8 @@ QSize ShadowMinimap::fieldSize() const
 QPointF ShadowMinimap::pixelsPerPosition() const
 {
     QSize field_size = fieldSize();
-    return QPointF(field_size.width() / (float)m_max_position.x(), field_size.height() / (float)m_max_position.y());
+    return QPointF(field_size.width() / (float)(m_max_position.x() - m_min_position.x()),
+                   field_size.height() / (float)(m_max_position.y() - m_min_position.y()));
 }
 
 QPoint ShadowMinimap::valueToPoint(QPoint value) const
@@ -111,3 +149,7 @@ void ShadowMinimap::paintEvent(QPaintEvent *)
     p.fillRect(position_center.x() - c_thumb_size.x() / 2, position_center.y() - c_thumb_size.y() / 2, c_thumb_size.x(), c_thumb_size.y(), Qt::black);
 }
 
+void ShadowMinimap::setSensitivity(float sensitivity)
+{
+    m_sensitivity = sensitivity;
+}
