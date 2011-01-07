@@ -572,9 +572,7 @@ def run_camera():
         camera = edsdk.getFakeCamera(fakeCameraImagePath)
     else:
         debug("getting first camera")
-        tries = 0
-        while tries < 15:
-            tries += 1
+        for _ in range(15):
             try:
                 camera = edsdk.getFirstCamera()
                 break
