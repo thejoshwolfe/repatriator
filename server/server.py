@@ -741,15 +741,6 @@ def run_init_motors():
     threads = []
     for char, motor in motors.items():
         def find_motor(char, motor):
-            def done_initializing_handler(*args):
-                motor.stoppedMovingHandlers.remove(done_initializing_handler)
-                motor_is_initialized[char] = True
-            def go_to_startup_handler(*args):
-                motor.stoppedMovingHandlers.remove(go_to_startup_handler)
-                motor.stoppedMovingHandlers.append(done_initializing_handler)
-                if not move_motor(motor, settings['MOTOR_%s_START_POSITION' % char]):
-                    # no initial position. just call the final step
-                    done_initializing_handler()
             for _ in range(15):
                 found[char] = motor.findAndConnect()
                 if not found[char]:
@@ -762,7 +753,10 @@ def run_init_motors():
                     continue
                 # success
                 debug("found motor " + repr(char))
-                motor.stoppedMovingHandlers.append(go_to_startup_handler)
+                def done_initializing_handler(*args):
+                    motor.stoppedMovingHandlers.remove(done_initializing_handler)
+                    motor_is_initialized[char] = True
+                motor.stoppedMovingHandlers.append(done_initializing_handler)
                 motor.fullInit()
                 # wait for initialization
                 while not motor_is_initialized[char]:
