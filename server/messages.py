@@ -105,10 +105,7 @@ class MagicalRequest(ClientMessage):
 __all__.append('ConnectionRequest')
 class ConnectionRequest(ClientMessage):
     def parse(self):
-        self.version = [0, 0, 0]
-        self.version[0] = self._parse_int32()
-        self.version[1] = self._parse_int32()
-        self.version[2] = self._parse_int32()
+        self.newest_protocol_supported = self._parse_int32()
         self.username = self._parse_string()
         self.password = self._parse_string()
         self.hardware_flag = self._parse_bool()
@@ -273,6 +270,7 @@ class ConnectionResult(ServerMessage):
     # for example, requested operating hardware but don't have Privilege.OperateHardware
     InsufficientPrivileges = 1 
     Success = 2
+    UnsupportedProtocol = 3
 
     def __init__(self, status, privileges=None):
         if privileges is None:
@@ -283,12 +281,12 @@ class ConnectionResult(ServerMessage):
         self.status = status
 
     def _serialize(self):
-        major, minor, revision = version
+        server_name = "SuperWolfe RepatriatorServer 0.0.0"
 
         buf = bytearray()
-        buf.extend(struct.pack(">i", major))
-        buf.extend(struct.pack(">i", minor))
-        buf.extend(struct.pack(">i", revision))
+        buf.extend(struct.pack(">i", self.protocol))
+        buf.extend(struct.pack(">i", len(server_name)))
+        buf.extend(server_name.encode('utf8'))
         buf.extend(struct.pack(">i", self.status))
         buf.extend(struct.pack(">i", len(self.privileges)))
         for privilege in self.privileges:

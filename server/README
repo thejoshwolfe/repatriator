@@ -1,3 +1,5 @@
+Repatriator Protocol Version 0
+
 Installation:
 
     install python 3.1 32-bit to C:\Python31 or somewhere else.
@@ -101,9 +103,9 @@ Messages:
         ConnectionResult
             int8 - identifies this message as a ConnectionResult (enum value 1)
             int64 - byte count of the entire message including this field
-            int32 - major version number of server
-            int32 - minor version number of server
-            int32 - revision version number of server
+            int32 - protocol version we're going to use
+            int32 - length of utf8 string below
+            <utf8 string server description>
             int32 - connection status
             int32 - number of permissions granted
             for each permission granted:
@@ -197,9 +199,7 @@ Messages:
         ConnectionRequest - used to initialize a session with the repatriator
             int8 - identifies this message as a ConnectionRequest (enum value 1)
             int64 - byte count of the entire message including this field
-            int32 - major version number of client
-            int32 - minor version number of client
-            int32 - revision version number of client
+            int32 - highest protocol version supported
             int32 - length of utf8 username string below
             <utf8 username string>
             int32 - length of utf8 password string below

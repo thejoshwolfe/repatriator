@@ -55,9 +55,8 @@ public:
         Success = 2,
     };
 
-    qint32 major_version;
-    qint32 minor_version;
-    qint32 revision_version;
+    qint32 protocol;
+    QString server_description;
     ConnectionResultStatus connection_status;
     QSet<ServerTypes::Permission> permissions;
 
