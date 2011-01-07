@@ -14,7 +14,7 @@
    <string>Repatriator</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="repatriator.qrc">
     <normaloff>:/general/resource/bug.ico</normaloff>:/general/resource/bug.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -121,7 +121,7 @@
        <item>
         <widget class="QPushButton" name="snapshotButton">
          <property name="icon">
-          <iconset>
+          <iconset resource="repatriator.qrc">
            <normaloff>:/general/resource/camera.png</normaloff>:/general/resource/camera.png</iconset>
          </property>
          <property name="shortcut">
@@ -236,7 +236,7 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="goToButton">
            <property name="text">
             <string>Go To</string>
            </property>
@@ -340,7 +340,7 @@
   </action>
   <action name="actionTakeSnapshot">
    <property name="icon">
-    <iconset>
+    <iconset resource="repatriator.qrc">
      <normaloff>:/general/resource/camera.png</normaloff>:/general/resource/camera.png</iconset>
    </property>
    <property name="text">
@@ -397,7 +397,9 @@
   <tabstop>snapshotButton</tabstop>
   <tabstop>picturesList</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="repatriator.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionSelectAll</sender>
@@ -412,6 +414,22 @@
     <hint type="destinationlabel">
      <x>322</x>
      <y>455</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bookmarksList</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>goToButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>454</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>485</x>
+     <y>378</y>
     </hint>
    </hints>
   </connection>
