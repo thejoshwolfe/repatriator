@@ -685,9 +685,13 @@ def on_connection_close():
         debug("shutting down motors")
         motor_disposer_threads = []
         def shutdown_motor(motor):
-            while not motor.isReady():
-                debug("waiting for motor " + repr(motor.name) + " to stop moving")
+            debug("waiting for motor " + repr(motor.name) + " to stop moving")
+            for _ in range(settings['MOTOR_MOVEMENT_TIMEOUT']):
+                if motor.isReady():
+                    break
                 time.sleep(1)
+            else:
+                error("timed out waiting for motor " + repr(motor.name) + " to stop moving")
             debug("disposing motor " + repr(motor.name))
             motor.dispose()
         for motor in motors.values():
