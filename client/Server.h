@@ -10,6 +10,8 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QSharedPointer>
+#include <QTime>
+#include <QTimer>
 
 class IncomingMessageParser;
 
@@ -39,6 +41,8 @@ signals:
     // messageReceived. use it only to tell messages apart. You are, however, guaranteed
     // ability to read message->type.
     void progress(qint64 bytesTransferred, qint64 bytesTotal, IncomingMessage * message);
+
+    void pingComputed(int ms);
 
 public slots:
     void sendMessage(QSharedPointer<OutgoingMessage> message);
@@ -75,6 +79,11 @@ private:
 
     QSharedPointer<IncomingMessage> m_connection_result;
 
+    qint32 m_next_ping;
+    qint32 m_recent_ping;
+    QTime m_ping_time;
+
+    QTimer * m_ping_timer;
 
 private:
     void changeLoginState(ServerTypes::LoginStatus state);
@@ -86,6 +95,7 @@ private slots:
     void cleanUpAfterDisconnect();
     void processIncomingMessage(QSharedPointer<IncomingMessage>);
     void handleSocketError(QAbstractSocket::SocketError);
+    void sendPingMessage();
 };
 
 

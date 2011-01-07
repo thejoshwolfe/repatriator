@@ -31,8 +31,9 @@ protected:
         ChangePasswordRequest = 10,
         ListUserRequest = 11,
         SetAutoFocusEnabled = 12,
-        SetStaticBookmarks = 13,
-        SetUserBookmarks = 14,
+        Ping = 13,
+        SetStaticBookmarks = 14,
+        SetUserBookmarks = 15,
     };
 
     // serialize
@@ -203,6 +204,17 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream & stream);
     virtual MessageCode type() const { return SetAutoFocusEnabled; }
+};
+
+
+class PingMessage : public OutgoingMessage
+{
+public:
+    qint32 ping_id;
+    PingMessage(qint32 ping_id) : ping_id(ping_id) {}
+protected:
+    virtual void writeMessageBody(QDataStream &stream);
+    virtual MessageCode type() const { return Ping; }
 };
 
 class SetStaticBookmarksMessage : public OutgoingMessage

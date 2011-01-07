@@ -85,6 +85,11 @@ void MotorMovementMessage::writeMessageBody(QDataStream &stream)
         stream << (qint64) positions.at(i);
 }
 
+void PingMessage::writeMessageBody(QDataStream &stream)
+{
+    stream << this->ping_id;
+}
+
 void SetStaticBookmarksMessage::writeMessageBody(QDataStream &stream)
 {
     stream << (qint32)bookmarks.size();

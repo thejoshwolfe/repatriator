@@ -91,6 +91,8 @@ private slots:
     void processMessage(QSharedPointer<IncomingMessage> msg);
     void connectionEnded();
     void showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMessage * msg);
+
+    void showPing(int ms);
 };
 
 #endif // MAINWINDOW_H

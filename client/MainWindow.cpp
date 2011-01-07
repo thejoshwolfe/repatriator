@@ -96,6 +96,8 @@ void MainWindow::connected(QSharedPointer<Server> server)
     Q_ASSERT(success);
     success = connect(m_server.data(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SLOT(showProgress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
+    success = connect(m_server.data(), SIGNAL(pingComputed(int)), this, SLOT(showPing(int)));
+    Q_ASSERT(success);
 
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DirectoryListingRequestMessage()));
 
@@ -410,4 +412,9 @@ void MainWindow::on_picturesList_customContextMenuRequested(QPoint pos)
 void MainWindow::on_autoFocusEnabledCheckBox_clicked(bool checked)
 {
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetAutoFocusEnabledMessage(checked)));
+}
+
+void MainWindow::showPing(int ms)
+{
+    ui->statusBar->showMessage(tr("Ping: ") + QString::number(ms));
 }

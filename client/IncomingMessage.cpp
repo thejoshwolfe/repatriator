@@ -143,3 +143,8 @@ void InitInfoMessage::readBookmarkList(QDataStream & stream, QVector<ServerTypes
         bookmark_list.append(bookmark);
     }
 }
+
+void PongMessage::parse(QDataStream & stream)
+{
+    stream >> ping_id;
+}

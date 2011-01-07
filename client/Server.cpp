@@ -18,7 +18,9 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
     m_hardware(hardware),
     m_socket_thread(NULL),
     m_socket(NULL),
-    m_parser(NULL)
+    m_parser(NULL),
+    m_next_ping(0),
+    m_ping_timer(NULL)
 {
     // we run in m_socket_thread
     m_socket_thread = new QThread(this);
@@ -33,6 +35,7 @@ Server::Server(ConnectionSettings connection_info, QString password, bool hardwa
 Server::~Server()
 {
     delete m_parser;
+    delete m_ping_timer;
 }
 
 void Server::initialize()
@@ -101,6 +104,11 @@ void Server::handleConnected()
     delete m_parser;
     m_parser = new IncomingMessageParser(m_socket);
 
+    delete m_ping_timer;
+    m_ping_timer = new QTimer();
+
+    m_next_ping = 0;
+
     bool success;
 
     success = connect(m_parser, SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processIncomingMessage(QSharedPointer<IncomingMessage>)));
@@ -108,6 +116,11 @@ void Server::handleConnected()
 
     success = connect(m_parser, SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SIGNAL(progress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
+
+    success = connect(m_ping_timer, SIGNAL(timeout()), this, SLOT(sendPingMessage()));
+    Q_ASSERT(success);
+
+    m_ping_timer->start(1000);
 
     changeLoginState(ServerTypes::WaitingForMagicalResponse);
     sendMessage(QSharedPointer<OutgoingMessage>(new MagicalRequestMessage()));
@@ -141,8 +154,11 @@ void Server::processIncomingMessage(QSharedPointer<IncomingMessage> msg)
         qDebug() << "null message, socket disconnect";
         socketDisconnect();
         return;
-    } else if (msg.data()->type == IncomingMessage::Ping) {
-        // just ignore it
+    } else if (msg.data()->type == IncomingMessage::Pong) {
+        PongMessage * pong_msg = (PongMessage *) msg.data();
+        qDebug() << "Pong number:" << pong_msg->ping_id << ", recent ping: " << m_recent_ping;
+        if (m_recent_ping == pong_msg->ping_id)
+            emit pingComputed(m_ping_time.elapsed());
         return;
     } else if (m_login_state == ServerTypes::WaitingForMagicalResponse && msg.data()->type == IncomingMessage::MagicalResponse) {
         MagicalResponseMessage * magic_msg = (MagicalResponseMessage *) msg.data();
@@ -199,4 +215,11 @@ void Server::finishWritingAndDisconnect()
 ServerTypes::LoginStatus Server::loginStatus()
 {
     return m_login_state;
+}
+
+void Server::sendPingMessage()
+{
+    m_recent_ping = m_next_ping++;
+    m_ping_time.start();
+    sendMessage(QSharedPointer<OutgoingMessage>(new PingMessage(m_recent_ping)));
 }
