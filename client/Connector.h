@@ -43,6 +43,7 @@ signals:
 private:
     QSharedPointer<QProgressDialog> m_progressDialog;
     QSharedPointer<Server> m_server;
+    bool m_done;
 
 private:
     void fail(FailureReason reason);

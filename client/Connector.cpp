@@ -6,7 +6,8 @@
 #include <QMessageBox>
 
 Connector::Connector(QSharedPointer<Server> server) :
-    m_server(server)
+    m_server(server),
+    m_done(false)
 {}
 
 Connector::~Connector()
@@ -48,48 +49,48 @@ void Connector::updateProgressFromLoginStatus(ServerTypes::LoginStatus status)
 {
     switch(status) {
         case ServerTypes::Connecting:
-            qDebug() << "update progress. connecting. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Connecting..."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(1);
             return;
         case ServerTypes::WaitingForMagicalResponse:
-            qDebug() << "update progress. waiting for magic response. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Waiting for server validation..."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(2);
             return;
         case ServerTypes::WaitingForConnectionResult:
-            qDebug() << "update progress. waiting for connection result. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Waiting for connection result..."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(3);
             return;
         case ServerTypes::ServerIsBogus:
-            qDebug() << "update progress. server is bogus. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Server is bogus."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(4);
             fail(ServerIsBogus);
             return;
         case ServerTypes::LoginIsInvalid:
-            qDebug() << "update progress. login is invalid. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Login is invalid."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(4);
             fail(LoginIsInvalid);
             return;
         case ServerTypes::InsufficientPrivileges:
-            qDebug() << "update progress. insufficient priv. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Insufficient privileges."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(4);
             fail(InsufficientPrivileges);
             return;
         case ServerTypes::Success:
-            qDebug() << "update progress. success. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Success."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(4);
             cleanup(false);
             emit success();
             return;
         case ServerTypes::SocketError:
-            qDebug() << "update progress. socket error. thread:" << QThread::currentThread();
             m_progressDialog.data()->setLabelText(tr("Socket error."));
+            if (m_done) return;
             m_progressDialog.data()->setValue(4);
             fail(UnableToConnect);
             return;
@@ -114,8 +115,8 @@ void Connector::fail(FailureReason reason)
 
 void Connector::cleanup(bool kill_connection)
 {
+    m_done = true;
     disconnect(this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)));
-    qDebug() << "Disconnected. Thread: " << QThread::currentThread();
     if (kill_connection)
         m_server.data()->socketDisconnect();
 }
