@@ -56,7 +56,7 @@ private:
 
     QHash<QString, ServerTypes::DirectoryItem> m_file_info;
 
-    QVector<ServerTypes::Bookmark> m_static_bookmarks;
+    QList<ServerTypes::Bookmark> m_static_bookmarks;
 
     static const float c_lowest_sensitivity;
     QVector<float> m_sensitivities;
@@ -72,8 +72,8 @@ private:
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
-    void setLocations(QVector<ServerTypes::Bookmark> bookmarks);
-    ServerTypes::Bookmark get_home_location_from_bookmarks(QVector<ServerTypes::Bookmark> bookmarks);
+    void setLocations(QList<ServerTypes::Bookmark> bookmarks);
+    ServerTypes::Bookmark get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks);
     bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
     void blockSliderSignals(bool value);
     void goToBookmark(ServerTypes::Bookmark bookmark);

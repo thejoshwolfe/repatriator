@@ -125,12 +125,12 @@ public:
     };
 
     QVector<MotorBoundaries> motor_boundaries;
-    QVector<ServerTypes::Bookmark> static_bookmarks;
-    QVector<ServerTypes::Bookmark> user_bookmarks;
+    QList<ServerTypes::Bookmark> static_bookmarks;
+    QList<ServerTypes::Bookmark> user_bookmarks;
 
     virtual void parse(QDataStream &);
 
-    static void readBookmarkList(QDataStream & stream, QVector<ServerTypes::Bookmark> & bookmark_list);
+    static void readBookmarkList(QDataStream & stream, QList<ServerTypes::Bookmark> & bookmark_list);
 };
 
 

@@ -444,7 +444,7 @@ bool MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
     return true;
 }
 
-void MainWindow::setLocations(QVector<ServerTypes::Bookmark> bookmarks)
+void MainWindow::setLocations(QList<ServerTypes::Bookmark> bookmarks)
 {
     m_static_bookmarks = bookmarks;
     for (int i = 0; i < bookmarks.size(); i++) {
@@ -473,7 +473,7 @@ void MainWindow::location_button_clicked()
     goToBookmark(bookmark);
 }
 
-ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QVector<ServerTypes::Bookmark> bookmarks)
+ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks)
 {
     if (bookmarks.size() > 0)
         return bookmarks.at(0);

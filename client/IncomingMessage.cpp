@@ -125,7 +125,7 @@ void InitInfoMessage::parse(QDataStream & stream)
     readBookmarkList(stream, static_bookmarks);
     readBookmarkList(stream, user_bookmarks);
 }
-void InitInfoMessage::readBookmarkList(QDataStream & stream, QVector<ServerTypes::Bookmark> & bookmark_list)
+void InitInfoMessage::readBookmarkList(QDataStream & stream, QList<ServerTypes::Bookmark> & bookmark_list)
 {
     qint32 bookmark_list_len;
     stream >> bookmark_list_len;
