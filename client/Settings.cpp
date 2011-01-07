@@ -11,6 +11,11 @@ QByteArray Settings::main_window_geometry;
 QByteArray Settings::main_window_state;
 QByteArray Settings::connection_window_geometry;
 
+QByteArray Settings::dock_controls_geometry;
+QByteArray Settings::dock_files_geometry;
+QByteArray Settings::dock_bookmarks_geometry;
+QByteArray Settings::dock_locations_geometry;
+
 void Settings::load()
 {
     initialize();
@@ -36,11 +41,21 @@ void Settings::load()
     connection_window_geometry = settings->value("windows/geometry/connection_window").toByteArray();
     main_window_geometry = settings->value("windows/geometry/main_window").toByteArray();
     main_window_state = settings->value("windows/state/main_window").toByteArray();
+
+    dock_bookmarks_geometry = settings->value("windows/geometry/dock_bookmarks").toByteArray();
+    dock_controls_geometry = settings->value("windows/geometry/dock_controls").toByteArray();
+    dock_files_geometry = settings->value("windows/geometry/dock_files").toByteArray();
+    dock_locations_geometry = settings->value("windows/geometry/dock_locations").toByteArray();
 }
 
 void Settings::save()
 {
     initialize();
+
+    settings->setValue("windows/geometry/dock_bookmarks", dock_bookmarks_geometry);
+    settings->setValue("windows/geometry/dock_controls", dock_controls_geometry);
+    settings->setValue("windows/geometry/dock_files", dock_files_geometry);
+    settings->setValue("windows/geometry/dock_locations", dock_locations_geometry);
 
     settings->setValue("windows/geometry/connection_window", connection_window_geometry);
     settings->setValue("windows/geometry/main_window", main_window_geometry);
