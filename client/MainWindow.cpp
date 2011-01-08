@@ -643,5 +643,5 @@ void MainWindow::on_deleteBookmarkButton_clicked()
 
 void MainWindow::sendFocusPoint(QPointF point)
 {
-
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ChangeFocusLocationMessage(point)));
 }

@@ -77,9 +77,9 @@ settings = {
     'MOTOR_Z_ENABLE_POSITION_CORRECTION': True,
     'MOTOR_Z_FAKE': False,
 
-    # how many milliseconds to wait for a message from the client
+    # how many seconds to wait for a message from the client
     # before giving up and closing the connection
-    'CLIENT_IDLE_TIMEOUT': 5000,
+    'CLIENT_IDLE_TIMEOUT': 10,
     # motors never take longer than this number of seconds to make one motion
     'MOTOR_MOVEMENT_TIMEOUT': 60,
 }

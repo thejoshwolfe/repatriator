@@ -84,7 +84,7 @@ void ImageDisplayWidget::mouseMoveEvent(QMouseEvent *e)
 
 void ImageDisplayWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (e->buttons() & Qt::LeftButton) {
+    if (e->button() == Qt::LeftButton) {
         emit focusPointChanged(m_focusPoint);
         e->accept();
     }

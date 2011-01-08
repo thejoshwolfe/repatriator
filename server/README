@@ -300,6 +300,12 @@ Messages:
             for each bookmark:
                 Bookmark
 
+        ChangeFocusLocation - sets the focus point for live view
+            int8 - the type of this message (enum value 16)
+            int64 - byte count of the entire message including this field
+            float32 (IEEE 754) - percent of live view width x position to focus
+            float32 (IEEE 754) - percent of live view height y position to focus
+
     Common:
 
         Bookmark:

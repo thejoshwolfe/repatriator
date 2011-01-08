@@ -406,6 +406,17 @@ def maybe_auto_focus():
 def handle_Ping(msg):
     server.send_message(Pong(msg.ping_id))
 
+@must_have_privilege(Privilege.OperateHardware)
+def handle_ChangeFocusLocation(msg):
+    debug("new focus floats: {0}, {1}".format(msg.focus_x, msg.focus_y))
+    w, h = camera.maxZoomPosition()
+    debug("max zoom position: {0}, {1}".format(w, h))
+    x, y = (int(msg.focus_x * w), int(msg.focus_y * h))
+    debug("Setting zoom position to {0}, {1}".format(x,y))
+    camera.setZoomPosition(x, y)
+    if auto_focus_enabled:
+        camera.autoFocus()
+
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,
     ClientMessage.ConnectionRequest: handle_ConnectionRequest,
@@ -423,6 +434,7 @@ message_handlers = {
     ClientMessage.Ping: handle_Ping,
     ClientMessage.SetStaticBookmarks: handle_SetStaticBookmarks,
     ClientMessage.SetUserBookmarks: handle_SetUserBookmarks,
+    ClientMessage.ChangeFocusLocation: handle_ChangeFocusLocation,
 }
 
 def init_state():
@@ -529,8 +541,8 @@ def run_connection_monitor():
     last_client_message_time = time.time()
     while not finished:
         now = time.time()
-        if now - last_client_message_time > settings['CLIENT_IDLE_TIMEOUT'] / 1000:
-            warning("Haven't heard from the client in {0} ms. Killing connection.".format(settings['CLIENT_IDLE_TIMEOUT']))
+        if now - last_client_message_time > settings['CLIENT_IDLE_TIMEOUT']:
+            warning("Haven't heard from the client in {0} sec. Killing connection.".format(settings['CLIENT_IDLE_TIMEOUT']))
             finished = True
             global server
             server.close()

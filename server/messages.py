@@ -25,6 +25,7 @@ class ClientMessage:
     Ping = 13
     SetStaticBookmarks = 14
     SetUserBookmarks = 15
+    ChangeFocusLocation = 16
 
     class ParseError(Exception):
         pass
@@ -47,6 +48,13 @@ class ClientMessage:
         n = struct.unpack_from(unpack_str, self._raw_data, self._offset)[0]
         self._move_pointer(byte_count)
         return n
+
+    def _parse_float32(self):
+        if self._bytes_left < 4:
+            raise self.ParseError("Message is missing float32 at position {0}".format(self._offset))
+        value = struct.unpack_from('>f', self._raw_data, self._offset)[0]
+        self._move_pointer(4)
+        return value
 
     def _parse_bool(self):
         return bool(self._parse_int8())
@@ -203,6 +211,12 @@ __all__.append('SetUserBookmarks')
 class SetUserBookmarks(SetStaticBookmarks):
     # same as static bookmarks
     pass
+
+__all__.append('ChangeFocusLocation')
+class ChangeFocusLocation(ClientMessage):
+    def parse(self):
+        self.focus_x = self._parse_float32()
+        self.focus_y = self._parse_float32()
 
 __all__.append('ServerMessage')
 class ServerMessage:
@@ -479,5 +493,6 @@ ClientMessage.TypeForId = {
     ClientMessage.Ping: Ping,
     ClientMessage.SetStaticBookmarks: SetStaticBookmarks,
     ClientMessage.SetUserBookmarks: SetUserBookmarks,
+    ClientMessage.ChangeFocusLocation: ChangeFocusLocation,
 }
 
