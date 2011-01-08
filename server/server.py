@@ -133,9 +133,6 @@ class Server:
         self.writer_thread = make_thread(self._run_writer, "message writer")
         self.reader_thread = make_thread(self._run_reader, "message reader")
 
-        global graceful_shutdown
-        graceful_shutdown = self.close
-
     def open(self):
         self.writer_thread.start()
         self.reader_thread.start()
@@ -531,7 +528,8 @@ def run_connection_monitor():
         if now - last_client_message_time > settings['CLIENT_IDLE_TIMEOUT'] / 1000:
             warning("Haven't heard from the client in {0} ms. Killing connection.".format(settings['CLIENT_IDLE_TIMEOUT']))
             finished = True
-            graceful_shutdown()
+            global server
+            server.close()
             return
         time.sleep(1)
 
