@@ -1,5 +1,3 @@
-Repatriator Protocol Version 0
-
 Installation:
 
     install python 3.1 32-bit to C:\Python31 or somewhere else.
@@ -48,6 +46,7 @@ How the server handles authentication:
         user: default_admin
         pass: temp1234
 
+Repatriator Protocol Version 0
 
 How to communicate with the server:
 

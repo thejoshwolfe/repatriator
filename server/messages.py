@@ -8,7 +8,6 @@ __all__ = []
 
 __all__.append('ClientMessage')
 class ClientMessage:
-    DummyAutoFocus = -2
     DummyCloseConnection = -1
     MagicalRequest = 0
     ConnectionRequest = 1
@@ -73,7 +72,6 @@ class ClientMessage:
 
         MessageClass = ClientMessage.TypeForId[raw_data[0]]
         msg_length = struct.unpack_from(">q", raw_data, 1)[0]
-        debug("Message length: " + str(msg_length) + ", actual length: " + str(len(raw_data)))
 
         if msg_length != len(raw_data):
             warning("Client message length value is wrong")
@@ -88,10 +86,6 @@ class ClientMessage:
         msg.message_type = raw_data[0]
         msg.parse()
         return msg
-
-__all__.append('DummyAutoFocus')
-class DummyAutoFocus():
-    message_type = ClientMessage.DummyAutoFocus
 
 __all__.append('MagicalRequest')
 class MagicalRequest(ClientMessage):
