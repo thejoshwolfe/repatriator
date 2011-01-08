@@ -34,6 +34,7 @@ protected:
         Ping = 13,
         SetStaticBookmarks = 14,
         SetUserBookmarks = 15,
+        ChangeFocusLocation = 16,
     };
 
     // serialize
@@ -200,7 +201,6 @@ protected:
     virtual MessageCode type() const { return SetAutoFocusEnabled; }
 };
 
-
 class PingMessage : public OutgoingMessage
 {
 public:
@@ -229,6 +229,16 @@ public:
         : SetStaticBookmarksMessage(bookmarks) {}
 protected:
     virtual MessageCode type() const { return SetUserBookmarks; }
+};
+
+class ChangeFocusLocationMessage : public OutgoingMessage
+{
+public:
+    QPointF pt;
+    ChangeFocusLocationMessage(QPointF pt) : pt(pt) {}
+protected:
+    virtual void writeMessageBody(QDataStream &stream);
+    virtual MessageCode type() const { return ChangeFocusLocation; }
 };
 
 #endif // OUTGOING_MESSAGE_H

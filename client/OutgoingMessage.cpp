@@ -99,3 +99,10 @@ void SetStaticBookmarksMessage::writeMessageBody(QDataStream &stream)
         stream << (qint8)bookmark.auto_focus;
     }
 }
+
+void ChangeFocusLocationMessage::writeMessageBody(QDataStream &stream)
+{
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream << (float) pt.x();
+    stream << (float) pt.y();
+}

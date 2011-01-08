@@ -421,6 +421,7 @@ void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bou
     blockSliderSignals(false);
 
     goToBookmark(home_location);
+    sendFocusPoint(ui->displayWidget->focusPoint());
 }
 
 void MainWindow::goToBookmark(ServerTypes::Bookmark bookmark)
@@ -638,7 +639,7 @@ void MainWindow::on_deleteBookmarkButton_clicked()
 
 void MainWindow::sendFocusPoint(QPointF point)
 {
-
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ChangeFocusLocationMessage(point)));
 }
 
 void MainWindow::on_editBookmarkButton_clicked()
