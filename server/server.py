@@ -653,8 +653,8 @@ def on_connection_close():
     if motors is not None:
         for char, motor in motors.items():
             motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
-            if motor.fancy:
-                end_position = settings['MOTOR_%s_END_POSITION' % char]
+            end_position = settings['MOTOR_%s_END_POSITION' % char]
+            if end_position is not None:
                 debug("sending motor " + repr(motor.name) + " home to " + repr(end_position))
                 move_motor(motor, end_position)
 
@@ -726,7 +726,8 @@ def run_motors():
         motor = silverpak.Silverpak()
         motor.baudRate = settings['MOTOR_%s_BAUD_RATE' % char]
         motor.driverAddress = settings['MOTOR_%s_DRIVER_ADDRESS' % char]
-        motor.fancy = settings['MOTOR_%s_FANCY' % char]
+        motor.enableLimitSwitches = settings['MOTOR_%s_ENABLE_LIMIT_SWITHCES' % char]
+        motor.enablePositionCorrection = settings['MOTOR_%s_ENABLE_POSITION_CORRECTION' % char]
         motor.velocity = settings['MOTOR_%s_VELOCITY' % char]
         motor.acceleration = settings['MOTOR_%s_ACCELERATION' % char]
         motor.maxPosition = settings['MOTOR_%s_MAX' % char]
