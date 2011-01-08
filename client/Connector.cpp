@@ -27,12 +27,10 @@ void Connector::go()
 
     m_server.data()->setPassword(password);
 
-    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(ServerTypes::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)), Qt::DirectConnection);
+    success = connect(m_server.data(), SIGNAL(loginStatusUpdated(ServerTypes::LoginStatus)), this, SLOT(updateProgressFromLoginStatus(ServerTypes::LoginStatus)));
     Q_ASSERT(success);
 
     m_progressDialog = QSharedPointer<QProgressDialog>(new QProgressDialog());
-    m_progressDialog.data()->setWindowModality(Qt::ApplicationModal);
-    m_progressDialog.data()->setWindowFlags(Qt::Dialog);
     m_progressDialog.data()->setWindowTitle(tr("Connecting to Server"));
     m_progressDialog.data()->setMinimum(0);
     m_progressDialog.data()->setMaximum(4);
