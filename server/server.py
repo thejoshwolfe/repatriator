@@ -726,7 +726,7 @@ def run_motors():
         motor = silverpak.Silverpak()
         motor.baudRate = settings['MOTOR_%s_BAUD_RATE' % char]
         motor.driverAddress = settings['MOTOR_%s_DRIVER_ADDRESS' % char]
-        motor.enableLimitSwitches = settings['MOTOR_%s_ENABLE_LIMIT_SWITHCES' % char]
+        motor.enableLimitSwitches = settings['MOTOR_%s_ENABLE_LIMIT_SWITCHES' % char]
         motor.enablePositionCorrection = settings['MOTOR_%s_ENABLE_POSITION_CORRECTION' % char]
         motor.velocity = settings['MOTOR_%s_VELOCITY' % char]
         motor.acceleration = settings['MOTOR_%s_ACCELERATION' % char]
