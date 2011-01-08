@@ -435,8 +435,11 @@ def init_state():
     global user
     user = None
 
-    global camera_thread
-    camera_thread = None
+    global init_camera_thread
+    init_camera_thread = None
+
+    global live_view_thread
+    live_view_thread = None
 
     global message_thread
     message_thread = None
@@ -532,7 +535,7 @@ def run_connection_monitor():
             return
         time.sleep(1)
 
-def run_camera():
+def run_init_camera():
     # try for 10 seconds to get the camera
     fakeCameraImagePath = settings['FAKE_CAMERA_IMAGE_PATH']
     if fakeCameraImagePath != None:
@@ -559,34 +562,43 @@ def run_camera():
                 camera = cam
 
                 def takePictureCallback(pic_file):
+                    debug("got picture callback")
                     # create a thumbnail
                     make_thumbnail(pic_file, pic_file+".thumb", 90)
                     # notify change
                     send_directory_list()
                 camera.setPictureCompleteCallback(takePictureCallback)
 
-                debug("camera.startLiveView()")
-                camera.startLiveView()
-                camera.grabLiveViewFrame()
 
-                debug("entering loop to send live view frames")
-                global finished
-                while not finished:
-                    if motors is None:
-                        motor_positions = {char: 0 for char in motor_chars}
-                        motor_states = {char: 0 for char in motor_chars}
-                    else:
-                        motor_positions = {char: motor.position() for char, motor in motors.items()}
-                        motor_states = {char: int(motor_is_initialized[char]) for char, motor in motors.items()}
-                    server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
-                    camera.grabLiveViewFrame()
-                    time.sleep(0.20)
+                global live_view_thread
+                live_view_thread = make_thread(run_live_view_thread, "live_view")
+                live_view_thread.start()
 
-                # shut down the camera
-                camera.disconnect()
-                camera = None
-                edsdk.terminate()
         edsdk.getFirstCamera(found_camera)
+
+def run_live_view_thread():
+    debug("camera.startLiveView()")
+    global camera
+    camera.startLiveView()
+    camera.grabLiveViewFrame()
+
+    debug("entering loop to send live view frames")
+    global finished
+    while not finished:
+        if motors is None:
+            motor_positions = {char: 0 for char in motor_chars}
+            motor_states = {char: 0 for char in motor_chars}
+        else:
+            motor_positions = {char: motor.position() for char, motor in motors.items()}
+            motor_states = {char: int(motor_is_initialized[char]) for char, motor in motors.items()}
+        server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
+        camera.grabLiveViewFrame()
+        time.sleep(0.20)
+
+    # shut down the camera
+    camera.disconnect()
+    camera = None
+    edsdk.terminate()
 
 def on_connection_open():
     debug("connection opening")
@@ -610,9 +622,9 @@ def on_connection_close():
     global finished
     finished = True
 
-    if camera_thread is not None:
-        debug("waiting for camera thread to join")
-        camera_thread.join()
+    if live_view_thread is not None:
+        debug("waiting for live view thread to join")
+        live_view_thread.join()
 
     if motors_thread is not None:
         debug("waiting for motors thread to join")
@@ -666,9 +678,9 @@ def initialize_hardware():
     motors_thread = make_thread(run_motors, "motors")
     motors_thread.start()
 
-    global camera_thread
-    camera_thread = make_thread(run_camera, "camera")
-    camera_thread.start()
+    global init_camera_thread
+    init_camera_thread = make_thread(run_init_camera, "camera")
+    init_camera_thread.start()
 
 def run_motors():
     def create_motor(char):
