@@ -214,8 +214,8 @@ protected:
 class SetStaticBookmarksMessage : public OutgoingMessage
 {
 public:
-    QVector<ServerTypes::Bookmark> bookmarks;
-    SetStaticBookmarksMessage(QVector<ServerTypes::Bookmark> bookmarks)
+    QList<ServerTypes::Bookmark> bookmarks;
+    SetStaticBookmarksMessage(QList<ServerTypes::Bookmark> bookmarks)
         : bookmarks(bookmarks) {}
 protected:
     virtual void writeMessageBody(QDataStream & stream);
@@ -225,7 +225,7 @@ protected:
 class SetUserBookmarksMessage : public SetStaticBookmarksMessage
 {
 public:
-    SetUserBookmarksMessage(QVector<ServerTypes::Bookmark> bookmarks)
+    SetUserBookmarksMessage(QList<ServerTypes::Bookmark> bookmarks)
         : SetStaticBookmarksMessage(bookmarks) {}
 protected:
     virtual MessageCode type() const { return SetUserBookmarks; }

@@ -73,9 +73,8 @@ private:
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
-    void setLocations(QList<ServerTypes::Bookmark> bookmarks);
-    void setBookmarks(QList<ServerTypes::Bookmark> bookmarks);
-    void refreshBookmarks();
+    void refreshLocations(bool save);
+    void refreshBookmarks(bool save);
     ServerTypes::Bookmark get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks);
     bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
     void blockSliderSignals(bool value);

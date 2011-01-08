@@ -183,8 +183,13 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         case IncomingMessage::InitInfo:
         {
             InitInfoMessage * init_info_msg = (InitInfoMessage *) msg.data();
-            setLocations(init_info_msg->static_bookmarks);
-            setBookmarks(init_info_msg->user_bookmarks);
+
+            m_static_bookmarks = init_info_msg->static_bookmarks;
+            refreshLocations(false);
+
+            m_user_bookmarks = init_info_msg->user_bookmarks;
+            refreshBookmarks(false);
+
             ServerTypes::Bookmark home_location = get_home_location_from_bookmarks(init_info_msg->static_bookmarks);
             changeMotorBounds(init_info_msg->motor_boundaries, home_location);
             break;
@@ -454,13 +459,12 @@ bool MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
     return true;
 }
 
-void MainWindow::setLocations(QList<ServerTypes::Bookmark> bookmarks)
+void MainWindow::refreshLocations(bool save)
 {
     foreach (QObject * child, ui->locationsLayout->children())
         delete child;
-    m_static_bookmarks = bookmarks;
-    for (int i = 0; i < bookmarks.size(); i++) {
-        ServerTypes::Bookmark bookmark = bookmarks.at(i);
+    for (int i = 0; i < m_static_bookmarks.size(); i++) {
+        ServerTypes::Bookmark bookmark = m_static_bookmarks.at(i);
         int readable_index = i + 1;
         QString text = "";
         if (readable_index <= 9)
@@ -471,6 +475,9 @@ void MainWindow::setLocations(QList<ServerTypes::Bookmark> bookmarks)
         Q_ASSERT(success);
         ui->locationsLayout->addWidget(location_button);
     }
+
+    if (save)
+        m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetStaticBookmarksMessage(m_static_bookmarks)));
 }
 void MainWindow::location_button_clicked()
 {
@@ -484,21 +491,16 @@ void MainWindow::location_button_clicked()
     ServerTypes::Bookmark bookmark = m_static_bookmarks.at(one_based_index - 1);
     goToBookmark(bookmark);
 }
-void MainWindow::setBookmarks(QList<ServerTypes::Bookmark> bookmarks)
-{
-    m_user_bookmarks.clear();
-    foreach (ServerTypes::Bookmark bookmark, bookmarks)
-        m_user_bookmarks.append(bookmark);
-
-    refreshBookmarks();
-}
-void MainWindow::refreshBookmarks()
+void MainWindow::refreshBookmarks(bool save)
 {
     ui->bookmarksList->clear();
     foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
         ui->bookmarksList->addItem(bookmark.name);
 
     enableBookmarkButtons();
+
+    if (save)
+        m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetUserBookmarksMessage(m_user_bookmarks)));
 }
 
 ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks)
@@ -621,6 +623,6 @@ void MainWindow::on_bookmarkHereButton_clicked()
 
     m_user_bookmarks.append(new_bookmark);
 
-    refreshBookmarks();
+    refreshBookmarks(true);
 }
 
