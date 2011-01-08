@@ -75,7 +75,7 @@ private:
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
     void refreshLocations(bool save);
     void saveBookmarks();
-    ServerTypes::Bookmark get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks);
+    ServerTypes::Bookmark getHomeLocationFromBookmarks(QList<ServerTypes::Bookmark> bookmarks);
     bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
     void blockSliderSignals(bool value);
     void goToBookmark(ServerTypes::Bookmark bookmark);
@@ -114,6 +114,7 @@ private slots:
     void showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMessage * msg);
 
     void showPing(int ms);
+    void sendFocusPoint(QPointF point);
 };
 
 #endif // MAINWINDOW_H

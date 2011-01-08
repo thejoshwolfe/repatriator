@@ -58,6 +58,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->sensitivitySlider->setValue(0);
 
     enableBookmarkButtons();
+
+    bool success;
+    success = connect(ui->displayWidget, SIGNAL(focusPointChanged(QPointF)), this, SLOT(sendFocusPoint(QPointF)));
+    Q_ASSERT(success);
 }
 
 MainWindow::~MainWindow()
@@ -118,6 +122,8 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
     ui->filesDock->restoreGeometry(Settings::dock_files_geometry);
     ui->bookmarksDock->restoreGeometry(Settings::dock_bookmarks_geometry);
     ui->locationsDock->restoreGeometry(Settings::dock_locations_geometry);
+
+    ui->displayWidget->clear();
 }
 
 void MainWindow::connected()
@@ -192,7 +198,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
             foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
                 ui->bookmarksList->addItem(bookmark.name);
 
-            ServerTypes::Bookmark home_location = get_home_location_from_bookmarks(init_info_msg->static_bookmarks);
+            ServerTypes::Bookmark home_location = getHomeLocationFromBookmarks(init_info_msg->static_bookmarks);
             changeMotorBounds(init_info_msg->motor_boundaries, home_location);
             break;
         }
@@ -499,7 +505,7 @@ void MainWindow::saveBookmarks()
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetUserBookmarksMessage(m_user_bookmarks)));
 }
 
-ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks)
+ServerTypes::Bookmark MainWindow::getHomeLocationFromBookmarks(QList<ServerTypes::Bookmark> bookmarks)
 {
     if (bookmarks.size() > 0)
         return bookmarks.at(0);
@@ -633,4 +639,9 @@ void MainWindow::on_deleteBookmarkButton_clicked()
     delete ui->bookmarksList->item(index);
 
     saveBookmarks();
+}
+
+void MainWindow::sendFocusPoint(QPointF point)
+{
+
 }
