@@ -1,18 +1,13 @@
-#-------------------------------------------------
-#
+# -------------------------------------------------
 # Project created by QtCreator 2010-12-17T16:29:53
-#
-#-------------------------------------------------
-
-QT += core gui network
-
+# -------------------------------------------------
+QT += core \
+    gui \
+    network
 TARGET = RepatriatorClient
 TEMPLATE = app
-
 CONFIG -= exceptions
-
-SOURCES += \
-    main.cpp \
+SOURCES += main.cpp \
     MainWindow.cpp \
     IncomingMessage.cpp \
     OutgoingMessage.cpp \
@@ -29,10 +24,9 @@ SOURCES += \
     ShadowMinimap.cpp \
     ShadowSlider.cpp \
     Rotate3DWidget.cpp \
-    ImageDisplayWidget.cpp
-
-HEADERS += \
-    MainWindow.h \
+    ImageDisplayWidget.cpp \
+    EditBookmarkDialog.cpp
+HEADERS += MainWindow.h \
     ConnectionSettings.h \
     IncomingMessage.h \
     OutgoingMessage.h \
@@ -50,17 +44,14 @@ HEADERS += \
     ShadowMinimap.h \
     ShadowSlider.h \
     Rotate3DWidget.h \
-    ImageDisplayWidget.h
-
-FORMS += \
-    MainWindow.ui \
+    ImageDisplayWidget.h \
+    EditBookmarkDialog.h
+FORMS += MainWindow.ui \
     ConnectionWindow.ui \
     AdminWindow.ui \
     EditConnectionWindow.ui \
     EditUserAccountWindow.ui \
-    PasswordInputWindow.ui
-
-RESOURCES += \
-    repatriator.qrc
-
+    PasswordInputWindow.ui \
+    EditBookmarkDialog.ui
+RESOURCES += repatriator.qrc
 RC_FILE = repatriator.rc

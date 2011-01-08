@@ -3,6 +3,7 @@
 
 #include "ConnectionWindow.h"
 #include "Settings.h"
+#include "EditBookmarkDialog.h"
 
 #include <QFile>
 #include <QDir>
@@ -577,7 +578,7 @@ void MainWindow::on_goToBookmarkButton_clicked()
     int index = selectedBookmarkIndex();
     if (index == -1)
         return;
-    goToBookmark(m_user_bookmarks[index]);
+    goToBookmark(m_user_bookmarks.at(index));
 }
 
 int MainWindow::selectedBookmarkIndex()
@@ -603,7 +604,7 @@ void MainWindow::enableBookmarkButtons()
 
 void MainWindow::on_bookmarkHereButton_clicked()
 {
-    ServerTypes::Bookmark new_bookmark;
+    ServerTypes::Bookmark new_bookmark = here();
 
     // determin a name for the new bookmark
     QSet<QString> existing_names;
@@ -616,12 +617,6 @@ void MainWindow::on_bookmarkHereButton_clicked()
         new_bookmark.name = name;
         break;
     }
-    new_bookmark.motor_positions.append(ui->orbitSliderA->value());
-    new_bookmark.motor_positions.append(ui->orbitSliderB->value());
-    new_bookmark.motor_positions.append(ui->shadowMinimap->position().x());
-    new_bookmark.motor_positions.append(ui->shadowMinimap->position().y());
-    new_bookmark.motor_positions.append(ui->liftSliderZ->value());
-    new_bookmark.auto_focus = ServerTypes::NotSpecified;
 
     m_user_bookmarks.append(new_bookmark);
     ui->bookmarksList->addItem(new_bookmark.name);
@@ -644,4 +639,34 @@ void MainWindow::on_deleteBookmarkButton_clicked()
 void MainWindow::sendFocusPoint(QPointF point)
 {
 
+}
+
+void MainWindow::on_editBookmarkButton_clicked()
+{
+    int index = selectedBookmarkIndex();
+    if (index == -1)
+        return;
+
+    ServerTypes::Bookmark bookmark = m_user_bookmarks.at(index);
+    if (!EditBookmarkDialog::showEdit(&bookmark, here()))
+        return;
+
+    m_user_bookmarks.replace(index, bookmark);
+    ui->bookmarksList->item(index)->setText(bookmark.name);
+
+    saveBookmarks();
+}
+
+ServerTypes::Bookmark MainWindow::here()
+{
+    ServerTypes::Bookmark bookmark;
+    // no name
+    bookmark.motor_positions.append(ui->orbitSliderA->value());
+    bookmark.motor_positions.append(ui->orbitSliderB->value());
+    bookmark.motor_positions.append(ui->shadowMinimap->position().x());
+    bookmark.motor_positions.append(ui->shadowMinimap->position().y());
+    bookmark.motor_positions.append(ui->liftSliderZ->value());
+    bookmark.auto_focus = ServerTypes::NotSpecified;
+
+    return bookmark;
 }

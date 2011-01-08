@@ -84,8 +84,11 @@ private:
     void updateControlSensitivities();
     int selectedBookmarkIndex();
     void enableBookmarkButtons();
+    ServerTypes::Bookmark here();
+
 
 private slots:
+    void on_editBookmarkButton_clicked();
     void on_deleteBookmarkButton_clicked();
     void on_bookmarksList_itemSelectionChanged();
     void on_bookmarkHereButton_clicked();

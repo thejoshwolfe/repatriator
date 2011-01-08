@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditBookmarkDialog</class>
+ <widget class="QDialog" name="EditBookmarkDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>391</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Na&amp;me:</string>
+       </property>
+       <property name="buddy">
+        <cstring>nameLineEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameLineEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="formGroupBox">
+     <property name="title">
+      <string>Motor Locations:</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>&amp;A (Spin):</string>
+        </property>
+        <property name="buddy">
+         <cstring>motorLineEditA</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="motorLineEditA"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="hereButtonA">
+          <property name="text">
+           <string>Here</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ignoreButtonA">
+          <property name="text">
+           <string>Ignore</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>&amp;B (Tilt):</string>
+        </property>
+        <property name="buddy">
+         <cstring>motorLineEditB</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLineEdit" name="motorLineEditB"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="hereButtonB">
+          <property name="text">
+           <string>Here</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ignoreButtonB">
+          <property name="text">
+           <string>Ignore</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>&amp;X:</string>
+        </property>
+        <property name="buddy">
+         <cstring>motorLineEditX</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLineEdit" name="motorLineEditX"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="hereButtonX">
+          <property name="text">
+           <string>Here</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ignoreButtonX">
+          <property name="text">
+           <string>Ignore</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>&amp;Y:</string>
+        </property>
+        <property name="buddy">
+         <cstring>motorLineEditY</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLineEdit" name="motorLineEditY"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="hereButtonY">
+          <property name="text">
+           <string>Here</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ignoreButtonY">
+          <property name="text">
+           <string>Ignore</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>&amp;Z (Zoom):</string>
+        </property>
+        <property name="buddy">
+         <cstring>motorLineEditZ</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLineEdit" name="motorLineEditZ"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="hereButtonZ">
+          <property name="text">
+           <string>Here</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ignoreButtonZ">
+          <property name="text">
+           <string>Ignore</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="autoFocusGroup">
+     <property name="title">
+      <string>Auto &amp;Focus:</string>
+     </property>
+     <layout class="QVBoxLayout" name="autoFocusLayout">
+      <item>
+       <widget class="QRadioButton" name="autoFocusIgnoreRadio">
+        <property name="text">
+         <string>Ignore</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="autoFocusOnRadio">
+        <property name="text">
+         <string>On</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="autoFocusOffRadio">
+        <property name="text">
+         <string>Off</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>EditBookmarkDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>EditBookmarkDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
