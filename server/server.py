@@ -35,7 +35,6 @@ import traceback
 from functools import wraps
 
 # dependencies
-import pythoncom
 import edsdk
 import silverpak
 
@@ -148,7 +147,6 @@ class Server:
         """
         message is a ServerMessage which will be put on the outgoing message queue.
         """
-        debug("adding message to outgoing queue")
         with self._current_full_update_lock:
             if message.message_type == ServerMessage.FullUpdate:
                 self._current_full_update = message
@@ -167,7 +165,6 @@ invalid_ntfs_characters = set('\\/:*?"<>|' + "".join(chr(x) for x in range(0x20)
 def valid_filename(filename):
     return not any(c in invalid_ntfs_characters for c in filename)
 
-# message handlers are guaranteed to be run in the camera thread.
 def handle_MagicalRequest(msg):
     debug("got a magical request, sending a magical response")
     server.send_message(MagicalResponse())
@@ -236,7 +233,6 @@ def make_thread(target, name, args=[]):
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_TakePicture(msg):
-    global camera, user
     debug("Got take picture message")
 
     def unique_file(path, filename):
@@ -247,7 +243,8 @@ def handle_TakePicture(msg):
             if not os.path.exists(candidate):
                 return candidate
 
-    camera.takePicture(unique_file(user.picture_folder(), "img_{0}.jpg"))
+    if camera is not None:
+        camera.takePicture(unique_file(user.picture_folder(), "img_{0}.jpg"))
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_MotorMovement(msg):
@@ -379,7 +376,8 @@ def handle_ListUserRequest(msg):
 def handle_SetAutoFocusEnabled(msg):
     global auto_focus_enabled
     auto_focus_enabled = msg.value
-    maybe_trigger_auto_focus()
+    
+    maybe_auto_focus()
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_SetStaticBookmarks(msg):
@@ -393,10 +391,14 @@ def handle_SetUserBookmarks(msg):
 def motorStoppedMovingHandler(reason):
     if reason != silverpak.StoppedMovingReason.Normal:
         return
-    global need_to_auto_focus, camera_thread_queue
-    need_to_auto_focus = True
-    debug("a motor stopped moving. setting auto focus flag.")
-    camera_thread_queue.put(DummyAutoFocus())
+    
+    debug("a motor stopped moving.")
+    maybe_auto_focus()
+
+def maybe_auto_focus():
+    if auto_focus_enabled and camera is not None:
+        debug("camera.autoFocus()")
+        camera.autoFocus()
 
 def handle_Ping(msg):
     server.send_message(Pong(msg.ping_id))
@@ -418,26 +420,6 @@ message_handlers = {
     ClientMessage.Ping: handle_Ping,
     ClientMessage.SetStaticBookmarks: handle_SetStaticBookmarks,
     ClientMessage.SetUserBookmarks: handle_SetUserBookmarks,
-}
-
-need_camera_thread = {
-    ClientMessage.TakePicture: True,
-    ClientMessage.SetAutoFocusEnabled: True,
-
-    ClientMessage.MotorMovement: False,
-    ClientMessage.MagicalRequest: False,
-    ClientMessage.ConnectionRequest: False,
-    ClientMessage.DirectoryListingRequest: False,
-    ClientMessage.FileDownloadRequest: False,
-    ClientMessage.AddUser: False,
-    ClientMessage.UpdateUser: False,
-    ClientMessage.DeleteUser: False,
-    ClientMessage.FileDeleteRequest: False,
-    ClientMessage.ChangePasswordRequest: False,
-    ClientMessage.ListUserRequest: False,
-    ClientMessage.Ping: False,
-    ClientMessage.SetStaticBookmarks: False,
-    ClientMessage.SetUserBookmarks: False,
 }
 
 def init_state():
@@ -468,9 +450,6 @@ def init_state():
 
     global motor_is_initialized
     motor_is_initialized = {char: False for char in motor_chars}
-    
-    global camera_thread_queue
-    camera_thread_queue = queue.Queue()
 
     global message_queue
     message_queue = queue.Queue()
@@ -480,9 +459,6 @@ def init_state():
 
     global auto_focus_enabled
     auto_focus_enabled = True
-
-    global need_to_auto_focus
-    need_to_auto_focus = False
 
 
 def start_message_loop():
@@ -534,13 +510,7 @@ def run_message_loop():
         if msg.message_type == ClientMessage.DummyCloseConnection:
             return
 
-        # choose which thread to run the message handler in
-        if need_camera_thread[msg.message_type]:
-            # transfer to camera thread    
-            camera_thread_queue.put(msg)
-        else:
-            # handle directly
-            message_handlers[msg.message_type](msg)
+        message_handlers[msg.message_type](msg)
 
 def run_connection_monitor():
     global last_client_message_time
@@ -551,92 +521,66 @@ def run_connection_monitor():
     while not finished:
         now = time.time()
         if now - last_client_message_time > settings['CLIENT_IDLE_TIMEOUT'] / 1000:
-            warning("Haven't heard from the client in CLIENT_IDLE_TIMEOUT time. Killing connection.")
+            warning("Haven't heard from the client in {0} ms. Killing connection.".format(settings['CLIENT_IDLE_TIMEOUT']))
             finished = True
             graceful_shutdown()
             return
         time.sleep(1)
 
 def run_camera():
-    global camera, message_handlers, message_queue, finished
-
-    debug("running camera")
-
-    pythoncom.CoInitializeEx(2)
-
-    # try for 15 seconds to get the camera
+    # try for 10 seconds to get the camera
     fakeCameraImagePath = settings['FAKE_CAMERA_IMAGE_PATH']
-    global finished
     if fakeCameraImagePath != None:
-        debug("using fake camera")
+        debug("Using fake camera")
+        global camera
         camera = edsdk.getFakeCamera(fakeCameraImagePath)
     else:
-        debug("getting first camera")
-        for _ in range(15):
-            try:
-                camera = edsdk.getFirstCamera()
-                break
-            except edsdk.CppCamera.error:
-                debug("unable to get camera, waiting a second and trying again")
-                time.sleep(1)
-                if finished:
+        debug("Finding camera")
+        tries_left = 10
+        def found_camera(cam):
+            if cam is None:
+                # try again
+                nonlocal tries_left
+                tries_left -= 1
+                if tries_left >= 1:
+                    debug("Unable to find camera, waiting a second and trying again")
+                    time.sleep(1)
+                    edsdk.getFirstCamera(found_camera)
+                else:
+                    debug("Unable to find camera, giving up.")
                     return
-        else:
-            error("Unable to get camera.")
-            return
-
-    def takePictureCallback(pic_file):
-        # create a thumbnail
-        make_thumbnail(pic_file, pic_file+".thumb", 90)
-        # notify change
-        send_directory_list()
-    camera.setPictureCompleteCallback(takePictureCallback)
-
-    debug("starting live view")
-    camera.startLiveView()
-
-    next_frame = time.time()
-
-    debug("entering loop to send live view frames")
-    while not finished:
-        pythoncom.PumpWaitingMessages()
-
-        # if it's time, send a live view frame
-        now = time.time()
-        if now > next_frame:
-            if motors is None:
-                motor_positions = {char: 0 for char in motor_chars}
-                motor_states = {char: 0 for char in motor_chars}
             else:
-                motor_positions = {char: motor.position() for char, motor in motors.items()}
-                motor_states = {char: int(motor_is_initialized[char]) for char, motor in motors.items()}
-            server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
-            camera.grabLiveViewFrame()
-            next_frame = now + 0.20
+                global camera
+                camera = cam
 
-        # process messages that have to be run in camera thread
-        try:
-            msg = camera_thread_queue.get(block=False)
-            if msg.message_type == ClientMessage.DummyAutoFocus:
-                maybe_trigger_auto_focus()
-            else:
-                message_handlers[msg.message_type](msg)
-        except queue.Empty:
-            time.sleep(0.05)
-            continue
+                def takePictureCallback(pic_file):
+                    # create a thumbnail
+                    make_thumbnail(pic_file, pic_file+".thumb", 90)
+                    # notify change
+                    send_directory_list()
+                camera.setPictureCompleteCallback(takePictureCallback)
 
-    # shut down the camera
-    del camera
-    camera = None
-    edsdk.terminate()
+                debug("camera.startLiveView()")
+                camera.startLiveView()
+                camera.grabLiveViewFrame()
 
-def maybe_trigger_auto_focus():
-    global need_to_auto_focus
-    if not (auto_focus_enabled and need_to_auto_focus):
-        return
-    debug("Telling camera to auto focus")
-    camera.autoFocus()
-    need_to_auto_focus = False
+                debug("entering loop to send live view frames")
+                global finished
+                while not finished:
+                    if motors is None:
+                        motor_positions = {char: 0 for char in motor_chars}
+                        motor_states = {char: 0 for char in motor_chars}
+                    else:
+                        motor_positions = {char: motor.position() for char, motor in motors.items()}
+                        motor_states = {char: int(motor_is_initialized[char]) for char, motor in motors.items()}
+                    server.send_message(FullUpdate(camera.liveViewMemoryView(), motor_positions, motor_states))
+                    camera.grabLiveViewFrame()
+                    time.sleep(0.20)
+
+                # shut down the camera
+                camera.disconnect()
+                camera = None
+                edsdk.terminate()
 
 def on_connection_open():
     debug("connection opening")
@@ -645,8 +589,6 @@ def on_connection_open():
     init_monitor_thread()
 
 def on_connection_close():
-    global finished, camera_thread, server_thread, ping_thread
-
     debug("connection closing")
 
     # send motors home
@@ -659,6 +601,7 @@ def on_connection_close():
                 move_motor(motor, end_position)
 
     # clean up
+    global finished
     finished = True
 
     if camera_thread is not None:
@@ -713,13 +656,13 @@ def init_monitor_thread():
 def initialize_hardware():
     set_power_switch(on=True)
 
-    global camera_thread
-    camera_thread = make_thread(run_camera, "camera")
-    camera_thread.start()
-
     global motors_thread
     motors_thread = make_thread(run_motors, "motors")
     motors_thread.start()
+
+    global camera_thread
+    camera_thread = make_thread(run_camera, "camera")
+    camera_thread.start()
 
 def run_motors():
     def create_motor(char):
