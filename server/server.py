@@ -408,14 +408,13 @@ def handle_Ping(msg):
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_ChangeFocusLocation(msg):
-    debug("new focus floats: {0}, {1}".format(msg.focus_x, msg.focus_y))
-    w, h = camera.maxZoomPosition()
-    debug("max zoom position: {0}, {1}".format(w, h))
-    x, y = (int(msg.focus_x * w), int(msg.focus_y * h))
-    debug("Setting zoom position to {0}, {1}".format(x,y))
-    camera.setZoomPosition(x, y)
-    if auto_focus_enabled:
-        camera.autoFocus()
+    if camera is not None:
+        w, h = camera.maxZoomPosition()
+        x, y = (int(msg.focus_x * w), int(msg.focus_y * h))
+        debug("Setting zoom position to {0}, {1}".format(x,y))
+        camera.setZoomPosition(x, y)
+        if auto_focus_enabled:
+            camera.autoFocus()
 
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,

@@ -18,6 +18,7 @@ public slots:
     void prepareDisplayImage(QImage image);
     void clear();
     void setFocusPoint(QPointF point);
+    QPointF focusPoint() const { return m_focusPoint; }
 
 signals:
     void focusPointChanged(QPointF point);
@@ -25,6 +26,7 @@ signals:
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
+    void mousePressEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent * e);
     void mouseReleaseEvent(QMouseEvent * e);
 
@@ -32,6 +34,7 @@ private:
     QPixmap m_currentFrame;
     QMutex m_videoMutex;
     QPointF m_focusPoint; // percent
+    QSize m_focusSize;
 
 private:
     void scaleCurrentFrame();

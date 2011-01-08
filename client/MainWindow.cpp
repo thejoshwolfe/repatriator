@@ -420,6 +420,7 @@ void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bou
     blockSliderSignals(false);
 
     goToBookmark(home_location);
+    sendFocusPoint(ui->displayWidget->focusPoint());
 }
 
 void MainWindow::goToBookmark(ServerTypes::Bookmark bookmark)
