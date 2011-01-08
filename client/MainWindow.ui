@@ -79,6 +79,9 @@
      </item>
      <item>
       <widget class="ShadowMinimap" name="shadowMinimap" native="true">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -104,6 +107,9 @@
        </item>
        <item row="0" column="1">
         <widget class="ShadowSlider" name="liftSliderZ">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -127,6 +133,9 @@
        </item>
        <item row="1" column="1">
         <widget class="ShadowSlider" name="orbitSliderB">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -144,6 +153,9 @@
        </item>
        <item row="2" column="1">
         <widget class="ShadowSlider" name="orbitSliderA">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>

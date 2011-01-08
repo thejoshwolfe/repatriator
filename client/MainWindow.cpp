@@ -456,6 +456,8 @@ bool MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
 
 void MainWindow::setLocations(QList<ServerTypes::Bookmark> bookmarks)
 {
+    foreach (QObject * child, ui->locationsLayout->children())
+        delete child;
     m_static_bookmarks = bookmarks;
     for (int i = 0; i < bookmarks.size(); i++) {
         ServerTypes::Bookmark bookmark = bookmarks.at(i);
