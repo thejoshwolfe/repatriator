@@ -233,6 +233,8 @@ def make_thread(target, name, args=[]):
             error("Fatal exception, killing myself:\n" + traceback.format_exc())
             os._exit(0)
     return threading.Thread(target=exception_catcher, name=name)
+silverpak.make_thread = make_thread
+edsdk.make_thread = make_thread
 
 @must_have_privilege(Privilege.OperateHardware)
 def handle_TakePicture(msg):
