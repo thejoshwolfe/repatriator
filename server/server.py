@@ -424,6 +424,9 @@ message_handlers = {
 
 def init_state():
     # initialize variables
+    global camera
+    camera = None
+
     global finished
     finished = False
 
@@ -581,6 +584,7 @@ def run_camera():
                 camera.disconnect()
                 camera = None
                 edsdk.terminate()
+        edsdk.getFirstCamera(found_camera)
 
 def on_connection_open():
     debug("connection opening")
