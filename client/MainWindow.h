@@ -57,7 +57,7 @@ private:
     QHash<QString, ServerTypes::DirectoryItem> m_file_info;
 
     QList<ServerTypes::Bookmark> m_static_bookmarks;
-    QHash<QString, ServerTypes::Bookmark> m_user_bookmarks;
+    QList<ServerTypes::Bookmark> m_user_bookmarks;
 
     static const float c_lowest_sensitivity;
     QVector<float> m_sensitivities;
@@ -75,6 +75,7 @@ private:
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
     void setLocations(QList<ServerTypes::Bookmark> bookmarks);
     void setBookmarks(QList<ServerTypes::Bookmark> bookmarks);
+    void refreshBookmarks();
     ServerTypes::Bookmark get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks);
     bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
     void blockSliderSignals(bool value);
@@ -86,7 +87,8 @@ private:
     void enableBookmarkButtons();
 
 private slots:
-    void on_bookmarksList_currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+    void on_bookmarksList_itemSelectionChanged();
+    void on_bookmarkHereButton_clicked();
     void on_sensitivitySlider_valueChanged(int value);
     void on_goToBookmarkButton_clicked();
     void on_autoFocusEnabledCheckBox_clicked(bool checked);

@@ -487,11 +487,17 @@ void MainWindow::location_button_clicked()
 void MainWindow::setBookmarks(QList<ServerTypes::Bookmark> bookmarks)
 {
     m_user_bookmarks.clear();
+    foreach (ServerTypes::Bookmark bookmark, bookmarks)
+        m_user_bookmarks.append(bookmark);
+
+    refreshBookmarks();
+}
+void MainWindow::refreshBookmarks()
+{
     ui->bookmarksList->clear();
-    foreach (ServerTypes::Bookmark bookmark, bookmarks) {
-        m_user_bookmarks.insert(bookmark.name, bookmark);
+    foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
         ui->bookmarksList->addItem(bookmark.name);
-    }
+
     enableBookmarkButtons();
 }
 
@@ -567,17 +573,17 @@ void MainWindow::on_goToBookmarkButton_clicked()
     ServerTypes::Bookmark bookmark = selected_bookmark();
     if (bookmark.name.isEmpty())
         return;
+    goToBookmark(bookmark);
 }
 
 ServerTypes::Bookmark MainWindow::selected_bookmark()
 {
     if (ui->bookmarksList->selectedItems().isEmpty())
         return ServerTypes::Bookmark();
-    QString name = ui->bookmarksList->selectedItems().at(0)->text();
-    return m_user_bookmarks[name];
+    return m_user_bookmarks.at(ui->bookmarksList->row(ui->bookmarksList->selectedItems().first()));
 }
 
-void MainWindow::on_bookmarksList_currentItemChanged(QListWidgetItem*, QListWidgetItem*)
+void MainWindow::on_bookmarksList_itemSelectionChanged()
 {
     enableBookmarkButtons();
 }
@@ -590,3 +596,31 @@ void MainWindow::enableBookmarkButtons()
     ui->editBookmarkButton->setEnabled(any_selection);
     ui->deleteBookmarkButton->setEnabled(any_selection);
 }
+
+void MainWindow::on_bookmarkHereButton_clicked()
+{
+    ServerTypes::Bookmark new_bookmark;
+
+    // determin a name for the new bookmark
+    QSet<QString> existing_names;
+    foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
+        existing_names.insert(bookmark.name);
+    for (int number = 1; ; number++) {
+        QString name = tr("Bookmark ") + QString::number(number);
+        if (existing_names.contains(name))
+            continue;
+        new_bookmark.name = name;
+        break;
+    }
+    new_bookmark.motor_positions.append(ui->orbitSliderA->value());
+    new_bookmark.motor_positions.append(ui->orbitSliderB->value());
+    new_bookmark.motor_positions.append(ui->shadowMinimap->position().x());
+    new_bookmark.motor_positions.append(ui->shadowMinimap->position().y());
+    new_bookmark.motor_positions.append(ui->liftSliderZ->value());
+    new_bookmark.auto_focus = ServerTypes::NotSpecified;
+
+    m_user_bookmarks.append(new_bookmark);
+
+    refreshBookmarks();
+}
+
