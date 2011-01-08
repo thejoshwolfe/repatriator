@@ -375,6 +375,10 @@ def handle_ListUserRequest(msg):
 def handle_SetAutoFocusEnabled(msg):
     global auto_focus_enabled
     auto_focus_enabled = msg.value
+    if auto_focus_enabled:
+        camera.setAFMode(edsdk.AFMode.OneShotAF)
+    else:
+        camera.setAFMode(edsdk.AFMode.ManualFocus)
     
     maybe_auto_focus()
 
@@ -567,6 +571,8 @@ def run_init_camera():
                     send_directory_list()
                 camera.setPictureCompleteCallback(takePictureCallback)
 
+                camera.setMeteringMode(edsdk.MeteringMode.SpotMetering)
+                camera.setDriveMode(edsdk.DriveMode.SingleFrameShooting)
 
                 global live_view_thread
                 live_view_thread = make_thread(run_live_view_thread, "live_view")
