@@ -188,7 +188,9 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
             refreshLocations(false);
 
             m_user_bookmarks = init_info_msg->user_bookmarks;
-            refreshBookmarks(false);
+            ui->bookmarksList->clear();
+            foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
+                ui->bookmarksList->addItem(bookmark.name);
 
             ServerTypes::Bookmark home_location = get_home_location_from_bookmarks(init_info_msg->static_bookmarks);
             changeMotorBounds(init_info_msg->motor_boundaries, home_location);
@@ -491,16 +493,10 @@ void MainWindow::location_button_clicked()
     ServerTypes::Bookmark bookmark = m_static_bookmarks.at(one_based_index - 1);
     goToBookmark(bookmark);
 }
-void MainWindow::refreshBookmarks(bool save)
+
+void MainWindow::saveBookmarks()
 {
-    ui->bookmarksList->clear();
-    foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
-        ui->bookmarksList->addItem(bookmark.name);
-
-    enableBookmarkButtons();
-
-    if (save)
-        m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetUserBookmarksMessage(m_user_bookmarks)));
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetUserBookmarksMessage(m_user_bookmarks)));
 }
 
 ServerTypes::Bookmark MainWindow::get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks)
@@ -572,17 +568,17 @@ void MainWindow::updateControlSensitivities()
 
 void MainWindow::on_goToBookmarkButton_clicked()
 {
-    ServerTypes::Bookmark bookmark = selected_bookmark();
-    if (bookmark.name.isEmpty())
+    int index = selectedBookmarkIndex();
+    if (index == -1)
         return;
-    goToBookmark(bookmark);
+    goToBookmark(m_user_bookmarks[index]);
 }
 
-ServerTypes::Bookmark MainWindow::selected_bookmark()
+int MainWindow::selectedBookmarkIndex()
 {
     if (ui->bookmarksList->selectedItems().isEmpty())
-        return ServerTypes::Bookmark();
-    return m_user_bookmarks.at(ui->bookmarksList->row(ui->bookmarksList->selectedItems().first()));
+        return -1;
+    return ui->bookmarksList->row(ui->bookmarksList->selectedItems().first());
 }
 
 void MainWindow::on_bookmarksList_itemSelectionChanged()
@@ -592,8 +588,8 @@ void MainWindow::on_bookmarksList_itemSelectionChanged()
 
 void MainWindow::enableBookmarkButtons()
 {
-    QString selected_name = selected_bookmark().name;
-    bool any_selection = !selected_name.isEmpty();
+    int index = selectedBookmarkIndex();
+    bool any_selection = index != -1;
     ui->goToBookmarkButton->setEnabled(any_selection);
     ui->editBookmarkButton->setEnabled(any_selection);
     ui->deleteBookmarkButton->setEnabled(any_selection);
@@ -622,7 +618,19 @@ void MainWindow::on_bookmarkHereButton_clicked()
     new_bookmark.auto_focus = ServerTypes::NotSpecified;
 
     m_user_bookmarks.append(new_bookmark);
+    ui->bookmarksList->addItem(new_bookmark.name);
 
-    refreshBookmarks(true);
+    saveBookmarks();
 }
 
+void MainWindow::on_deleteBookmarkButton_clicked()
+{
+    int index = selectedBookmarkIndex();
+    if (index == -1)
+        return;
+
+    m_user_bookmarks.removeAt(index);
+    delete ui->bookmarksList->item(index);
+
+    saveBookmarks();
+}

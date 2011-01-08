@@ -74,7 +74,7 @@ private:
     void sendTargetMotorPositions();
     void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
     void refreshLocations(bool save);
-    void refreshBookmarks(bool save);
+    void saveBookmarks();
     ServerTypes::Bookmark get_home_location_from_bookmarks(QList<ServerTypes::Bookmark> bookmarks);
     bool maybeSetSlider(ShadowSlider * slider, qint64 motor_position);
     void blockSliderSignals(bool value);
@@ -82,10 +82,11 @@ private:
     QString getNextDownloadFilename();
     void requestDownloadFile(QString remote_filename);
     void updateControlSensitivities();
-    ServerTypes::Bookmark selected_bookmark();
+    int selectedBookmarkIndex();
     void enableBookmarkButtons();
 
 private slots:
+    void on_deleteBookmarkButton_clicked();
     void on_bookmarksList_itemSelectionChanged();
     void on_bookmarkHereButton_clicked();
     void on_sensitivitySlider_valueChanged(int value);
