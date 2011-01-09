@@ -118,8 +118,8 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
 
     this->show();
 
-    this->restoreGeometry(Settings::main_window_geometry);
     this->restoreState(Settings::main_window_state);
+    this->restoreGeometry(Settings::main_window_geometry);
     ui->controlsDock->restoreGeometry(Settings::dock_controls_geometry);
     ui->filesDock->restoreGeometry(Settings::dock_files_geometry);
     ui->bookmarksDock->restoreGeometry(Settings::dock_bookmarks_geometry);

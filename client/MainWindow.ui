@@ -35,7 +35,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>C&amp;ontrols</string>
+    <string>Controls</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -202,7 +202,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>&amp;Downloadable Pictures</string>
+    <string>Downloadable Pictures</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -234,7 +234,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -275,7 +275,7 @@
   </widget>
   <widget class="QDockWidget" name="bookmarksDock">
    <property name="windowTitle">
-    <string>&amp;Bookmarks</string>
+    <string>Bookmarks</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -333,7 +333,7 @@
   </widget>
   <widget class="QDockWidget" name="locationsDock">
    <property name="windowTitle">
-    <string>&amp;Locations</string>
+    <string>Locations</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
