@@ -9,6 +9,12 @@ EditUserAccountWindow::EditUserAccountWindow(QWidget *parent) :
     m_account()
 {
     ui->setupUi(this);
+
+    bool success;
+    success = connect(this, SIGNAL(accepted()), this, SLOT(handleAccepted()));
+    Q_ASSERT(success);
+    success = connect(this, SIGNAL(rejected()), this, SLOT(handleRejected()));
+    Q_ASSERT(success);
 }
 
 EditUserAccountWindow::~EditUserAccountWindow()
@@ -64,14 +70,14 @@ void EditUserAccountWindow::showEditUser(QSharedPointer<UserAccount> account)
     this->exec();
 }
 
-void EditUserAccountWindow::on_buttonBox_accepted()
+void EditUserAccountWindow::handleAccepted()
 {
     m_account.data()->username = ui->usernameLineEdit->text();
     m_account.data()->password = ui->passwordLineEdit->text();
     m_account.data()->is_admin = ui->adminCheckBox->isChecked();
 }
 
-void EditUserAccountWindow::on_buttonBox_rejected()
+void EditUserAccountWindow::handleRejected()
 {
     m_account.clear();
     Q_ASSERT(m_account.isNull());

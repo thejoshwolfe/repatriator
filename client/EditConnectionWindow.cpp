@@ -95,21 +95,10 @@ void EditConnectionWindow::enableCorrectControls()
     ui->passwordLineEdit->setEnabled(ui->savePasswordCheckBox->isChecked());
     ui->passwordLabel->setEnabled(ui->savePasswordCheckBox->isChecked());
 }
-
-void EditConnectionWindow::on_buttonBox_accepted()
-{
-    handleAccepted();
-}
-
 void EditConnectionWindow::handleAccepted()
 {
     updateConnectionWithControls();
     m_accepted = true;
-}
-
-void EditConnectionWindow::on_buttonBox_rejected()
-{
-    handleRejected();
 }
 
 void EditConnectionWindow::handleRejected()
@@ -124,6 +113,8 @@ void EditConnectionWindow::updateConnectionWithControls()
     m_connection->username = ui->usernameLineEdit->text();
     if (ui->savePasswordCheckBox->isChecked() && ui->passwordLineEdit->text() != c_static_password)
         m_connection->password = ui->passwordLineEdit->text();
+    else
+        m_connection->password = QString();
 }
 
 void EditConnectionWindow::on_savePasswordCheckBox_toggled(bool checked)

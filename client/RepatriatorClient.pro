@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     ShadowSlider.cpp \
     Rotate3DWidget.cpp \
     ImageDisplayWidget.cpp \
-    EditBookmarkDialog.cpp
+    EditBookmarkDialog.cpp \
+    ChangePasswordDialog.cpp
 HEADERS += MainWindow.h \
     ConnectionSettings.h \
     IncomingMessage.h \
@@ -45,13 +46,15 @@ HEADERS += MainWindow.h \
     ShadowSlider.h \
     Rotate3DWidget.h \
     ImageDisplayWidget.h \
-    EditBookmarkDialog.h
+    EditBookmarkDialog.h \
+    ChangePasswordDialog.h
 FORMS += MainWindow.ui \
     ConnectionWindow.ui \
     AdminWindow.ui \
     EditConnectionWindow.ui \
     EditUserAccountWindow.ui \
     PasswordInputWindow.ui \
-    EditBookmarkDialog.ui
+    EditBookmarkDialog.ui \
+    ChangePasswordDialog.ui
 RESOURCES += repatriator.qrc
 RC_FILE = repatriator.rc

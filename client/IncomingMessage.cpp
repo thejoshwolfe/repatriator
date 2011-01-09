@@ -92,7 +92,10 @@ void FileDownloadResultMessage::parse(QDataStream &stream)
 
 void ErrorMessage::parse(QDataStream &stream)
 {
-    stream >> number;
+    qint32 n;
+    stream >> n;
+    number = (ErrorType) n;
+
     message = readString(stream);
 }
 

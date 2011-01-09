@@ -261,6 +261,7 @@
      <string>&amp;Settings</string>
     </property>
     <addaction name="actionChangeDownloadFolder"/>
+    <addaction name="actionChangePassword"/>
    </widget>
    <widget class="QMenu" name="viewMenu">
     <property name="title">
@@ -423,6 +424,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionChangePassword">
+   <property name="text">
+    <string>Change &amp;Password...</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the password you use to log in to this server</string>
    </property>
   </action>
  </widget>

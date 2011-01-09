@@ -94,8 +94,19 @@ public:
 class ErrorMessage : public IncomingMessage
 {
 public:
+    enum ErrorType {
+        NotAuthorized = 0,
+        HardwareInUse = 1,
+        FileDoesNotExist = 2,
+        UserAlreadyExists = 3,
+        UserDoesNotExist = 4,
+        OverwritingOtherUser = 5,
+        InvalidFilename = 6,
+        BadPassword = 7,
+    };
+
     QString message;
-    int number;
+    ErrorType number;
 
     virtual void parse(QDataStream & stream);
 };

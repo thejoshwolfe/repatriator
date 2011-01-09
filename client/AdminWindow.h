@@ -76,8 +76,6 @@ private slots:
     void on_deleteButton_clicked();
     void on_usersList_itemSelectionChanged();
     void on_changePasswordButton_clicked();
-    void on_buttonBox_accepted();
-    void on_buttonBox_rejected();
 
     void handleAccepted();
     void handleRejected();

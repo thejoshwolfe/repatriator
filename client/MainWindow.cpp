@@ -4,6 +4,7 @@
 #include "ConnectionWindow.h"
 #include "Settings.h"
 #include "EditBookmarkDialog.h"
+#include "ChangePasswordDialog.h"
 
 #include <QFile>
 #include <QDir>
@@ -106,8 +107,6 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
     Q_ASSERT(success);
     success = connect(m_server.data(), SIGNAL(messageReceived(QSharedPointer<IncomingMessage>)), this, SLOT(processMessage(QSharedPointer<IncomingMessage>)));
     Q_ASSERT(success);
-    success = connect(m_server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
-    Q_ASSERT(success);
     success = connect(m_server.data(), SIGNAL(progress(qint64,qint64,IncomingMessage*)), this, SLOT(showProgress(qint64,qint64,IncomingMessage*)));
     Q_ASSERT(success);
     success = connect(m_server.data(), SIGNAL(pingComputed(int)), this, SLOT(showPing(int)));
@@ -129,6 +128,10 @@ void MainWindow::showWithConnection(ConnectionSettings *connection)
 
 void MainWindow::connected()
 {
+    bool success;
+    success = connect(m_server.data(), SIGNAL(socketDisconnected()), this, SLOT(connectionEnded()));
+    Q_ASSERT(success);
+
     m_connector.clear();
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DirectoryListingRequestMessage()));
 
@@ -172,7 +175,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         case IncomingMessage::ErrorMessage:
         {
             ErrorMessage * err_msg = (ErrorMessage *) msg.data();
-            qDebug() << "Error message: " << err_msg->message;
+            handleErrorMessage(err_msg->number, err_msg->message);
             break;
         }
         case IncomingMessage::DirectoryListingResult:
@@ -206,6 +209,18 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         default:
             qDebug() << "wtf got a message " << msg.data()->type;
             Q_ASSERT(false);
+    }
+}
+
+void MainWindow::handleErrorMessage(ErrorMessage::ErrorType type, QString msg)
+{
+    qDebug() << "Incoming error message:" << type << ":" << msg;
+    switch (type) {
+    case ErrorMessage::BadPassword:
+        QMessageBox::warning(this, tr("Invalid Password"), tr("The password you used was invalid."), QMessageBox::Ok);
+        break;
+    default:
+        break;
     }
 }
 
@@ -670,4 +685,12 @@ ServerTypes::Bookmark MainWindow::here()
     bookmark.auto_focus = ServerTypes::NotSpecified;
 
     return bookmark;
+}
+
+void MainWindow::on_actionChangePassword_triggered()
+{
+    ChangePasswordDialog::Result result = ChangePasswordDialog::instance()->showChangePassword();
+    if (! result.accepted)
+        return;
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ChangePasswordRequestMessage(result.old_password, result.new_password)));
 }

@@ -324,10 +324,10 @@ def handle_ChangePasswordRequest(msg):
         user.change_password(msg.old_password, msg.new_password)
         user.save()
     except admin.BadPassword:
-        warning("user {0} tried to change password with invalid old password, sending error message".format(msg.username))
+        warning("user {0} tried to change password with invalid old password, sending error message".format(user.username))
         server.send_message(ErrorMessage(ErrorMessage.BadPassword))
         return
-    debug("changed password for user {0}".format(msg.username))
+    debug("changed password for user {0}".format(user.username))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_AddUser(msg):

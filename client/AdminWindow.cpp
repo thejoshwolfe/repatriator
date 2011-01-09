@@ -90,11 +90,6 @@ void AdminWindow::updateUserList(QList<ServerTypes::UserInfo> users)
     enableCorrectControls();
 }
 
-void AdminWindow::on_buttonBox_rejected()
-{
-    handleRejected();
-}
-
 void AdminWindow::handleRejected()
 {
     cleanup();
@@ -120,11 +115,6 @@ void AdminWindow::connectionEnded()
 void AdminWindow::cleanup()
 {
     m_server.clear();
-}
-
-void AdminWindow::on_buttonBox_accepted()
-{
-    handleAccepted();
 }
 
 void AdminWindow::handleAccepted()

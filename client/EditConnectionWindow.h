@@ -52,8 +52,6 @@ private:
 
 private slots:
     void on_savePasswordCheckBox_toggled(bool checked);
-    void on_buttonBox_rejected();
-    void on_buttonBox_accepted();
 
     void delegateFocusEvent(QWidget * from, QWidget * to);
     void passwordLineEdit_gotFocus();

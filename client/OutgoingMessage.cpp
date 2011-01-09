@@ -1,5 +1,7 @@
 #include "OutgoingMessage.h"
 
+#include <QDebug>
+
 const qint8 MagicalRequestMessage::c_magical_data[] = { 0xd1, 0xb6, 0xd7, 0x92, 0x8a, 0xc5, 0x51, 0xa4 };
 
 void OutgoingMessage::writeToStream(QDataStream &stream)
@@ -68,6 +70,7 @@ void FileDeleteRequestMessage::writeMessageBody(QDataStream &stream)
 
 void ChangePasswordRequestMessage::writeMessageBody(QDataStream &stream)
 {
+    qDebug() << "writing change password message";
     writeString(stream, old_password);
     writeString(stream, new_password);
 }

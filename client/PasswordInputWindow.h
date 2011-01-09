@@ -27,9 +27,6 @@ private:
     QString m_return_password;
 
 private slots:
-    void on_buttonBox_rejected();
-    void on_buttonBox_accepted();
-
     void handleRejected();
     void handleAccepted();
 };

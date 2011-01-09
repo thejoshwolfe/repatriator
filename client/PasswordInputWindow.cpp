@@ -55,19 +55,9 @@ QString PasswordInputWindow::showGetPassword(QString dialog_title, QString ok_te
     return m_return_password;
 }
 
-void PasswordInputWindow::on_buttonBox_accepted()
-{
-    handleAccepted();
-}
-
 void PasswordInputWindow::handleAccepted()
 {
     m_return_password = ui->passwordLineEdit->text();
-}
-
-void PasswordInputWindow::on_buttonBox_rejected()
-{
-    handleRejected();
 }
 
 void PasswordInputWindow::handleRejected()

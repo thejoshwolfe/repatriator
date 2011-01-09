@@ -85,9 +85,11 @@ private:
     int selectedBookmarkIndex();
     void enableBookmarkButtons();
     ServerTypes::Bookmark here();
+    void handleErrorMessage(ErrorMessage::ErrorType type, QString msg);
 
 
 private slots:
+    void on_actionChangePassword_triggered();
     void on_editBookmarkButton_clicked();
     void on_deleteBookmarkButton_clicked();
     void on_bookmarksList_itemSelectionChanged();

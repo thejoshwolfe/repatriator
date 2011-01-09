@@ -37,8 +37,8 @@ private:
     QSharedPointer<UserAccount> m_account;
 
 private slots:
-    void on_buttonBox_rejected();
-    void on_buttonBox_accepted();
+    void handleRejected();
+    void handleAccepted();
 };
 
 #endif // EDITUSERACCOUNTWINDOW_H
