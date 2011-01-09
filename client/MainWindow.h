@@ -68,7 +68,7 @@ private:
     void cleanup();
     void enableCorrectControls();
     void updateDirectoryList(QList<ServerTypes::DirectoryItem> items);
-    void updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions);
+    void updateMotorPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions);
     void saveFile(QByteArray blob, QString remote_filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();

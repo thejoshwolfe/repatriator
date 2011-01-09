@@ -47,7 +47,23 @@ void ImageDisplayWidget::paintEvent(QPaintEvent *)
         painter.drawPixmap(m_frameDrawLocation, m_currentFrame);
     m_videoMutex.unlock();
 
-    if (! frame_null) {
+    if (frame_null) {
+        // text explaining why there is no image
+        painter.setPen(QPen(Qt::white, 1));
+        painter.drawText(widgetSize, tr("Remote camera is initializing..."), QTextOption(Qt::AlignCenter));
+    } else {
+        // small crosshair in the center
+        const int cross_radius = 4;
+        int center_y = widgetSize.height() / 2;
+        int center_x = widgetSize.width() / 2;
+        painter.setPen(QPen(Qt::darkGray, 3));
+        painter.drawLine(center_x - cross_radius, center_y, center_x + cross_radius, center_y);
+        painter.drawLine(center_x, center_y - cross_radius, center_x, center_y + cross_radius);
+        painter.setPen(QPen(Qt::lightGray, 1));
+        painter.drawLine(center_x - cross_radius, center_y, center_x + cross_radius, center_y);
+        painter.drawLine(center_x, center_y - cross_radius, center_x, center_y + cross_radius);
+
+        // focus rectangle
         QRect focus_rect(m_focusPoint.x()*widgetSize.width()-m_focusSize.width()/2,
                          m_focusPoint.y()*widgetSize.height()-m_focusSize.height()/2,
                          m_focusSize.width(), m_focusSize.height());

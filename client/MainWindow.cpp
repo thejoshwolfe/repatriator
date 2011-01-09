@@ -171,7 +171,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
         {
             FullUpdateMessage * full_update_msg = (FullUpdateMessage *) msg.data();
             ui->displayWidget->prepareDisplayImage(full_update_msg->image);
-            updateShadowPositions(full_update_msg->motor_states, full_update_msg->motor_positions);
+            updateMotorPositions(full_update_msg->motor_states, full_update_msg->motor_positions);
             break;
         }
         case IncomingMessage::ErrorMessage:
@@ -236,7 +236,7 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
     enableCorrectControls();
 }
 
-void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions)
+void MainWindow::updateMotorPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions)
 {
     m_motor_states = motor_states;
     ui->orbitSliderA->setShadowPosition((int)motor_positions.at(0));
@@ -245,6 +245,7 @@ void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint
 
     ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
 
+    enableCorrectControls();
 }
 
 void MainWindow::saveFile(QByteArray blob, QString remote_filename)
@@ -505,6 +506,8 @@ void MainWindow::refreshLocations(bool save)
         Q_ASSERT(success);
         ui->locationsLayout->addWidget(location_button);
     }
+
+    enableCorrectControls();
 
     if (save)
         m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetStaticBookmarksMessage(m_static_bookmarks)));
