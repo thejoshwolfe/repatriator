@@ -24,6 +24,8 @@ public:
     static QByteArray dock_bookmarks_geometry;
     static QByteArray dock_locations_geometry;
 
+    static QString download_directory;
+
     // read the settings on disk into this class
     static void load();
 

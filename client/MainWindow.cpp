@@ -246,7 +246,7 @@ void MainWindow::saveFile(QByteArray blob, QString remote_filename)
         m_progressDialog->reset();
     }
 
-    QDir downloadDir(m_connection_settings->download_directory);
+    QDir downloadDir(Settings::download_directory);
     if (! downloadDir.exists())
         return;
     QString local_filename = getNextDownloadFilename();
@@ -307,22 +307,22 @@ void MainWindow::on_actionTakeSnapshot_triggered()
 
 void MainWindow::on_actionChangeDownloadFolder_triggered()
 {
-    QString result = QFileDialog::getExistingDirectory(this, QString(), m_connection_settings->download_directory);
+    QString result = QFileDialog::getExistingDirectory(this, QString(), Settings::download_directory);
     if (result.isEmpty())
         return;
-    m_connection_settings->download_directory = result;
+    Settings::download_directory = result;
     Settings::save();
 }
 
 bool MainWindow::checkDownloadDirectory()
 {
     // make sure we have a download dir
-    if (! m_connection_settings->download_directory.isEmpty())
+    if (! Settings::download_directory.isEmpty())
         return true;
     QString result = QFileDialog::getExistingDirectory(this);
     if (result.isEmpty())
         return false;
-    m_connection_settings->download_directory = result;
+    Settings::download_directory = result;
     Settings::save();
     return true;
 }
@@ -535,7 +535,7 @@ void MainWindow::closeEvent(QCloseEvent *)
 QString MainWindow::getNextDownloadFilename()
 {
     forever {
-        QDir folder(m_connection_settings->download_directory);
+        QDir folder(Settings::download_directory);
         QString filename = folder.absoluteFilePath(QString("img_") + QString::number(m_next_download_number) + QString(".jpg"));
         if (! QFileInfo(filename).exists())
             return filename;

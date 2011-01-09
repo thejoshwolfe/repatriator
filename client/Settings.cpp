@@ -16,6 +16,8 @@ QByteArray Settings::dock_files_geometry;
 QByteArray Settings::dock_bookmarks_geometry;
 QByteArray Settings::dock_locations_geometry;
 
+QString Settings::download_directory;
+
 void Settings::load()
 {
     initialize();
@@ -46,11 +48,15 @@ void Settings::load()
     dock_controls_geometry = settings->value("windows/geometry/dock_controls").toByteArray();
     dock_files_geometry = settings->value("windows/geometry/dock_files").toByteArray();
     dock_locations_geometry = settings->value("windows/geometry/dock_locations").toByteArray();
+
+    download_directory = settings->value("general/download_directory").toString();
 }
 
 void Settings::save()
 {
     initialize();
+
+    settings->setValue("general/download_directory", download_directory);
 
     settings->setValue("windows/geometry/dock_bookmarks", dock_bookmarks_geometry);
     settings->setValue("windows/geometry/dock_controls", dock_controls_geometry);
