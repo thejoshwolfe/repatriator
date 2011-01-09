@@ -324,10 +324,10 @@ def handle_ChangePasswordRequest(msg):
         user.change_password(msg.old_password, msg.new_password)
         user.save()
     except admin.BadPassword:
-        warning("user {0} tried to change password with invalid old password, sending error message".format(user.username))
+        warning("user {0} tried to change password with invalid old password, sending error message".format(msg.username))
         server.send_message(ErrorMessage(ErrorMessage.BadPassword))
         return
-    debug("changed password for user {0}".format(user.username))
+    debug("changed password for user {0}".format(msg.username))
 
 @must_have_privilege(Privilege.ManageUsers)
 def handle_AddUser(msg):
@@ -375,10 +375,6 @@ def handle_ListUserRequest(msg):
 def handle_SetAutoFocusEnabled(msg):
     global auto_focus_enabled
     auto_focus_enabled = msg.value
-    if auto_focus_enabled:
-        camera.setAFMode(edsdk.AFMode.OneShotAF)
-    else:
-        camera.setAFMode(edsdk.AFMode.ManualFocus)
     
     maybe_auto_focus()
 
@@ -583,6 +579,7 @@ def run_init_camera():
                 camera.setPictureCompleteCallback(takePictureCallback)
 
                 camera.setMeteringMode(edsdk.MeteringMode.SpotMetering)
+                camera.setAFMode(edsdk.AFMode.ManualFocus)
                 camera.setDriveMode(edsdk.DriveMode.SingleFrameShooting)
 
                 global live_view_thread
