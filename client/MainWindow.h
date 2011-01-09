@@ -43,7 +43,6 @@ private:
 
     QString m_quit_after_this_file;
 
-
     int m_next_download_number;
     // set this to true if we are expecting the server to close the connection
     bool m_quit_after_close;
@@ -63,11 +62,12 @@ private:
     QVector<float> m_sensitivities;
     float m_current_sensitivity;
 
+    QVector<qint8> m_motor_states;
+
 private:
     void cleanup();
     void enableCorrectControls();
     void updateDirectoryList(QList<ServerTypes::DirectoryItem> items);
-    void updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position);
     void updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions);
     void saveFile(QByteArray blob, QString remote_filename);
     bool checkDownloadDirectory();
@@ -83,7 +83,6 @@ private:
     void requestDownloadFile(QString remote_filename);
     void updateControlSensitivities();
     int selectedBookmarkIndex();
-    void enableBookmarkButtons();
     ServerTypes::Bookmark here();
     void handleErrorMessage(ErrorMessage::ErrorType type, QString msg);
 

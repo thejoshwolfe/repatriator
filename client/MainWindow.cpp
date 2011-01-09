@@ -23,8 +23,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_bytes_done(0),
     m_bytes_total(0),
     m_expected_download_count(0),
-    m_current_sensitivity(1.0f)
+    m_current_sensitivity(1.0f),
+    m_motor_states(5)
 {
+    for (int i = 0; i < 5; i++)
+        m_motor_states.replace(i, false);
+
     ui->setupUi(this);
 
     this->setCentralWidget(ui->displayWidget);
@@ -58,8 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i <= ui->sensitivitySlider->maximum(); i++)
         m_sensitivities.replace(i, 1.0f - i * percent_delta);
     ui->sensitivitySlider->setValue(0);
-
-    enableBookmarkButtons();
 
     bool success;
     success = connect(ui->displayWidget, SIGNAL(focusPointChanged(QPointF)), this, SLOT(sendFocusPoint(QPointF)));
@@ -234,20 +236,15 @@ void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
     enableCorrectControls();
 }
 
-void MainWindow::updateShadowPosition(ShadowSlider * slider, qint8 motor_state, qint64 motor_position)
-{
-    slider->setEnabled((bool)motor_state);
-    slider->setShadowPosition((int)motor_position);
-}
-
 void MainWindow::updateShadowPositions(QVector<qint8> motor_states, QVector<qint64> motor_positions)
 {
-    updateShadowPosition(ui->orbitSliderA, motor_states.at(0), motor_positions.at(0));
-    updateShadowPosition(ui->orbitSliderB, motor_states.at(1), motor_positions.at(1));
-    updateShadowPosition(ui->liftSliderZ, motor_states.at(4), motor_positions.at(4));
+    m_motor_states = motor_states;
+    ui->orbitSliderA->setShadowPosition((int)motor_positions.at(0));
+    ui->orbitSliderB->setShadowPosition((int)motor_positions.at(1));
+    ui->liftSliderZ->setShadowPosition((int)motor_positions.at(4));
 
-    ui->shadowMinimap->setEnabled((bool)motor_states.at(2) && (bool)(motor_states.at(3)));
     ui->shadowMinimap->setShadowPosition(QPoint((int)motor_positions.at(2), (int)motor_positions.at(3)));
+
 }
 
 void MainWindow::saveFile(QByteArray blob, QString remote_filename)
@@ -293,21 +290,29 @@ void MainWindow::showProgress(qint64 bytes_done, qint64 bytes_total, IncomingMes
 
 void MainWindow::enableCorrectControls()
 {
-    bool an_item_exists = ui->picturesList->count() > 0;
-    ui->actionDownloadAllAndQuit->setEnabled(an_item_exists);
-    ui->actionSelectAll->setEnabled(an_item_exists);
-
-    bool an_item_is_selected = ui->picturesList->selectedItems().count() > 0;
-    ui->actionDownload->setEnabled(an_item_is_selected);
-    ui->actionDiscardSelectedFiles->setEnabled(an_item_is_selected);
-
     bool server_connected = ! m_server.isNull() && (m_server.data()->loginStatus() == ServerTypes::Success);
+    bool pictures_list_nonempty = ui->picturesList->count() > 0;
+    bool a_picture_is_selected = ui->picturesList->selectedItems().count() > 0;
+    bool a_bookmark_is_selected = ui->bookmarksList->selectedItems().count() > 0;
+
     ui->actionTakeSnapshot->setEnabled(server_connected);
     ui->snapshotButton->setEnabled(server_connected);
-    ui->shadowMinimap->setEnabled(server_connected);
-    ui->liftSliderZ->setEnabled(server_connected);
-    ui->orbitSliderA->setEnabled(server_connected);
-    ui->orbitSliderB->setEnabled(server_connected);
+    ui->newBookmarkButton->setEnabled(server_connected);
+
+    ui->actionDownloadAllAndQuit->setEnabled(pictures_list_nonempty && server_connected);
+    ui->actionSelectAll->setEnabled(pictures_list_nonempty && server_connected);
+
+    ui->actionDownload->setEnabled(a_picture_is_selected && server_connected);
+    ui->actionDiscardSelectedFiles->setEnabled(a_picture_is_selected && server_connected);
+
+    ui->shadowMinimap->setEnabled(server_connected && m_motor_states.at(2) && m_motor_states.at(3));
+    ui->liftSliderZ->setEnabled(server_connected && m_motor_states.at(4));
+    ui->orbitSliderA->setEnabled(server_connected && m_motor_states.at(0));
+    ui->orbitSliderB->setEnabled(server_connected && m_motor_states.at(1));
+
+    ui->goToBookmarkButton->setEnabled(server_connected && a_bookmark_is_selected);
+    ui->editBookmarkButton->setEnabled(server_connected && a_bookmark_is_selected);
+    ui->deleteBookmarkButton->setEnabled(server_connected && a_bookmark_is_selected);
 }
 
 void MainWindow::on_snapshotButton_clicked()
@@ -606,16 +611,7 @@ int MainWindow::selectedBookmarkIndex()
 
 void MainWindow::on_bookmarksList_itemSelectionChanged()
 {
-    enableBookmarkButtons();
-}
-
-void MainWindow::enableBookmarkButtons()
-{
-    int index = selectedBookmarkIndex();
-    bool any_selection = index != -1;
-    ui->goToBookmarkButton->setEnabled(any_selection);
-    ui->editBookmarkButton->setEnabled(any_selection);
-    ui->deleteBookmarkButton->setEnabled(any_selection);
+    enableCorrectControls();
 }
 
 void MainWindow::on_bookmarkHereButton_clicked()
