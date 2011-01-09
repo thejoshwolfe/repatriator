@@ -567,24 +567,43 @@ def run_init_camera():
                     debug("Unable to find camera, giving up.")
                     return
             else:
-                global camera
-                camera = cam
+                debug("Found camera")
 
-                def takePictureCallback(pic_file):
-                    debug("got picture callback")
-                    # create a thumbnail
-                    make_thumbnail(pic_file, pic_file+".thumb", 90)
-                    # notify change
-                    send_directory_list()
-                camera.setPictureCompleteCallback(takePictureCallback)
+                cam.setMeteringMode(edsdk.MeteringMode.SpotMetering)
+                cam.setAFMode(edsdk.AFMode.ManualFocus)
+                cam.setDriveMode(edsdk.DriveMode.SingleFrameShooting)
 
-                camera.setMeteringMode(edsdk.MeteringMode.SpotMetering)
-                camera.setAFMode(edsdk.AFMode.ManualFocus)
-                camera.setDriveMode(edsdk.DriveMode.SingleFrameShooting)
+                def firstPicCallback(trash):
+                    def takePictureCallback(pic_file):
+                        debug("got picture callback")
+                        # create a thumbnail
+                        make_thumbnail(pic_file, pic_file+".thumb", 90)
+                        # notify change
+                        send_directory_list()
+                    cam.setPictureCompleteCallback(takePictureCallback)
+                    global camera
+                    camera = cam
 
-                global live_view_thread
-                live_view_thread = make_thread(run_live_view_thread, "live_view")
-                live_view_thread.start()
+                    global live_view_thread
+                    live_view_thread = make_thread(run_live_view_thread, "live_view")
+                    live_view_thread.start()
+                cam.setPictureCompleteCallback(firstPicCallback)
+
+                def incantation():
+                    debug("starting incantation")
+                    time.sleep(0.5)
+                    debug("incantation start live view")
+                    cam.startLiveView()
+                    time.sleep(0.5)
+                    debug("incantation grab live view frame")
+                    cam.grabLiveViewFrame()
+                    time.sleep(0.5)
+                    debug("incantation auto focus")
+                    cam.autoFocus()
+                    time.sleep(0.5)
+                    debug("incantation take picture")
+                    cam.takePicture(os.path.join(settings['DATA_FOLDER'], 'trash.jpg'))
+                make_thread(incantation, "incantation").start()
 
         edsdk.getFirstCamera(found_camera)
 

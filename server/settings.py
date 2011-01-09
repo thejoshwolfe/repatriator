@@ -79,7 +79,7 @@ settings = {
 
     # how many seconds to wait for a message from the client
     # before giving up and closing the connection
-    'CLIENT_IDLE_TIMEOUT': 10,
+    'CLIENT_IDLE_TIMEOUT': 15,
     # motors never take longer than this number of seconds to make one motion
     'MOTOR_MOVEMENT_TIMEOUT': 60,
 }
