@@ -23,7 +23,6 @@ SOURCES += main.cpp \
     Connector.cpp \
     ShadowMinimap.cpp \
     ShadowSlider.cpp \
-    Rotate3DWidget.cpp \
     ImageDisplayWidget.cpp \
     EditBookmarkDialog.cpp \
     ChangePasswordDialog.cpp
@@ -44,7 +43,6 @@ HEADERS += MainWindow.h \
     MetaTypes.h \
     ShadowMinimap.h \
     ShadowSlider.h \
-    Rotate3DWidget.h \
     ImageDisplayWidget.h \
     EditBookmarkDialog.h \
     ChangePasswordDialog.h
