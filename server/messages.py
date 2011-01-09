@@ -372,29 +372,30 @@ class DirectoryListingResult(ServerMessage):
 
     def _serialize(self):
         file_list = [os.path.join(self.folder_path, f) for f in os.listdir(self.folder_path) if f.endswith('.jpg')]
-        buf = bytearray()
-        buf.extend(struct.pack(">i", len(file_list)))
+
+        # do the race condition stuff without generating raw data
+        data = []
         for file_path in file_list:
             try:
                 file_size = os.path.getsize(file_path)
                 path, filename = os.path.split(file_path)
-                buf.extend(struct.pack(">q", file_size))
-                buf.extend(struct.pack(">i", len(filename)))
-                buf.extend(filename.encode('utf8'))
-
-                try:
-                    thumb_path = file_path + ".thumb"
-                    thumb_size = os.path.getsize(thumb_path)
-                    with open(thumb_path, "rb") as f:
-                        buf.extend(struct.pack(">q", thumb_size))
-                        buf.extend(f.read())
-                except (OSError, IOError):
-                    buf.extend(struct.pack(">q", 0))
-                    error("error accessing thumbnail for {0}".format(file_path))
+                thumb_path = file_path + ".thumb"
+                thumb_size = os.path.getsize(thumb_path)
+                with open(thumb_path, "rb") as f:
+                    thumb_data = f.read()
+                data.append((file_size, filename, thumb_data))
             except (OSError, IOError):
-                buf.extend(struct.pack(">q", 0))
-                buf.extend(struct.pack(">i", 0))
-                error("error getting file size for {0}".format(file_path))
+                pass
+
+        # now that we got the dangerous stuff over with, we build the message
+        buf = bytearray()
+        buf.extend(struct.pack(">i", len(data)))
+        for file_size, filename, thumb_data in data:
+            buf.extend(struct.pack(">q", file_size))
+            buf.extend(struct.pack(">i", len(filename)))
+            buf.extend(filename.encode('utf8'))
+            buf.extend(struct.pack(">q", len(thumb_data)))
+            buf.extend(thumb_data)
             
         return buf
 
