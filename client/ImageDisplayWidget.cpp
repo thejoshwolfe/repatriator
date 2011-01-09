@@ -7,7 +7,8 @@ ImageDisplayWidget::ImageDisplayWidget(QWidget *parent) :
     m_currentFrame(),
     m_videoMutex(),
     m_focusPoint(0.5f, 0.5f),
-    m_focusSize(1, 1)
+    m_focusSize(1, 1),
+    m_frameDrawLocation(0, 0)
 {
     this->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     this->setAutoFillBackground(false);
@@ -39,20 +40,16 @@ void ImageDisplayWidget::paintEvent(QPaintEvent *)
 
     QRectF widgetSize = this->rect();
 
-    bool frame_null = true;
-    if (m_videoMutex.tryLock()) {
-        float x = widgetSize.width() / 2 - m_currentFrame.width() / 2;
-        float y = widgetSize.height() / 2 - m_currentFrame.height() / 2;
-        painter.fillRect(widgetSize, Qt::black);
-        frame_null = m_currentFrame.isNull();
-        if (!frame_null)
-            painter.drawPixmap(x, y, m_currentFrame);
-        m_videoMutex.unlock();
-    }
+    m_videoMutex.lock();
+    painter.fillRect(widgetSize, Qt::black);
+    bool frame_null = m_currentFrame.isNull();
+    if (!frame_null)
+        painter.drawPixmap(m_frameDrawLocation, m_currentFrame);
+    m_videoMutex.unlock();
 
     if (! frame_null) {
-        QRect focus_rect(m_focusPoint.x()*this->rect().width()-m_focusSize.width()/2,
-                         m_focusPoint.y()*this->rect().height()-m_focusSize.height()/2,
+        QRect focus_rect(m_focusPoint.x()*widgetSize.width()-m_focusSize.width()/2,
+                         m_focusPoint.y()*widgetSize.height()-m_focusSize.height()/2,
                          m_focusSize.width(), m_focusSize.height());
         painter.setPen(QPen(Qt::white, 3));
         painter.drawRect(focus_rect);
@@ -75,6 +72,9 @@ void ImageDisplayWidget::scaleCurrentFrame()
 
     m_currentFrame = m_currentFrame.scaled(this->rect().size(), Qt::KeepAspectRatio);
     m_focusSize = m_currentFrame.size() / 5.0f;
+    QRectF widgetSize = this->rect();
+    m_frameDrawLocation = QPoint(widgetSize.width() / 2 - m_currentFrame.width() / 2,
+                                  widgetSize.height() / 2 - m_currentFrame.height() / 2);
 }
 
 void ImageDisplayWidget::setFocusPoint(QPointF point)
@@ -91,8 +91,10 @@ void ImageDisplayWidget::mousePressEvent(QMouseEvent * e)
 void ImageDisplayWidget::mouseMoveEvent(QMouseEvent *e)
 {
     if (e->buttons() & Qt::LeftButton) {
-        m_focusPoint.setX(e->x() / (float)this->rect().width());
-        m_focusPoint.setY(e->y() / (float)this->rect().height());
+        m_videoMutex.lock();
+        m_focusPoint.setX((e->x() - m_frameDrawLocation.x()) / (float)m_currentFrame.size().width());
+        m_focusPoint.setY((e->y() - m_frameDrawLocation.y()) / (float)m_currentFrame.size().height());
+        m_videoMutex.unlock();
         update();
         e->accept();
     }

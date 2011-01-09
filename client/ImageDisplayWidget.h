@@ -35,6 +35,7 @@ private:
     QMutex m_videoMutex;
     QPointF m_focusPoint; // percent
     QSize m_focusSize;
+    QPoint m_frameDrawLocation;
 
 private:
     void scaleCurrentFrame();
