@@ -102,12 +102,18 @@ void ShadowMinimap::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
     case Qt::Key_Left:
-        break;
     case Qt::Key_Right:
-        break;
     case Qt::Key_Up:
-        break;
     case Qt::Key_Down:
+        QPoint delta = m_sensitivity * (this->maxPosition() - this->minPosition()) / 10.0f;
+        switch(e->key()){
+        case Qt::Key_Left: m_position.rx() -= delta.x(); break;
+        case Qt::Key_Right: m_position.rx() += delta.x(); break;
+        case Qt::Key_Up: m_position.ry() -= delta.y(); break;
+        case Qt::Key_Down: m_position.ry() += delta.y(); break;
+        }
+        setPosition(m_position);
+        emit positionChosen(m_position);
         break;
     }
 }
@@ -137,7 +143,8 @@ void ShadowMinimap::paintEvent(QPaintEvent *)
     QPainter p(this);
 
     // border
-    p.setPen(QPen(Qt::lightGray, borderWidth));
+    Qt::GlobalColor border_color = this->hasFocus() ? Qt::blue : Qt::lightGray;
+    p.setPen(QPen(border_color, borderWidth));
     p.drawRect(borderWidth / 2, borderWidth / 2, this->width() - borderWidth, this->height() - borderWidth);
 
     // shadow

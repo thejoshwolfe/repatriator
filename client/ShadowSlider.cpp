@@ -14,6 +14,7 @@ ShadowSlider::ShadowSlider(QWidget *parent) :
 {
     this->setTracking(false);
     this->setMouseTracking(true);
+    setSensitivity(m_sensitivity);
 }
 
 void ShadowSlider::mousePressEvent(QMouseEvent * e)
@@ -64,6 +65,12 @@ void ShadowSlider::mouseReleaseEvent(QMouseEvent * e)
     e->accept();
 }
 
+void ShadowSlider::keyPressEvent(QKeyEvent *ev)
+{
+    QSlider::keyPressEvent(ev);
+    emit valueChanged(this->value());
+}
+
 void ShadowSlider::paintEvent(QPaintEvent * ev)
 {
     QSlider::paintEvent(ev);
@@ -97,6 +104,7 @@ void ShadowSlider::setShadowPosition(int value)
 void ShadowSlider::setSensitivity(float sensitivity)
 {
     m_sensitivity = sensitivity;
+    this->setSingleStep(m_sensitivity * (this->maximum() - this->minimum()) / 10);
 }
 
 float ShadowSlider::pixelsPerPosition() const
