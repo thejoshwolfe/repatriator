@@ -64,6 +64,15 @@ private:
 
     QVector<qint8> m_motor_states;
 
+    struct Compensation {
+        float value;
+        QString label;
+        Compensation() {}
+        Compensation(float value, QString label) : value(value), label(label) {}
+    };
+
+    QVector<Compensation> m_compensation_values;
+
 private:
     void cleanup();
     void enableCorrectControls();
@@ -88,6 +97,7 @@ private:
 
 
 private slots:
+    void on_exposureCompensationSlider_valueChanged(int value);
     void on_actionChangePassword_triggered();
     void on_editBookmarkButton_clicked();
     void on_deleteBookmarkButton_clicked();

@@ -26,6 +26,7 @@ class ClientMessage:
     SetStaticBookmarks = 14
     SetUserBookmarks = 15
     ChangeFocusLocation = 16
+    ExposureCompensation = 17
 
     class ParseError(Exception):
         pass
@@ -217,6 +218,11 @@ class ChangeFocusLocation(ClientMessage):
     def parse(self):
         self.focus_x = self._parse_float32()
         self.focus_y = self._parse_float32()
+
+__all__.append('ExposureCompensation')
+class ExposureCompensation(ClientMessage):
+    def parse(self):
+        self.value = self._parse_float32()
 
 __all__.append('ServerMessage')
 class ServerMessage:
@@ -495,5 +501,6 @@ ClientMessage.TypeForId = {
     ClientMessage.SetStaticBookmarks: SetStaticBookmarks,
     ClientMessage.SetUserBookmarks: SetUserBookmarks,
     ClientMessage.ChangeFocusLocation: ChangeFocusLocation,
+    ClientMessage.ExposureCompensation: ExposureCompensation,
 }
 

@@ -412,6 +412,12 @@ def handle_ChangeFocusLocation(msg):
         if auto_focus_enabled:
             camera.autoFocus()
 
+@must_have_privilege(Privilege.OperateHardware)
+def handle_ExposureCompensation(msg):
+    if camera is not None:
+        debug("Setting exposure compensation to {0}".format(msg.value))
+        camera.setExposureCompensation(msg.value)
+
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,
     ClientMessage.ConnectionRequest: handle_ConnectionRequest,

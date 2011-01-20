@@ -194,6 +194,35 @@
        </item>
       </layout>
      </item>
+     <item>
+      <widget class="QLabel" name="exposureCompensationLabel">
+       <property name="text">
+        <string>E&amp;xposure Compensation: 0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="buddy">
+        <cstring>exposureCompensationSlider</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="exposureCompensationSlider">
+       <property name="maximum">
+        <number>24</number>
+       </property>
+       <property name="value">
+        <number>12</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksAbove</enum>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -234,7 +263,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">

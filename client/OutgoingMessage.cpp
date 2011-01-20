@@ -109,3 +109,9 @@ void ChangeFocusLocationMessage::writeMessageBody(QDataStream &stream)
     stream << (float) pt.x();
     stream << (float) pt.y();
 }
+
+void ExposureCompensationMessage::writeMessageBody(QDataStream &stream)
+{
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream << (float) value;
+}

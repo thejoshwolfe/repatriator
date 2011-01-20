@@ -35,6 +35,7 @@ protected:
         SetStaticBookmarks = 14,
         SetUserBookmarks = 15,
         ChangeFocusLocation = 16,
+        ExposureCompensation = 17,
     };
 
     // serialize
@@ -239,6 +240,16 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream &stream);
     virtual MessageCode type() const { return ChangeFocusLocation; }
+};
+
+class ExposureCompensationMessage : public OutgoingMessage
+{
+public:
+    float value;
+    ExposureCompensationMessage(float value) : value(value) {}
+protected:
+    virtual void writeMessageBody(QDataStream &stream);
+    virtual MessageCode type() const { return ExposureCompensation; }
 };
 
 #endif // OUTGOING_MESSAGE_H

@@ -24,10 +24,37 @@ MainWindow::MainWindow(QWidget *parent) :
     m_bytes_total(0),
     m_expected_download_count(0),
     m_current_sensitivity(1.0f),
-    m_motor_states(5)
+    m_motor_states(5),
+    m_compensation_values(25)
 {
     for (int i = 0; i < 5; i++)
         m_motor_states.replace(i, false);
+
+    m_compensation_values.replace(24, Compensation(3.0f, tr("3")));
+    m_compensation_values.replace(23, Compensation(2.0f+2.0f/3.0f, tr("2 2/3")));
+    m_compensation_values.replace(22, Compensation(2.0f+1.0f/2.0f, tr("2 1/2")));
+    m_compensation_values.replace(21, Compensation(2.0f+1.0f/3.0f, tr("2 1/3")));
+    m_compensation_values.replace(20, Compensation(2.0f, tr("2")));
+    m_compensation_values.replace(19, Compensation(1.0f+2.0f/3.0f, tr("1 2/3")));
+    m_compensation_values.replace(18, Compensation(1.0f+1.0f/2.0f, tr("1 1/2")));
+    m_compensation_values.replace(17, Compensation(1.0f+1.0f/3.0f, tr("1 1/3")));
+    m_compensation_values.replace(16, Compensation(1.0f, tr("1")));
+    m_compensation_values.replace(15, Compensation(2.0f/3.0f, tr("2/3")));
+    m_compensation_values.replace(14, Compensation(1.0f/2.0f, tr("1/2")));
+    m_compensation_values.replace(13, Compensation(1.0f/3.0f, tr("1/3")));
+    m_compensation_values.replace(12, Compensation(0.0f, tr("0")));
+    m_compensation_values.replace(11, Compensation(-1.0f/3.0f, tr("-1/3")));
+    m_compensation_values.replace(10, Compensation(-1.0f/2.0f, tr("-1/2")));
+    m_compensation_values.replace(9, Compensation(-2.0f/3.0f, tr("-2/3")));
+    m_compensation_values.replace(8, Compensation(-1.0f, tr("-1")));
+    m_compensation_values.replace(7, Compensation(-1.0f-1.0f/3.0f, tr("-1 1/3")));
+    m_compensation_values.replace(6, Compensation(-1.0f-1.0f/2.0f, tr("-1 1/2")));
+    m_compensation_values.replace(5, Compensation(-1.0f-2.0f/3.0f, tr("-1 2/3")));
+    m_compensation_values.replace(4, Compensation(-2.0f, tr("-2")));
+    m_compensation_values.replace(3, Compensation(-2.0f-1.0f/3.0f, tr("-2 1/3")));
+    m_compensation_values.replace(2, Compensation(-2.0f-1.0f/2.0f, tr("-2 1/2")));
+    m_compensation_values.replace(1, Compensation(-2.0f-2.0f/3.0f, tr("-2 2/3")));
+    m_compensation_values.replace(0, Compensation(-3.0f, tr("-3")));
 
     ui->setupUi(this);
 
@@ -692,4 +719,12 @@ void MainWindow::on_actionChangePassword_triggered()
     if (! result.accepted)
         return;
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ChangePasswordRequestMessage(result.old_password, result.new_password)));
+}
+
+void MainWindow::on_exposureCompensationSlider_valueChanged(int value)
+{
+    Compensation comp = m_compensation_values.at(value);
+    ui->exposureCompensationLabel->setText(tr("E&xposure Compensation: %1").arg(comp.label));
+
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ExposureCompensationMessage(comp.value)));
 }
