@@ -436,6 +436,7 @@ message_handlers = {
     ClientMessage.SetStaticBookmarks: handle_SetStaticBookmarks,
     ClientMessage.SetUserBookmarks: handle_SetUserBookmarks,
     ClientMessage.ChangeFocusLocation: handle_ChangeFocusLocation,
+    ClientMessage.ExposureCompensation: handle_ExposureCompensation,
 }
 
 def init_state():
