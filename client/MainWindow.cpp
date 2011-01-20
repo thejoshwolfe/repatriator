@@ -201,7 +201,7 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
 
             m_user_bookmarks = init_info_msg->user_bookmarks;
             ui->bookmarksList->clear();
-            foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
+            foreach (ServerTypes::Bookmark bookmark, *getSupposedUserBookmarks())
                 ui->bookmarksList->addItem(bookmark.name);
 
             ServerTypes::Bookmark home_location = getHomeLocationFromBookmarks(init_info_msg->static_bookmarks);
@@ -225,6 +225,17 @@ void MainWindow::handleErrorMessage(ErrorMessage::ErrorType type, QString msg)
         break;
     }
 }
+
+bool MainWindow::isAdmin()
+{
+    return ((ConnectionResultMessage*)m_server.data()->connectionResultMessage().data())->permissions.contains(ServerTypes::ManageUsers);
+}
+
+QList<ServerTypes::Bookmark> * MainWindow::getSupposedUserBookmarks()
+{
+    return isAdmin() ? & m_static_bookmarks : & m_user_bookmarks;
+}
+
 
 void MainWindow::updateDirectoryList(QList<ServerTypes::DirectoryItem> items)
 {
@@ -492,8 +503,9 @@ bool MainWindow::maybeSetSlider(ShadowSlider *slider, qint64 motor_position)
 
 void MainWindow::refreshLocations(bool save)
 {
-    foreach (QObject * child, ui->locationsLayout->children())
-        delete child;
+    foreach (QPushButton * location_button, m_location_buttons)
+        delete location_button;
+    m_location_buttons.clear();
     for (int i = 0; i < m_static_bookmarks.size(); i++) {
         ServerTypes::Bookmark bookmark = m_static_bookmarks.at(i);
         int readable_index = i + 1;
@@ -505,6 +517,7 @@ void MainWindow::refreshLocations(bool save)
         bool success = connect(location_button, SIGNAL(clicked()), this, SLOT(location_button_clicked()));
         Q_ASSERT(success);
         ui->locationsLayout->addWidget(location_button);
+        m_location_buttons.append(location_button);
     }
 
     enableCorrectControls();
@@ -527,7 +540,10 @@ void MainWindow::location_button_clicked()
 
 void MainWindow::saveBookmarks()
 {
-    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetUserBookmarksMessage(m_user_bookmarks)));
+    if (isAdmin())
+        refreshLocations(true);
+    else
+        m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetUserBookmarksMessage(m_user_bookmarks)));
 }
 
 ServerTypes::Bookmark MainWindow::getHomeLocationFromBookmarks(QList<ServerTypes::Bookmark> bookmarks)
@@ -602,7 +618,7 @@ void MainWindow::on_goToBookmarkButton_clicked()
     int index = selectedBookmarkIndex();
     if (index == -1)
         return;
-    goToBookmark(m_user_bookmarks.at(index));
+    goToBookmark(getSupposedUserBookmarks()->at(index));
 }
 
 int MainWindow::selectedBookmarkIndex()
@@ -621,7 +637,7 @@ void MainWindow::on_bookmarkHereButton_clicked()
 {
     ServerTypes::Bookmark new_bookmark = newBookmarkHere();
 
-    m_user_bookmarks.append(new_bookmark);
+    getSupposedUserBookmarks()->append(new_bookmark);
     ui->bookmarksList->addItem(new_bookmark.name);
 
     saveBookmarks();
@@ -633,7 +649,7 @@ void MainWindow::on_deleteBookmarkButton_clicked()
     if (index == -1)
         return;
 
-    m_user_bookmarks.removeAt(index);
+    getSupposedUserBookmarks()->removeAt(index);
     delete ui->bookmarksList->item(index);
 
     saveBookmarks();
@@ -650,11 +666,11 @@ void MainWindow::on_editBookmarkButton_clicked()
     if (index == -1)
         return;
 
-    ServerTypes::Bookmark bookmark = m_user_bookmarks.at(index);
+    ServerTypes::Bookmark bookmark = getSupposedUserBookmarks()->at(index);
     if (!EditBookmarkDialog::showEdit(&bookmark, here()))
         return;
 
-    m_user_bookmarks.replace(index, bookmark);
+    getSupposedUserBookmarks()->replace(index, bookmark);
     ui->bookmarksList->item(index)->setText(bookmark.name);
 
     saveBookmarks();
@@ -680,7 +696,7 @@ ServerTypes::Bookmark MainWindow::newBookmarkHere()
 
     // determin a name for the new bookmark
     QSet<QString> existing_names;
-    foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
+    foreach (ServerTypes::Bookmark bookmark, *getSupposedUserBookmarks())
         existing_names.insert(bookmark.name);
     for (int number = 1; ; number++) {
         QString name = tr("Bookmark ") + QString::number(number);
@@ -708,7 +724,7 @@ void MainWindow::on_newBookmarkButton_clicked()
     if (!EditBookmarkDialog::showEdit(&new_bookmark, here()))
         return;
 
-    m_user_bookmarks.append(new_bookmark);
+    getSupposedUserBookmarks()->append(new_bookmark);
     ui->bookmarksList->addItem(new_bookmark.name);
 
     saveBookmarks();
