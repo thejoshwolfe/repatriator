@@ -138,6 +138,8 @@ void MainWindow::connected()
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new DirectoryListingRequestMessage()));
 
     enableCorrectControls();
+
+    ui->bookmarksDock->setWindowTitle(isAdmin() ? "Edit Locations" : "Bookmarks");
 }
 
 void MainWindow::connectionFailure(Connector::FailureReason reason)
