@@ -57,6 +57,7 @@ private:
 
     QList<ServerTypes::Bookmark> m_static_bookmarks;
     QList<ServerTypes::Bookmark> m_user_bookmarks;
+    QList<QPushButton *> m_location_buttons;
 
     static const float c_lowest_sensitivity;
     QVector<float> m_sensitivities;
@@ -93,11 +94,14 @@ private:
     void updateControlSensitivities();
     int selectedBookmarkIndex();
     ServerTypes::Bookmark here();
+    ServerTypes::Bookmark newBookmarkHere();
     void handleErrorMessage(ErrorMessage::ErrorType type, QString msg);
-
+    QList<ServerTypes::Bookmark> * getSupposedUserBookmarks();
+    bool isAdmin();
 
 private slots:
     void on_exposureCompensationSlider_valueChanged(int value);
+    void on_newBookmarkButton_clicked();
     void on_actionChangePassword_triggered();
     void on_editBookmarkButton_clicked();
     void on_deleteBookmarkButton_clicked();

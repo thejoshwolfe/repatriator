@@ -38,6 +38,16 @@ private:
     static qint64 textToMotorPosition(QString text);
 
 private slots:
+    void on_ignoreButtonZ_clicked();
+    void on_ignoreButtonY_clicked();
+    void on_ignoreButtonX_clicked();
+    void on_ignoreButtonB_clicked();
+    void on_ignoreButtonA_clicked();
+    void on_hereButtonZ_clicked();
+    void on_hereButtonY_clicked();
+    void on_hereButtonX_clicked();
+    void on_hereButtonB_clicked();
+    void on_hereButtonA_clicked();
     void handleRejected();
     void handleAccepted();
 

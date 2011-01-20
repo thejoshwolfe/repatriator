@@ -120,3 +120,14 @@ qint64 EditBookmarkDialog::textToMotorPosition(QString text)
     qint64 result = text.toLongLong(&success);
     return success ? result : ServerTypes::MotorPositionNotSpecified;
 }
+
+void EditBookmarkDialog::on_hereButtonA_clicked() { ui->motorLineEditA->setText(motorPositionToText(m_here.motor_positions.at(0))); }
+void EditBookmarkDialog::on_hereButtonB_clicked() { ui->motorLineEditB->setText(motorPositionToText(m_here.motor_positions.at(1))); }
+void EditBookmarkDialog::on_hereButtonX_clicked() { ui->motorLineEditX->setText(motorPositionToText(m_here.motor_positions.at(2))); }
+void EditBookmarkDialog::on_hereButtonY_clicked() { ui->motorLineEditY->setText(motorPositionToText(m_here.motor_positions.at(3))); }
+void EditBookmarkDialog::on_hereButtonZ_clicked() { ui->motorLineEditZ->setText(motorPositionToText(m_here.motor_positions.at(4))); }
+void EditBookmarkDialog::on_ignoreButtonA_clicked() { ui->motorLineEditA->setText("-"); }
+void EditBookmarkDialog::on_ignoreButtonB_clicked() { ui->motorLineEditB->setText("-"); }
+void EditBookmarkDialog::on_ignoreButtonX_clicked() { ui->motorLineEditX->setText("-"); }
+void EditBookmarkDialog::on_ignoreButtonY_clicked() { ui->motorLineEditY->setText("-"); }
+void EditBookmarkDialog::on_ignoreButtonZ_clicked() { ui->motorLineEditZ->setText("-"); }
