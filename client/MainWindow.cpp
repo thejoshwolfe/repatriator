@@ -619,19 +619,7 @@ void MainWindow::on_bookmarksList_itemSelectionChanged()
 
 void MainWindow::on_bookmarkHereButton_clicked()
 {
-    ServerTypes::Bookmark new_bookmark = here();
-
-    // determin a name for the new bookmark
-    QSet<QString> existing_names;
-    foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
-        existing_names.insert(bookmark.name);
-    for (int number = 1; ; number++) {
-        QString name = tr("Bookmark ") + QString::number(number);
-        if (existing_names.contains(name))
-            continue;
-        new_bookmark.name = name;
-        break;
-    }
+    ServerTypes::Bookmark new_bookmark = newBookmarkHere();
 
     m_user_bookmarks.append(new_bookmark);
     ui->bookmarksList->addItem(new_bookmark.name);
@@ -686,10 +674,42 @@ ServerTypes::Bookmark MainWindow::here()
     return bookmark;
 }
 
+ServerTypes::Bookmark MainWindow::newBookmarkHere()
+{
+    ServerTypes::Bookmark new_bookmark = here();
+
+    // determin a name for the new bookmark
+    QSet<QString> existing_names;
+    foreach (ServerTypes::Bookmark bookmark, m_user_bookmarks)
+        existing_names.insert(bookmark.name);
+    for (int number = 1; ; number++) {
+        QString name = tr("Bookmark ") + QString::number(number);
+        if (existing_names.contains(name))
+            continue;
+        new_bookmark.name = name;
+        break;
+    }
+
+    return new_bookmark;
+}
+
 void MainWindow::on_actionChangePassword_triggered()
 {
     ChangePasswordDialog::Result result = ChangePasswordDialog::instance()->showChangePassword();
     if (! result.accepted)
         return;
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new ChangePasswordRequestMessage(result.old_password, result.new_password)));
+}
+
+void MainWindow::on_newBookmarkButton_clicked()
+{
+    ServerTypes::Bookmark new_bookmark = newBookmarkHere();
+
+    if (!EditBookmarkDialog::showEdit(&new_bookmark, here()))
+        return;
+
+    m_user_bookmarks.append(new_bookmark);
+    ui->bookmarksList->addItem(new_bookmark.name);
+
+    saveBookmarks();
 }

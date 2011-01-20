@@ -84,10 +84,12 @@ private:
     void updateControlSensitivities();
     int selectedBookmarkIndex();
     ServerTypes::Bookmark here();
+    ServerTypes::Bookmark newBookmarkHere();
     void handleErrorMessage(ErrorMessage::ErrorType type, QString msg);
 
 
 private slots:
+    void on_newBookmarkButton_clicked();
     void on_actionChangePassword_triggered();
     void on_editBookmarkButton_clicked();
     void on_deleteBookmarkButton_clicked();
