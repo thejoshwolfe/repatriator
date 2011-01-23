@@ -775,7 +775,17 @@ def run_motors():
                 motor.stoppedMovingHandlers.remove(done_initializing_handler)
                 motor_is_initialized[char] = True
             motor.stoppedMovingHandlers.append(done_initializing_handler)
-            motor.fullInit()
+            debug("motor init message: " + repr(motor._generateFullInitCommandList()))
+            if char == "B":
+                debug("special initializeation for motor B")
+                time.sleep(2)
+                motor.initializeMotorSettings()
+                time.sleep(2)
+                motor.initializeSmoothMotion()
+                time.sleep(2)
+                motor.initializeCoordinates()
+            else:
+                motor.fullInit()
             # wait for initialization
             debug("waiting for motor " + repr(char) + " to initialize")
             for _ in range(settings['MOTOR_MOVEMENT_TIMEOUT']):
