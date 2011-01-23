@@ -204,7 +204,7 @@ except IOError as ex:
         motor_z_max = 500000
         return {
             'static_bookmarks': [
-                ["Home", [0, 0, motor_xy_max / 2, motor_xy_max / 2, 0], 1],
+                ["Home", [0, 0, motor_xy_max // 2, motor_xy_max // 2, 0], 1],
             ],
             'motor_bounds': [
                 [0, motor_a_max],
