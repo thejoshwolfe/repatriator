@@ -36,6 +36,7 @@ protected:
         SetUserBookmarks = 15,
         ChangeFocusLocation = 16,
         ExposureCompensation = 17,
+        SetMotorBounds = 18,
     };
 
     // serialize
@@ -250,6 +251,16 @@ public:
 protected:
     virtual void writeMessageBody(QDataStream &stream);
     virtual MessageCode type() const { return ExposureCompensation; }
+};
+
+class SetMotorBoundsMessage : public OutgoingMessage
+{
+public:
+    QVector<ServerTypes::MotorBoundaries> bounds;
+    SetMotorBoundsMessage(QVector<ServerTypes::MotorBoundaries> bounds) : bounds(bounds) {}
+protected:
+    virtual void writeMessageBody(QDataStream &stream);
+    virtual MessageCode type() const { return SetMotorBounds; }
 };
 
 #endif // OUTGOING_MESSAGE_H

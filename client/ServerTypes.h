@@ -56,6 +56,13 @@ namespace ServerTypes {
         SetOff = 2,
     };
 
+    struct MotorBoundaries {
+        qint64 min;
+        qint64 max;
+        MotorBoundaries() {}
+        MotorBoundaries(qint64 min, qint64 max) : min(min), max(max) {}
+    };
+
     const qint64 MotorPositionNotSpecified = -0x8000000000000000;
     struct Bookmark
     {

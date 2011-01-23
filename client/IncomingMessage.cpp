@@ -120,7 +120,7 @@ void ListUserResultMessage::parse(QDataStream &stream)
 void InitInfoMessage::parse(QDataStream & stream)
 {
     for (int i = 0; i < 5; i++) {
-        MotorBoundaries bounds;
+        ServerTypes::MotorBoundaries bounds;
         stream >> bounds.min;
         stream >> bounds.max;
         motor_boundaries.append(bounds);
