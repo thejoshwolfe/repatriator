@@ -40,7 +40,7 @@ PasswordInputWindow * PasswordInputWindow::instance()
     return s_instance;
 }
 
-QString PasswordInputWindow::showGetPassword(QString dialog_title, QString ok_text, QString username)
+PasswordInputWindow::Result PasswordInputWindow::showGetPassword(QString dialog_title, QString ok_text, QString username)
 {
     this->setWindowTitle(dialog_title);
 
@@ -48,19 +48,24 @@ QString PasswordInputWindow::showGetPassword(QString dialog_title, QString ok_te
     ui->buttonBox->addButton(ok_text, QDialogButtonBox::AcceptRole);
     ui->buttonBox->addButton(QDialogButtonBox::Cancel);
 
-    ui->usernameLabel->setText(username);
+    ui->usernameLineEdit->setText(username);
     ui->passwordLineEdit->setText("");
-    ui->passwordLineEdit->setFocus(Qt::OtherFocusReason);
+    if (username.isEmpty())
+        ui->usernameLineEdit->setFocus(Qt::OtherFocusReason);
+    else
+        ui->passwordLineEdit->setFocus(Qt::OtherFocusReason);
     this->exec();
-    return m_return_password;
+    return m_return_result;
 }
 
 void PasswordInputWindow::handleAccepted()
 {
-    m_return_password = ui->passwordLineEdit->text();
+    m_return_result.username = ui->usernameLineEdit->text();
+    m_return_result.password = ui->passwordLineEdit->text();
 }
 
 void PasswordInputWindow::handleRejected()
 {
-    m_return_password = QString();
+    m_return_result.username = QString();
+    m_return_result.password = QString();
 }

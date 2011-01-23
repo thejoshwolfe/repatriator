@@ -18,11 +18,13 @@ void Connector::go()
 
     QString password = m_server.data()->connectionSettings()->password;
     if (password.isEmpty()) {
-        password = PasswordInputWindow::instance()->showGetPassword(tr("Authentication Required"), tr("&Login"), m_server.data()->connectionSettings()->username);
+        PasswordInputWindow::Result result = PasswordInputWindow::instance()->showGetPassword(tr("Authentication Required"), tr("&Login"), m_server.data()->connectionSettings()->username);
+        password = result.password;
         if (password.isNull()) {
             emit failure(Cancelled);
             return;
         }
+        m_server.data()->setUsername(result.username);
     }
 
     m_server.data()->setPassword(password);

@@ -15,6 +15,10 @@ class ConnectionWindow : public QDialog
 public:
     static ConnectionWindow * instance();
 
+    // handling a custom url protocol like
+    // repatriator://repatriator.asu.edu:57051 or something like that.
+    void handleUrl(QString url);
+
 protected:
     void changeEvent(QEvent *e);
     void showEvent(QShowEvent *);

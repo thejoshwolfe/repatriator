@@ -27,6 +27,7 @@ public:
     ~Server();
 
     void setPassword(QString password);
+    void setUsername(QString username);
     void setNeedHardware(bool need_hardware);
 
     // returns the ConnectionResultMessage that the server gave upon connection
