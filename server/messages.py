@@ -27,6 +27,7 @@ class ClientMessage:
     SetUserBookmarks = 15
     ChangeFocusLocation = 16
     ExposureCompensation = 17
+    SetMotorBounds = 18
 
     class ParseError(Exception):
         pass
@@ -223,6 +224,14 @@ __all__.append('ExposureCompensation')
 class ExposureCompensation(ClientMessage):
     def parse(self):
         self.value = self._parse_float32()
+
+__all__.append('SetMotorBounds')
+class SetMotorBounds(ClientMessage):
+    def parse(self):
+        self.motor_bounds = []
+        for _ in range(5):
+            self.motor_bounds.append([self._parse_int64(), self._parse_int64()])
+
 
 __all__.append('ServerMessage')
 class ServerMessage:
@@ -502,5 +511,6 @@ ClientMessage.TypeForId = {
     ClientMessage.SetUserBookmarks: SetUserBookmarks,
     ClientMessage.ChangeFocusLocation: ChangeFocusLocation,
     ClientMessage.ExposureCompensation: ExposureCompensation,
+    ClientMessage.SetMotorBounds: SetMotorBounds,
 }
 

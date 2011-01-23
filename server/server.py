@@ -199,10 +199,10 @@ def handle_ConnectionRequest(msg):
         return
 
     debug("Successful login for user " + msg.username)
-    motor_boundaries = [[settings['MOTOR_%s_%s' % (char, setting_name)] for setting_name in ("MIN", "MAX")] for char in motor_chars]
+    motor_bounds = admin.motor_bounds()
     server.send_message(ConnectionResult(ConnectionResult.Success, this_protocol_version, user.privileges()))
     if msg.hardware_flag:
-        server.send_message(InitializationInformation(motor_boundaries, admin.static_bookmarks(), user.bookmarks()))
+        server.send_message(InitializationInformation(motor_bounds, admin.static_bookmarks(), user.bookmarks()))
 
     if msg.hardware_flag:
         initialize_hardware()
@@ -418,6 +418,11 @@ def handle_ExposureCompensation(msg):
         debug("Setting exposure compensation to {0}".format(msg.value))
         camera.setExposureCompensation(msg.value)
 
+@must_have_privilege(Privilege.ManageUsers)
+def handle_SetMotorBounds(msg):
+    debug("Setting motor bounds to {}".format(msg.motor_bounds))
+    admin.set_motor_bounds(msg.motor_bounds)
+
 message_handlers = {
     ClientMessage.MagicalRequest: handle_MagicalRequest,
     ClientMessage.ConnectionRequest: handle_ConnectionRequest,
@@ -437,6 +442,7 @@ message_handlers = {
     ClientMessage.SetUserBookmarks: handle_SetUserBookmarks,
     ClientMessage.ChangeFocusLocation: handle_ChangeFocusLocation,
     ClientMessage.ExposureCompensation: handle_ExposureCompensation,
+    ClientMessage.SetMotorBounds: handle_SetMotorBounds,
 }
 
 def init_state():
@@ -649,12 +655,17 @@ def on_connection_close():
 
     # send motors home
     if motors is not None:
-        for char, motor in motors.items():
+        # leave A alone
+        # send B to its min so that it's upright
+        motor_b = motors['B']
+        motor_b_home = admin.motor_bounds()[1][0]
+        debug("sending motor " + repr(motor_b.name) + " home to " + repr(motor_b_home))
+        # send X, Y, Z to 0
+        for char in "XYZ":
+            motor = motors[char]
             motor.stoppedMovingHandlers.remove(motorStoppedMovingHandler)
-            end_position = settings['MOTOR_%s_END_POSITION' % char]
-            if end_position is not None:
-                debug("sending motor " + repr(motor.name) + " home to " + repr(end_position))
-                move_motor(motor, end_position)
+            debug("sending motor " + repr(motor.name) + " home to 0")
+            move_motor(motor, 0)
 
     # clean up
     global finished
@@ -722,6 +733,7 @@ def initialize_hardware():
 
 def run_motors():
     def create_motor(char):
+        index = motor_chars.index(char)
         motor = silverpak.Silverpak()
         motor.baudRate = settings['MOTOR_%s_BAUD_RATE' % char]
         motor.driverAddress = settings['MOTOR_%s_DRIVER_ADDRESS' % char]
@@ -729,7 +741,7 @@ def run_motors():
         motor.enablePositionCorrection = settings['MOTOR_%s_ENABLE_POSITION_CORRECTION' % char]
         motor.velocity = settings['MOTOR_%s_VELOCITY' % char]
         motor.acceleration = settings['MOTOR_%s_ACCELERATION' % char]
-        motor.maxPosition = settings['MOTOR_%s_MAX' % char]
+        motor.maxPosition = admin.motor_bounds()[index][1]
         if settings['MOTOR_%s_FAKE' % char]:
             motor.setFake()
         motor.name = char
