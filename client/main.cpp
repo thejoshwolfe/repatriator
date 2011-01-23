@@ -11,6 +11,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    a.setApplicationName("RepatriatorClient");
+    a.setApplicationVersion("1.0.0");
+
     // warn if can't find jpeg plugin
     bool support_jpeg = QImageReader::supportedImageFormats().contains("jpg") ||
                         QImageReader::supportedImageFormats().contains("jpeg");

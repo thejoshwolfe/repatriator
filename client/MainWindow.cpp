@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QApplication>
 
 MainWindow * MainWindow::s_instance = NULL;
 const float MainWindow::c_lowest_sensitivity = 0.01f;
@@ -781,4 +782,10 @@ void MainWindow::on_actionChang_Motor_Bounds_triggered()
     m_motor_bounds = tmp_bounds;
     updateMotorBoundsWidgets();
     m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetMotorBoundsMessage(m_motor_bounds)));
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this, tr("About RepatriatorClient"),
+        tr("Version %1\n\nby Andrew Kelley and Josh Wolfe").arg(QApplication::instance()->applicationVersion()));
 }

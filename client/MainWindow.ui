@@ -263,7 +263,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -298,10 +298,17 @@
      <string>&amp;View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="fileMenu"/>
    <addaction name="menuSe_ttings"/>
    <addaction name="menu_Camera"/>
    <addaction name="viewMenu"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QDockWidget" name="bookmarksDock">
    <property name="windowTitle">
@@ -467,6 +474,14 @@
   <action name="actionChang_Motor_Bounds">
    <property name="text">
     <string>Chang &amp;Motor Bounds...</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>&amp;About RepatriatorClient...</string>
+   </property>
+   <property name="toolTip">
+    <string>Version information, etc</string>
    </property>
   </action>
  </widget>

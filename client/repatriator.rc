@@ -1,8 +1,8 @@
 IDI_ICON1   ICON    DISCARDABLE     "resource/bug.ico"
 
 1 VERSIONINFO
-FILEVERSION 0,0,0,0
-PRODUCTVERSION 0,0,0,0
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
 FILEOS 0x4
 FILETYPE 0x1
 {
@@ -12,12 +12,12 @@ FILETYPE 0x1
         {
             VALUE "CompanyName", "SuperWolfe"
             VALUE "FileDescription", "Repatriator"
-            VALUE "FileVersion", "0.0.0.0"
+            VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "repatriator_exe"
             VALUE "LegalCopyright", "Copyright (C) 2011 SuperWolfe."
             VALUE "OriginalFilename", "repatriator.exe"
             VALUE "ProductName", "Repatriator"
-            VALUE "ProductVersion", "0.0.0.0"
+            VALUE "ProductVersion", "1.0.0.0"
             VALUE "CompanyShortName", "SuperWolfe"
             VALUE "ProductShortName", "Repatriator"
             VALUE "Official Build", "0"
