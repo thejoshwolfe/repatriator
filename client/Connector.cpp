@@ -2,6 +2,7 @@
 
 #include "PasswordInputWindow.h"
 #include "IncomingMessage.h"
+#include "Settings.h"
 
 #include <QMessageBox>
 
@@ -25,6 +26,9 @@ void Connector::go()
             return;
         }
         m_server.data()->setUsername(result.username);
+        // this makes it a nice flow if you're first clicking an URL link
+        if (m_server.data()->connectionSettings()->username.isEmpty())
+            Settings::save();
     }
 
     m_server.data()->setPassword(password);
