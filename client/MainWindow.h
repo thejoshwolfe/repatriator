@@ -55,6 +55,7 @@ private:
 
     QHash<QString, ServerTypes::DirectoryItem> m_file_info;
 
+    QVector<ServerTypes::MotorBoundaries> m_motor_bounds;
     QList<ServerTypes::Bookmark> m_static_bookmarks;
     QList<ServerTypes::Bookmark> m_user_bookmarks;
     QList<QPushButton *> m_location_buttons;
@@ -82,7 +83,7 @@ private:
     void saveFile(QByteArray blob, QString remote_filename);
     bool checkDownloadDirectory();
     void sendTargetMotorPositions();
-    void changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> motor_boundaries, ServerTypes::Bookmark home_location);
+    void updateMotorBoundsWidgets();
     void refreshLocations(bool save);
     void saveBookmarks();
     ServerTypes::Bookmark getHomeLocationFromBookmarks(QList<ServerTypes::Bookmark> bookmarks);
@@ -100,6 +101,7 @@ private:
     bool isAdmin();
 
 private slots:
+    void on_actionChang_Motor_Bounds_triggered();
     void on_exposureCompensationSlider_valueChanged(int value);
     void on_newBookmarkButton_clicked();
     void on_actionChangePassword_triggered();

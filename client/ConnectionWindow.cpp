@@ -5,10 +5,12 @@
 #include "AdminWindow.h"
 #include "MainWindow.h"
 #include "PasswordInputWindow.h"
-#include "ConnectionSettings.h"
 #include "Settings.h"
+#include "ConnectionSettings.h"
 
 #include <QDebug>
+#include <QMessageBox>
+#include <QUrl>
 
 ConnectionWindow * ConnectionWindow::s_instance = NULL;
 
@@ -228,3 +230,42 @@ void ConnectionWindow::handleAccepted()
         refreshConnections();
     }
 }
+
+void ConnectionWindow::handleUrl(QString url_string)
+{
+    QUrl url(url_string);
+
+    if (! url.isValid() || url.scheme() != "repatriator") {
+        QMessageBox::warning(this, tr("Invalid URL"), tr("Unable to connect to %1: Invalid URL.").arg(url_string));
+        return;
+    }
+
+    ConnectionSettings * new_conn = new ConnectionSettings;
+
+    new_conn->host = url.host();
+    new_conn->password = url.password();
+    new_conn->port = url.port(57051);
+    new_conn->username = url.userName();
+
+    // if the url already exists, try to connect to the first saved one.
+    // if a username is specified, it must be the same username.
+    for (int i = 0; i < Settings::connections.count(); i++) {
+        ConnectionSettings * conn = Settings::connections.at(i);
+        if (conn->host.compare(new_conn->host, Qt::CaseInsensitive) == 0 && (new_conn->username.isEmpty() || conn->username == new_conn->username)) {
+            // use this connection
+            ui->connectionTable->selectRow(i);
+            this->accept();
+            delete new_conn;
+            return;
+        }
+    }
+
+    // otherwise create a new connection with this information, save it, and connect.
+    Settings::connections.append(new_conn);
+    Settings::save();
+
+    refreshConnections();
+    ui->connectionTable->selectRow(Settings::connections.count()-1);
+    this->accept();
+}
+

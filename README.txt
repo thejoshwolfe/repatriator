@@ -20,8 +20,9 @@ client:
 The client is cross-platform using the Qt framework and uses network
 communication to interact with the server.
 
+See docs/index.html for setup instructions.
 
 
-TODO: reference gentleface.com for the bug icons
+Thanks to gentleface.com for the bug icon.
 
 

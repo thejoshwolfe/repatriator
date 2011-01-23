@@ -115,3 +115,11 @@ void ExposureCompensationMessage::writeMessageBody(QDataStream &stream)
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
     stream << (float) value;
 }
+
+void SetMotorBoundsMessage::writeMessageBody(QDataStream &stream)
+{
+    foreach (ServerTypes::MotorBoundaries bound, bounds) {
+        stream << bound.min;
+        stream << bound.max;
+    }
+}

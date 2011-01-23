@@ -5,6 +5,7 @@
 #include "Settings.h"
 #include "EditBookmarkDialog.h"
 #include "ChangePasswordDialog.h"
+#include "EditMotorBoundsDialog.h"
 
 #include <QFile>
 #include <QDir>
@@ -166,7 +167,9 @@ void MainWindow::connected()
 
     enableCorrectControls();
 
-    ui->bookmarksDock->setWindowTitle(isAdmin() ? "Edit Locations" : "Bookmarks");
+    bool is_admin = isAdmin();
+    ui->bookmarksDock->setWindowTitle(is_admin ? "Edit Locations" : "Bookmarks");
+    ui->actionChang_Motor_Bounds->setVisible(is_admin);
 }
 
 void MainWindow::connectionFailure(Connector::FailureReason reason)
@@ -234,7 +237,10 @@ void MainWindow::processMessage(QSharedPointer<IncomingMessage> msg)
                 ui->bookmarksList->addItem(bookmark.name);
 
             ServerTypes::Bookmark home_location = getHomeLocationFromBookmarks(init_info_msg->static_bookmarks);
-            changeMotorBounds(init_info_msg->motor_boundaries, home_location);
+            m_motor_bounds = init_info_msg->motor_boundaries;
+            updateMotorBoundsWidgets();
+            goToBookmark(home_location);
+            sendFocusPoint(ui->displayWidget->focusPoint());
             break;
         }
         default:
@@ -463,26 +469,23 @@ void MainWindow::on_orbitSliderA_valueChanged(int)
     sendTargetMotorPositions();
 }
 
-void MainWindow::changeMotorBounds(QVector<InitInfoMessage::MotorBoundaries> bounds, ServerTypes::Bookmark home_location)
+void MainWindow::updateMotorBoundsWidgets()
 {
     blockSliderSignals(true);
 
-    ui->orbitSliderA->setMinimum((int)bounds.at(0).min);
-    ui->orbitSliderA->setMaximum((int)bounds.at(0).max);
+    ui->orbitSliderA->setMinimum((int)m_motor_bounds.at(0).min);
+    ui->orbitSliderA->setMaximum((int)m_motor_bounds.at(0).max);
 
-    ui->orbitSliderB->setMinimum((int)bounds.at(1).min);
-    ui->orbitSliderB->setMaximum((int)bounds.at(1).max);
+    ui->orbitSliderB->setMinimum((int)m_motor_bounds.at(1).min);
+    ui->orbitSliderB->setMaximum((int)m_motor_bounds.at(1).max);
 
-    ui->shadowMinimap->setMinPosition(QPoint((int)bounds.at(2).min, (int)bounds.at(3).min));
-    ui->shadowMinimap->setMaxPosition(QPoint((int)bounds.at(2).max, (int)bounds.at(3).max));
+    ui->shadowMinimap->setMinPosition(QPoint((int)m_motor_bounds.at(2).min, (int)m_motor_bounds.at(3).min));
+    ui->shadowMinimap->setMaxPosition(QPoint((int)m_motor_bounds.at(2).max, (int)m_motor_bounds.at(3).max));
 
-    ui->liftSliderZ->setMinimum(bounds.at(4).min);
-    ui->liftSliderZ->setMaximum(bounds.at(4).max);
+    ui->liftSliderZ->setMinimum(m_motor_bounds.at(4).min);
+    ui->liftSliderZ->setMaximum(m_motor_bounds.at(4).max);
 
     blockSliderSignals(false);
-
-    goToBookmark(home_location);
-    sendFocusPoint(ui->displayWidget->focusPoint());
 }
 
 void MainWindow::goToBookmark(ServerTypes::Bookmark bookmark)
@@ -765,4 +768,17 @@ void MainWindow::on_newBookmarkButton_clicked()
     ui->bookmarksList->addItem(new_bookmark.name);
 
     saveBookmarks();
+}
+
+void MainWindow::on_actionChang_Motor_Bounds_triggered()
+{
+    Q_ASSERT(isAdmin());
+
+    QVector<ServerTypes::MotorBoundaries> tmp_bounds = m_motor_bounds;
+    if (!EditMotorBoundsDialog::showEdit(&tmp_bounds, here()))
+        return;
+
+    m_motor_bounds = tmp_bounds;
+    updateMotorBoundsWidgets();
+    m_server.data()->sendMessage(QSharedPointer<OutgoingMessage>(new SetMotorBoundsMessage(m_motor_bounds)));
 }

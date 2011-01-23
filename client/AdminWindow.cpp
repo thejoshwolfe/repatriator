@@ -173,12 +173,13 @@ void AdminWindow::on_changePasswordButton_clicked()
 
     QSharedPointer<DetailedUserInfo> user = m_users.value(username);
 
-    QString new_password = PasswordInputWindow::instance()->showGetPassword(tr("Change Password"), tr("&OK"), user.data()->username);
+    PasswordInputWindow::Result result = PasswordInputWindow::instance()->showGetPassword(tr("Change Password"), tr("&OK"), user.data()->username);
 
-    if (new_password.isEmpty())
+    if (result.password.isEmpty())
         return;
 
-    user.data()->password = new_password;
+    user.data()->password = result.password;
+    user.data()->username = result.username;
     user.data()->changed_status = DetailedUserInfo::Updated;
 }
 

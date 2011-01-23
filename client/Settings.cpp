@@ -1,5 +1,7 @@
 #include "Settings.h"
 #include <QSettings>
+#include <QCoreApplication>
+#include <QDir>
 
 const char * Settings::settings_file = "repatriator.ini";
 QSettings * Settings::settings = NULL;
@@ -83,7 +85,8 @@ void Settings::initialize()
 {
     if (settings)
         return;
-    settings = new QSettings(settings_file, QSettings::IniFormat);
+    QDir dir(QCoreApplication::applicationDirPath());
+    settings = new QSettings(dir.absoluteFilePath(settings_file), QSettings::IniFormat);
 
     connection_column_width.resize(3);
 }

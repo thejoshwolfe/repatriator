@@ -263,7 +263,7 @@
      <x>0</x>
      <y>0</y>
      <width>646</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -291,6 +291,7 @@
     </property>
     <addaction name="actionChangeDownloadFolder"/>
     <addaction name="actionChangePassword"/>
+    <addaction name="actionChang_Motor_Bounds"/>
    </widget>
    <widget class="QMenu" name="viewMenu">
     <property name="title">
@@ -461,6 +462,11 @@
    </property>
    <property name="toolTip">
     <string>Change the password you use to log in to this server</string>
+   </property>
+  </action>
+  <action name="actionChang_Motor_Bounds">
+   <property name="text">
+    <string>Chang &amp;Motor Bounds...</string>
    </property>
   </action>
  </widget>

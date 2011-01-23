@@ -228,6 +228,11 @@ void Server::setPassword(QString password)
     m_password = password;
 }
 
+void Server::setUsername(QString username)
+{
+    m_connection_info.username = username;
+}
+
 void Server::setNeedHardware(bool need_hardware)
 {
     m_hardware = need_hardware;

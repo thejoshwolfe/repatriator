@@ -311,6 +311,20 @@ Messages:
             int64 - byte count of the entire message including this field
             float32 (IEEE 754) - new exposure compensation value
 
+        SetMotorBounds
+            int8 - the type of this message (enum value 18)
+            int64 - byte count of the entire message including this field (always 89)
+            int64 - motor A min
+            int64 - motor A max
+            int64 - motor B min
+            int64 - motor B max
+            int64 - motor X min
+            int64 - motor X max
+            int64 - motor Y min
+            int64 - motor Y max
+            int64 - motor Z min
+            int64 - motor Z max
+
     Common:
 
         Bookmark:

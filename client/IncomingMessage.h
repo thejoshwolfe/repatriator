@@ -130,12 +130,7 @@ public:
 class InitInfoMessage : public IncomingMessage
 {
 public:
-    struct MotorBoundaries {
-        qint64 min;
-        qint64 max;
-    };
-
-    QVector<MotorBoundaries> motor_boundaries;
+    QVector<ServerTypes::MotorBoundaries> motor_boundaries;
     QList<ServerTypes::Bookmark> static_bookmarks;
     QList<ServerTypes::Bookmark> user_bookmarks;
 

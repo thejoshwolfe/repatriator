@@ -24,5 +24,8 @@ int main(int argc, char *argv[])
     MetaTypes::registerMetaTypes();
     Settings::load();
     ConnectionWindow::instance()->show();
+    QStringList args = a.arguments();
+    if (args.count() == 2)
+        ConnectionWindow::instance()->handleUrl(args.at(1));
     return a.exec();
 }

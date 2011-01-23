@@ -130,7 +130,7 @@ def login(username, password):
 
 def add_user(username, password, privileges):
     """
-    can raise UserAlreadyExists. returns nothing.
+    can raise UserAlreadyExists. saves to file. returns nothing.
     """
     if username in list_users():
         raise UserAlreadyExists
@@ -168,6 +168,15 @@ def set_static_bookmarks(bookmarks):
     _config_data['static_bookmarks'] = bookmarks
     _save_json()
 
+def motor_bounds():
+    return _config_data['motor_bounds']
+def set_motor_bounds(bounds):
+    """
+    saves to file
+    """
+    _config_data['motor_bounds'] = bounds
+    _save_json()
+
 _config_file = os.path.join(settings['DATA_FOLDER'], "config.json")
 _build_path(settings['DATA_FOLDER'])
 _lock = threading.Lock()
@@ -178,6 +187,7 @@ try:
             _config_data = json.loads(f.read())
             # check roots
             static_bookmarks()
+            motor_bounds()
             users = list_users()
             # make sure at least one user exists
             if len(users) == 0:
@@ -187,9 +197,25 @@ try:
             raise IOError
 except IOError as ex:
     # initialize brand new database
-    _config_data = {
-        'static_bookmarks': [],
-        'users': {},
-    }
+    def _make_default_config_data():
+        motor_a_max = 242000 * 2
+        motor_b_max = 10000
+        motor_xy_max = 150000
+        motor_z_max = 500000
+        return {
+            'static_bookmarks': [
+                ["Home", [0, 0, motor_xy_max // 2, motor_xy_max // 2, 0], 1],
+            ],
+            'motor_bounds': [
+                [0, motor_a_max],
+                [0, motor_b_max],
+                [0, motor_xy_max],
+                [0, motor_xy_max],
+                [0, motor_z_max],
+            ],
+            'users': {},
+        }
+    _config_data = _make_default_config_data()
+    # add default admin and save
     add_user("default_admin", "temp1234", [Privilege.ManageUsers])
 
