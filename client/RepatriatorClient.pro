@@ -56,3 +56,4 @@ FORMS += MainWindow.ui \
     ChangePasswordDialog.ui
 RESOURCES += repatriator.qrc
 RC_FILE = repatriator.rc
+ICON = resource/bug.icns
