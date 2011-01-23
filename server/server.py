@@ -587,6 +587,8 @@ def run_init_camera():
                 cam.setDriveMode(edsdk.DriveMode.SingleFrameShooting)
 
                 def firstPicCallback(trash):
+                    os.remove(trash)
+
                     def takePictureCallback(pic_file):
                         debug("got picture callback")
                         # create a thumbnail
