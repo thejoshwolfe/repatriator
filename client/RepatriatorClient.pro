@@ -59,3 +59,4 @@ FORMS += MainWindow.ui \
     EditMotorBoundsDialog.ui
 RESOURCES += repatriator.qrc
 RC_FILE = repatriator.rc
+ICON = resource/bug.icns

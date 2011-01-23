@@ -101,6 +101,7 @@ private:
     bool isAdmin();
 
 private slots:
+    void on_actionAbout_triggered();
     void on_actionChang_Motor_Bounds_triggered();
     void on_exposureCompensationSlider_valueChanged(int value);
     void on_newBookmarkButton_clicked();
