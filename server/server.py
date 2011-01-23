@@ -742,6 +742,8 @@ def run_motors():
         motor.velocity = settings['MOTOR_%s_VELOCITY' % char]
         motor.acceleration = settings['MOTOR_%s_ACCELERATION' % char]
         motor.maxPosition = admin.motor_bounds()[index][1]
+        if not settings['MOTOR_%s_SET_HOLDING_CURRENT']:
+            motor.holdingCurrent = None
         if settings['MOTOR_%s_FAKE' % char]:
             motor.setFake()
         motor.name = char

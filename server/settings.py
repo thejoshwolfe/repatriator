@@ -23,6 +23,7 @@ settings = {
     'MOTOR_A_DRIVER_ADDRESS': 9,    # used to identify the motor on the serial port
     'MOTOR_A_ENABLE_LIMIT_SWITCHES': False,
     'MOTOR_A_ENABLE_POSITION_CORRECTION': False,
+    'MOTOR_A_SET_HOLDING_CURRENT': True,
     'MOTOR_A_FAKE': False,          # use debug motor which does not use real hardware
 
     'MOTOR_B_BAUD_RATE': 9600,
@@ -30,7 +31,8 @@ settings = {
     'MOTOR_B_ACCELERATION': 50,
     'MOTOR_B_DRIVER_ADDRESS': 7,
     'MOTOR_B_ENABLE_LIMIT_SWITCHES': True,
-    'MOTOR_B_ENABLE_POSITION_CORRECTION': True,
+    'MOTOR_B_ENABLE_POSITION_CORRECTION': False,
+    'MOTOR_B_SET_HOLDING_CURRENT': False,
     'MOTOR_B_FAKE': False,
 
     'MOTOR_X_BAUD_RATE': 9600,
@@ -39,6 +41,7 @@ settings = {
     'MOTOR_X_DRIVER_ADDRESS': 3,
     'MOTOR_X_ENABLE_LIMIT_SWITCHES': True,
     'MOTOR_X_ENABLE_POSITION_CORRECTION': True,
+    'MOTOR_X_SET_HOLDING_CURRENT': True,
     'MOTOR_X_FAKE': False,
 
     'MOTOR_Y_BAUD_RATE': 9600,
@@ -47,6 +50,7 @@ settings = {
     'MOTOR_Y_DRIVER_ADDRESS': 5,
     'MOTOR_Y_ENABLE_LIMIT_SWITCHES': True,
     'MOTOR_Y_ENABLE_POSITION_CORRECTION': True,
+    'MOTOR_Y_SET_HOLDING_CURRENT': True,
     'MOTOR_Y_FAKE': False,
 
     'MOTOR_Z_BAUD_RATE': 9600,
@@ -55,6 +59,7 @@ settings = {
     'MOTOR_Z_DRIVER_ADDRESS': 1,
     'MOTOR_Z_ENABLE_LIMIT_SWITCHES': True,
     'MOTOR_Z_ENABLE_POSITION_CORRECTION': True,
+    'MOTOR_Z_SET_HOLDING_CURRENT': True,
     'MOTOR_Z_FAKE': False,
 
     # how many seconds to wait for a message from the client
