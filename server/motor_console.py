@@ -10,7 +10,6 @@ def createA():
     motor = silverpak.Silverpak()
     motor.baudRate = 9600
     motor.driverAddress = 9
-    motor.fancy = False
     motor.velocity = 150000
     motor.acceleration = 500
     motor.maxPosition = 242000 * 2
@@ -24,12 +23,12 @@ def createB():
     motor.driverAddress = 7
     motor.maxPosition = 10000
     motor.id = "b"
-    # motor.fancy = False
     motor.velocity = 4000
     motor.acceleration = 5
     motor.motorPolarity = 1
-    motor.holdingCurrent = 5
+    motor.holdingCurrent = None
     motor.runningCurrent = 75
+    motor.enablePositionCorrection = False
     return motor
 
 def createXYZ():
@@ -74,6 +73,17 @@ def main(options):
         motor.stoppedMovingHandlers.append(stoppedMoving)
         motor.connectionLostHandlers.append(connectionLost)
 
+        print("motor init command: " + repr(motor._generateFullInitCommandList()))
+        if options.init != None:
+            print("initing after a second or two...")
+            import time
+            time.sleep(options.init)
+            motor.initializeMotorSettings()
+            time.sleep(options.init)
+            motor.initializeSmoothMotion()
+            time.sleep(options.init)
+            motor.initializeCoordinates()
+
         if options.raw:
             print("entering raw mode")
             while True:
@@ -90,6 +100,8 @@ def fancyConsole():
     while True:
         line = input(">>> ")
         if line.strip() == "":
+            continue
+        if line.strip().startswith("#"):
             continue
         call = not line.startswith(" ")
         if line.startswith("-"):
@@ -151,6 +163,7 @@ if __name__ == "__main__":
     parser.add_option("-d", "--driverAddress", type=int, help="integer in the range 0-15")
     parser.add_option("-r", "--raw", action="store_true", default=False, help="raw communication mode")
     parser.add_option("-t", "--preset", help="see the mapping 'presets' in this module")
+    parser.add_option("-i", "--init", type=float, metavar="TIMEOUT", help="initialize automatically with TIMEOUT seconds of timing")
     (options, args) = parser.parse_args()
 
     main(options)
