@@ -33,6 +33,12 @@ Section "RepatriatorClient (required)"
     CreateDirectory "$INSTDIR\imageformats"
     File "/oname=imageformats\qjpeg4.dll" "imageformats\qjpeg4.dll"
 
+    ; custom URL protocol handler
+    WriteRegStr HKCR "repatriator" "" "URL:Repatriator Protocol Handler"
+    WriteRegStr HKCR "repatriator" "URL Protocol" "repatriator"
+    WriteRegStr HKCR "repatriator\DefaultIcon" "" "$INSTDIR\RepatriatorClient.exe"
+    WriteRegStr HKCR "repatriator\shell\open\command" "" '$INSTDIR\RepatriatorClient.exe "%1"'
+
     ; write the installation path into the registry
     WriteRegStr HKLM SOFTWARE\RepatriatorClient "Install_Dir" "$INSTDIR"
 
@@ -59,6 +65,7 @@ Section "Uninstall"
     ; Remove registry keys
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RepatriatorClient"
     DeleteRegKey HKLM SOFTWARE\RepatriatorClient
+    DeleteRegKey HKCR "repatriator"
 
     ; Remove files and uninstaller
     Delete "$INSTDIR\*.*"
