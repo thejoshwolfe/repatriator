@@ -5,7 +5,7 @@
 <body>
     <h1>Installing and Configuring the Server</h1>
     <p>
-    by <a href="mailto:superjoe30@gmail.com">Andrew Kelley</a> on Jan 22 2011
+    by <a href="mailto:superjoe30@gmail.com">Andrew Kelley</a> last updated on Jan 31 2011
     </p>
     <ol>
         <li>Build the computer according to the <a href="hardware.html">hardware docs</a>.</li>
@@ -93,21 +93,45 @@ password: temp1234</pre></li>
         </li>
         <li>Configure the motor boundaries and locations
             <ol>
-                <li>Using the RepatriatorClient program, use your admin
-                account and connect with the Login button.
-                This is a different interface than you see when you log
-                in with a non-admin account.
+                <li>
+                    Using the RepatriatorClient program, use your admin
+                    account and connect with the Login button.
+                    This is a different interface than you see when you log
+                    in with a non-admin account.
                 </li>
-                <li>Configure the boundaries
+                <li>Configure the boundaries. Do this for all 5 motors.
                     <ol>
-                        <li>Carefully adjust the lift location until it is 
-                        as high as you ever want it to go. Press the button
-                        to save this boundary. Carefully adjust it until it
-                        is as low as you ever want it to go. Press the button
-                        to save this boundary.
+                        <li>
+                            Go to "Settings" -&gt; "Change Motor Bounds" and
+                            adjust the motor limits. If there is
+                            no "Change Motor Bounds" option, then you're not
+                            logged in as an admin. Click OK.
                         </li>
-                        <li>Repeat for the X-Y stage motors, and both orbit
-                        motors.</li>
+                        <li>
+                            Try out the new bounds by dragging the motors all
+                            the way to the right. If a motor is still not going
+                            far enough, go back a step and adjust it again.
+                            If you configure it too high, you'll see that the
+                            actual position doesn't get all the way to the
+                            intended position on the slider.
+                        </li>
+                        <li>Make sure that the minimum bound for the Tilt motor
+                        is pointing  straight up at the camera.</li>
+                    </ol>
+                    Don't worry about breaking anything; the physical limit
+                    switches will always kick in and prevent anything from
+                    going wrong. Changing the velocity can be dangerous,
+                    however, so be careful.
+                </li>
+                <li>Centering the hardware
+                    <ol>
+                        <li>Once your motor bounds are set up correctly, move
+                        all of the motors to what looks like the center. Your
+                        specimen might not actually be in the center right now,
+                        and this is what we are correcting.
+                        </li>
+                        <li>Physically move the hardware so that the specimen
+                        shows up in the center of your screen.</li>
                     </ol>
                 </li>
                 <li>Configure the locations. These are bookmark buttons that
@@ -115,7 +139,10 @@ password: temp1234</pre></li>
                     <ol>
                         <li>There must be at least one Location, and the first
                         one must be called "Home". This is where the machine
-                        moves to just after starting up and initializing.</li>
+                        moves to just after starting up and initializing.
+                        This should be the center point that you just
+                        configured.
+                        </li>
                         <li>Create any more locations that you want, for example
                         if you have a ruler or label location.</li>
                     </ol>
