@@ -72,6 +72,7 @@ private:
     void enableCorrectControls();
 
 private slots:
+    void on_adminPrivilegesCheckBox_toggled(bool checked);
     void on_newButton_clicked();
     void on_deleteButton_clicked();
     void on_usersList_itemSelectionChanged();

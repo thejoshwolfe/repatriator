@@ -180,7 +180,8 @@ void AdminWindow::on_changePasswordButton_clicked()
 
     user.data()->password = result.password;
     user.data()->username = result.username;
-    user.data()->changed_status = DetailedUserInfo::Updated;
+    if (user.data()->changed_status == DetailedUserInfo::Unchanged)
+        user.data()->changed_status = DetailedUserInfo::Updated;
 }
 
 void AdminWindow::on_usersList_itemSelectionChanged()
@@ -263,4 +264,22 @@ void AdminWindow::on_newButton_clicked()
 
     ui->usersList->addItem(user.data()->username);
     ui->usersList->setCurrentRow(ui->usersList->count() - 1);
+}
+
+void AdminWindow::on_adminPrivilegesCheckBox_toggled(bool checked)
+{
+    Q_ASSERT(ui->usersList->selectedItems().count() == 1);
+
+    QString username = ui->usersList->selectedItems().at(0)->text();
+    Q_ASSERT(! username.isEmpty());
+
+    QSharedPointer<DetailedUserInfo> user = m_users.value(username);
+
+    if (checked)
+        user.data()->permissions.insert(ServerTypes::ManageUsers);
+    else
+        user.data()->permissions.remove(ServerTypes::ManageUsers);
+
+    if (user.data()->changed_status == DetailedUserInfo::Unchanged)
+        user.data()->changed_status = DetailedUserInfo::Updated;
 }
